@@ -5,6 +5,7 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
+    site: "https://lacorte.city",
     integrations: [tailwind(), sitemap(), mdx()],
     markdown: {
         shikiConfig: {
