@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lacorte.city/sitemap.xml
+Sitemap: https://lacorte.city/sitemap-index.xml
