@@ -9,12 +9,12 @@ export const SITE: Site = {
 
 export const HOME: Metadata = {
     TITLE: "Home",
-    DESCRIPTION: "A backend developer",
+    DESCRIPTION: "A backend developer personal website :D",
 };
 
 export const BLOG: Metadata = {
     TITLE: "Blog",
-    DESCRIPTION: "A collection of my thoughts and experiences.",
+    DESCRIPTION: "Things i write about computers.",
 };
 
 export const SKILLS: Skill[] = [
