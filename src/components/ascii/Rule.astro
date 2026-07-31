@@ -1,0 +1,30 @@
+---
+/**
+ * A section heading that reads as a terminal separator:
+ *
+ *   FOCUS ─────────────────────────────────────────────── 4 areas
+ *
+ * `as` keeps the heading level correct per page rather than hard-coding
+ * one — the old blog index shipped year labels as <div>s and no <h1> at all.
+ */
+type Props = {
+    label: string;
+    note?: string;
+    as?: "h1" | "h2" | "h3" | "div";
+    id?: string;
+};
+
+const { label, note, as: Tag = "h2", id } = Astro.props as Props;
+---
+
+<Tag class="rule" id={id}>
+    {label}
+    {note && <span class="rule-note">{note}</span>}
+</Tag>
+
+<style>
+    /* The note sits after the flexible rule, so order matters. */
+    .rule-note {
+        order: 3;
+    }
+</style>

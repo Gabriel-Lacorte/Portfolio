@@ -1,80 +1,187 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
-import Container from "@components/Container.astro";
-import { SITE, HOME, SOCIALS, SKILLS } from "@consts";
-import Link from "@components/Link.astro";
+import Banner from "@components/ascii/Banner.astro";
+import Frame from "@components/ascii/Frame.astro";
+import Leaders from "@components/ascii/Leaders.astro";
+import Rule from "@components/ascii/Rule.astro";
+import Stack from "@components/ascii/Stack.astro";
+import { FOCUS, HOME, PROJECTS, SITE, SOCIALS } from "@consts";
+import { readingTime } from "@lib/stats";
+
+const posts = (await getCollection("blog"))
+    .filter((post) => !post.data.draft)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+    .slice(0, 4);
+
+const iso = (d: Date) => d.toISOString().slice(0, 10);
 ---
 
-<Layout title={HOME.TITLE} description={HOME.DESCRIPTION}>
-  <Container>
-    <aside data-pagefind-ignore>
-      <h1 class="font-semibold text-black dark:text-white text-3xl">
-        Hey!
-      </h1>
-      <div class="space-y-16">
-        <section>
-          <article class="space-y-4">
-            <span>
-              <p>
-                I'm a backend developer with a passion for cyber security and low-level systems.
-              </p>
-            </span>
-            <span class="animate">
-              <p>
-                I also write about programming and security on my blog and I'm always looking for new things to learn.
-              </p>
-            </span>
-          </article>
+<Layout title={SITE.TITLE} description={HOME.DESCRIPTION} suffix={false}>
+    <div class="shell">
+        <section class="hero">
+            <Banner />
+            <h1 class="sr-only">{SITE.TITLE} — {SITE.ROLE}</h1>
+            <p class="tagline" aria-hidden="true">{SITE.TAGLINE}</p>
         </section>
 
-        <section class="animate space-y-6">
-          <div class="flex flex-wrap items-center justify-between gap-y-2">
-            <h2 class="font-semibold text-black dark:text-white">
-              My Skills
-            </h2>
-          </div>
-          <ul class="not-prose flex flex-col gap-4">
-            {SKILLS.map(skill => (
-              <li>{skill}</li>
-            ))}
-          </ul>
+        <p class="intro reveal">
+            I work below the abstraction line — hypervisors, compilers, and
+            operating systems. This is where I write down what I find when I
+            take them apart.
+        </p>
+
+        <Frame title="where I work" class="reveal">
+            <Stack />
+        </Frame>
+
+        <div class="two-up">
+            <section class="reveal">
+                <Rule
+                    label="writing"
+                    note={`${posts.length} recent`}
+                    as="h2"
+                />
+                <ul class="entries">
+                    {
+                        posts.map((post) => (
+                            <li>
+                                <a href={`/blog/${post.slug}`}>
+                                    {post.data.title}
+                                </a>
+                                <div class="entry-meta">
+                                    <time datetime={iso(post.data.date)}>
+                                        {iso(post.data.date)}
+                                    </time>
+                                    <span aria-hidden="true">·</span>
+                                    <span>{readingTime(post.body)} min</span>
+                                </div>
+                            </li>
+                        ))
+                    }
+                </ul>
+                <a class="more" href="/blog">all posts →</a>
+            </section>
+
+            <section class="reveal">
+                <Rule
+                    label="building"
+                    note={`${PROJECTS.length} listed`}
+                    as="h2"
+                />
+                <ul class="entries">
+                    {
+                        PROJECTS.map((project) => (
+                            <li>
+                                <a href={project.HREF}>{project.NAME}</a>
+                                <div class="entry-meta">
+                                    {project.STACK.slice(0, 3).join(" · ")}
+                                </div>
+                            </li>
+                        ))
+                    }
+                </ul>
+                <a class="more" href="/projects">all projects →</a>
+            </section>
+        </div>
+
+        <section class="reveal block">
+            <Rule label="focus" as="h2" />
+            <Leaders
+                rows={FOCUS.map(({ AREA, ITEMS }) => ({ k: AREA, v: ITEMS }))}
+            />
         </section>
 
-        <section class="animate space-y-4">
-          <h2 class="font-semibold text-black dark:text-white">
-            Let's Connect
-          </h2>
-          <article>
-            <p>
-              I'm always looking for new things to learn and new people to connect with. Feel free to reach out to me on any of the following platforms.
-            </p>
-          </article>
-          <ul class="not-prose flex flex-wrap gap-2">
-            {
-              SOCIALS.map((SOCIAL) => (
-                <li class="flex gap-x-2 text-nowrap">
-                  <Link
-                    href={SOCIAL.HREF}
-                    external
-                    aria-label={`${SITE.TITLE} on ${SOCIAL.NAME}`}
-                  >
-                    {SOCIAL.NAME}
-                  </Link>
-                  {"/"}
-                </li>
-              ))
-            }
-            <li class="line-clamp-1">
-              <Link
-                href={`mailto:${SITE.EMAIL}`}
-                aria-label={`Email ${SITE.TITLE}`}
-              >
-                {SITE.EMAIL}
-              </Link>
-            </li>
-          </ul>
+        <section class="reveal block">
+            <Rule label="elsewhere" as="h2" />
+            <Leaders
+                rows={[
+                    ...SOCIALS.map(({ NAME, HANDLE, HREF }) => ({
+                        k: NAME,
+                        v: HANDLE,
+                        href: HREF,
+                        external: true,
+                    })),
+                    {
+                        k: "mail",
+                        v: SITE.EMAIL,
+                        href: `mailto:${SITE.EMAIL}`,
+                    },
+                ]}
+            />
         </section>
-      </div>
-    </aside>
-  </Container>
+    </div>
 </Layout>
+
+<style>
+    .hero {
+        padding-top: calc(var(--step) * 1.5);
+    }
+
+    .tagline {
+        margin: 0.6rem 0 0;
+        color: var(--dim);
+        letter-spacing: 0.04em;
+    }
+
+    .intro {
+        max-width: var(--measure);
+        margin: var(--step) 0 0;
+        color: var(--base);
+    }
+
+    .two-up {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(38ch, 1fr));
+        gap: var(--step) 4ch;
+        margin-top: calc(var(--step) * 1.5);
+    }
+
+    .block {
+        margin-top: calc(var(--step) * 1.75);
+    }
+
+    .entries {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .entries > li + li {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .entries a {
+        color: var(--base);
+        text-decoration: none;
+    }
+
+    .entries a:hover {
+        color: var(--bg);
+        background: var(--accent);
+    }
+
+    .entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 1ch;
+        color: var(--dim);
+        font-size: 0.93em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .more {
+        display: inline-block;
+        margin-top: 0.9rem;
+        color: var(--dim);
+        font-size: 0.93em;
+        text-decoration: none;
+    }
+
+    .more:hover {
+        color: var(--bg);
+        background: var(--accent);
+    }
+</style>

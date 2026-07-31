@@ -1,0 +1,73 @@
+---
+/**
+ * An ASCII diagram inside an article.
+ *
+ * Deliberately not a diagram DSL — you write the art directly as the
+ * slot's content and this handles the framing, the caption, the cell
+ * lock, mobile scrolling, and the text alternative. A sequence-diagram
+ * mini-language would be more machinery than drawing the thing.
+ *
+ * `alt` is required and is what a screen reader announces in place of
+ * the art. Without it a reader gets a few hundred box characters read
+ * one at a time, which is worse than no figure at all.
+ */
+type Props = {
+    /** Prose description read instead of the art. */
+    alt: string;
+    caption?: string;
+    label?: string;
+};
+
+const { alt, caption, label } = Astro.props;
+---
+
+<figure class="fig">
+    <div class="fig-art" role="img" aria-label={alt}>
+        <pre class="ascii"><slot /></pre>
+    </div>
+    {
+        (label || caption) && (
+            <figcaption>
+                {label && <span class="fig-label">{label}</span>}
+                {caption}
+            </figcaption>
+        )
+    }
+</figure>
+
+<style>
+    .fig {
+        margin: var(--step) 0;
+    }
+
+    .fig-art {
+        padding: calc(var(--step) * 0.75) 2ch;
+        border: 1px solid var(--line);
+        background: var(--bg-raised);
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+    }
+
+    .fig-art pre {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--base);
+        font-size: clamp(10px, 1.05vw, 13.5px);
+        /* Tight enough that vertical box characters join into unbroken
+           lifelines, loose enough that label text stays readable. */
+        line-height: 1.2;
+    }
+
+    figcaption {
+        margin-top: 0.5rem;
+        color: var(--dim);
+        font-size: 0.88em;
+    }
+
+    .fig-label {
+        margin-right: 1ch;
+        color: var(--accent);
+    }
+</style>

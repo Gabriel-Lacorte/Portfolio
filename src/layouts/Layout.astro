@@ -5,23 +5,29 @@ import Footer from "@components/Footer.astro";
 import { SITE } from "@consts";
 
 type Props = {
-  title: string;
-  description: string;
+    title: string;
+    description: string;
+    /** Home passes false — its <title> is just the site name. */
+    suffix?: boolean;
 };
 
-const { title, description } = Astro.props;
+const { title, description, suffix = true } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <Head title={`${title} | ${SITE.TITLE}`} description={description} />
-  </head>
-  <body>
-    <Header />
-    <main>
-      <slot />
-    </main>
-    <Footer />
-  </body>
+    <head>
+        <Head
+            title={suffix ? `${title} — ${SITE.TITLE}` : title}
+            description={description}
+        />
+    </head>
+    <body>
+        <a class="skip-link" href="#content">Skip to content</a>
+        <Header />
+        <main id="content" tabindex="-1">
+            <slot />
+        </main>
+        <Footer />
+    </body>
 </html>

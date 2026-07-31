@@ -1,15 +1,102 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Container from "@components/Container.astro";
-import { SITE } from "@consts";
+import { NAV } from "@consts";
 ---
 
-<Layout title="404" description={SITE.DESCRIPTION}>
-  <Container>
-    <div class="mt-16 grid place-items-center gap-3">
-      <h4 class="animate text-2xl font-semibold text-black dark:text-white">
-        404: This page could not be found.
-      </h4>
+<Layout
+    title="404"
+    description="That path does not resolve."
+    suffix={false}
+>
+    <div class="shell wrap">
+        <pre class="ascii art" aria-hidden="true"><span class="r2">    ██╗  ██╗ ██████╗ ██╗  ██╗</span>
+<span class="r3">    ██║  ██║██╔═══██╗██║  ██║</span>
+<span class="r3">    ███████║██║   ██║███████║</span>
+<span class="r4">    ╚════██║██║   ██║╚════██║</span>
+<span class="r4">         ██║╚██████╔╝     ██║</span>
+<span class="r5">         ╚═╝ ╚═════╝      ╚═╝</span></pre>
+
+        <h1>404 — no such file or directory</h1>
+
+        <p class="msg">
+            The path <code>{Astro.url.pathname}</code> does not resolve. It may
+            have moved, or it may never have existed.
+        </p>
+
+        <nav aria-label="Recover">
+            <ul>
+                {
+                    NAV.map(({ LABEL, HREF }) => (
+                        <li>
+                            <a href={HREF}>{LABEL}</a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
     </div>
-  </Container>
 </Layout>
+
+<style>
+    .wrap {
+        padding-block: calc(var(--step) * 3);
+    }
+
+    .art {
+        font-size: clamp(8px, 2.2vw, 15px);
+        margin-bottom: var(--step);
+    }
+
+    .art .r2 {
+        color: var(--ramp-2);
+    }
+    .art .r3 {
+        color: var(--ramp-3);
+    }
+    .art .r4 {
+        color: var(--ramp-4);
+    }
+    .art .r5 {
+        color: var(--ramp-5);
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--bright);
+    }
+
+    .msg {
+        max-width: var(--measure);
+        margin: 0.6rem 0 0;
+        color: var(--dim);
+    }
+
+    code {
+        padding: 0.1em 0.5ch;
+        border: 1px solid var(--line);
+        background: var(--bg-raised);
+        color: var(--accent);
+        overflow-wrap: anywhere;
+    }
+
+    nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 2ch;
+        margin: var(--step) 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    nav a {
+        color: var(--dim);
+        text-decoration: none;
+    }
+
+    nav a:hover {
+        color: var(--bg);
+        background: var(--accent);
+    }
+</style>

@@ -1,54 +1,107 @@
 ---
 import TableOfContentsHeading from "./TableOfContentsHeading.astro";
 
-// https://kld.dev/building-table-of-contents/
-const { headings } = Astro.props;
-const toc = buildToc(headings);
-
 export interface Heading {
-  depth: number;
-  slug: string;
-  text: string;
+    depth: number;
+    slug: string;
+    text: string;
+    subheadings: Heading[];
 }
 
-function buildToc(headings: Heading[]) {
-  const toc: Heading[] = [];
-  const parentHeadings = new Map();
-  headings.forEach((h) => {
-    const heading = { ...h, subheadings: [] };
-    parentHeadings.set(heading.depth, heading);
-    if (heading.depth === 2) {
-      toc.push(heading);
-    } else {
-      parentHeadings.get(heading.depth - 1).subheadings.push(heading);
+type Props = {
+    headings: Omit<Heading, "subheadings">[];
+};
+
+const { headings } = Astro.props;
+
+/* Only h2/h3 make the outline — deeper levels turn it into noise.
+ *
+ * The previous implementation did `parentHeadings.get(depth - 1).subheadings
+ * .push(...)`, which throws on any post whose first heading is an h3, or that
+ * has an h4 with no h3 above it. Orphans are promoted here instead. */
+function buildToc(flat: Omit<Heading, "subheadings">[]): Heading[] {
+    const toc: Heading[] = [];
+
+    for (const raw of flat) {
+        if (raw.depth > 3) continue;
+
+        const heading: Heading = { ...raw, subheadings: [] };
+
+        if (heading.depth <= 2 || toc.length === 0) {
+            toc.push(heading);
+        } else {
+            toc[toc.length - 1].subheadings.push(heading);
+        }
     }
-  });
-  return toc;
+
+    return toc;
 }
+
+const toc = buildToc(headings);
 ---
 
-<details
-  open
-  class="animate rounded-lg border border-black/15 dark:border-white/20"
->
-  <summary>Table of Contents</summary>
-  <nav class="">
-    <ul class="py-3">
-      {toc.map((heading) => <TableOfContentsHeading heading={heading} />)}
-    </ul>
-  </nav>
-</details>
+{
+    toc.length > 0 && (
+        <details class="toc" open>
+            <summary>contents</summary>
+            <nav aria-label="Table of contents">
+                <ul>
+                    {toc.map((heading) => (
+                        <TableOfContentsHeading heading={heading} />
+                    ))}
+                </ul>
+            </nav>
+        </details>
+    )
+}
 
 <style>
-  summary {
-    @apply cursor-pointer rounded-t-lg px-3 py-1.5 font-medium transition-colors;
-  }
+    .toc {
+        border: 1px solid var(--line);
+        background: var(--bg-raised);
+        font-size: 0.93em;
+    }
 
-  summary:hover {
-    @apply bg-black/5 dark:bg-white/5;
-  }
+    summary {
+        padding: 0.35rem 2ch;
+        border-bottom: 1px solid transparent;
+        font-family: var(--font-display);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--dim);
+        cursor: pointer;
+        list-style: none;
+    }
 
-  details[open] summary {
-    @apply bg-black/5 dark:bg-white/5;
-  }
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    summary::before {
+        content: "▸ ";
+        color: var(--accent);
+    }
+
+    .toc[open] summary {
+        border-bottom-color: var(--line);
+    }
+
+    .toc[open] summary::before {
+        content: "▾ ";
+    }
+
+    summary:hover {
+        color: var(--bright);
+    }
+
+    nav :global(ul) {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    nav > ul {
+        padding: 0.5rem 2ch;
+    }
 </style>

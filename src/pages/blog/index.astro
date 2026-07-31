@@ -1,55 +1,181 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
-import Container from "@components/Container.astro";
-import ArrowCard from "@components/ArrowCard.astro";
+import Rule from "@components/ascii/Rule.astro";
 import { BLOG } from "@consts";
+import { compact, countWords, readingTime } from "@lib/stats";
 
-const data = (await getCollection("blog"))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const posts = (await getCollection("blog"))
+    .filter((post) => !post.data.draft)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-type Acc = {
-  [year: string]: CollectionEntry<"blog">[];
-};
+const totalWords = posts.reduce((sum, p) => sum + countWords(p.body), 0);
 
-const posts = data.reduce((acc: Acc, post) => {
-  const year = post.data.date.getFullYear().toString();
-  if (!acc[year]) {
-    acc[year] = [];
-  }
-  acc[year].push(post);
-  return acc;
-}, {});
+const byYear = posts.reduce<Record<string, CollectionEntry<"blog">[]>>(
+    (acc, post) => {
+        const year = post.data.date.getFullYear().toString();
+        (acc[year] ??= []).push(post);
+        return acc;
+    },
+    {},
+);
 
-const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
+const years = Object.keys(byYear).sort((a, b) => Number(b) - Number(a));
+
+const md = (d: Date) => d.toISOString().slice(5, 10);
+const iso = (d: Date) => d.toISOString().slice(0, 10);
 ---
 
 <Layout title={BLOG.TITLE} description={BLOG.DESCRIPTION}>
-  <Container>
-    <aside data-pagefind-ignore>
-      <div class="space-y-10">
-        <div class="space-y-4">
-          {
+    <div class="shell">
+        <header class="page-head">
+            <h1>~/blog</h1>
+            <p class="lede">{BLOG.DESCRIPTION}</p>
+            <p class="counts">
+                {posts.length} posts · {compact(totalWords)} words
+            </p>
+        </header>
+
+        {
             years.map((year) => (
-              <section class="animate space-y-4">
-                <div class="font-semibold text-black dark:text-white">
-                  {year}
-                </div>
-                <div>
-                  <ul class="not-prose flex flex-col gap-4">
-                    {posts[year].map((post) => (
-                      <li>
-                        <ArrowCard entry={post} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </section>
+                <section class="year reveal">
+                    <Rule
+                        label={year}
+                        note={`${byYear[year].length} ${byYear[year].length === 1 ? "post" : "posts"}`}
+                        as="h2"
+                    />
+                    <ul class="listing">
+                        {byYear[year].map((post) => (
+                            <li>
+                                <a href={`/blog/${post.slug}`}>
+                                    <time
+                                        class="date"
+                                        datetime={iso(post.data.date)}
+                                    >
+                                        {md(post.data.date)}
+                                    </time>
+                                    <span class="title">{post.data.title}</span>
+                                    <span class="lead" aria-hidden="true" />
+                                    <span class="time">
+                                        {readingTime(post.body)}m
+                                    </span>
+                                </a>
+                                <p class="desc">{post.data.description}</p>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
             ))
-          }
-        </div>
-      </div>
-    </aside>
-  </Container>
+        }
+    </div>
 </Layout>
+
+<style>
+    .page-head {
+        padding-top: calc(var(--step) * 1.5);
+        margin-bottom: calc(var(--step) * 1.5);
+    }
+
+    h1 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 400;
+        letter-spacing: 0.06em;
+        color: var(--bright);
+    }
+
+    .lede {
+        max-width: var(--measure);
+        margin: 0.5rem 0 0;
+        color: var(--base);
+    }
+
+    .counts {
+        margin: 0.25rem 0 0;
+        color: var(--dim);
+        font-size: 0.93em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .year + .year {
+        margin-top: calc(var(--step) * 1.5);
+    }
+
+    .listing {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .listing > li + li {
+        margin-top: 0.9rem;
+    }
+
+    /* The row is a directory listing: date, name, leader, size. */
+    .listing a {
+        display: flex;
+        align-items: baseline;
+        gap: 1ch;
+        text-decoration: none;
+        color: var(--base);
+    }
+
+    .listing a:hover {
+        color: var(--bg);
+        background: var(--accent);
+    }
+
+    .listing a:hover .date,
+    .listing a:hover .time {
+        color: var(--bg);
+    }
+
+    .listing a:hover .lead {
+        opacity: 0;
+    }
+
+    .date {
+        flex: none;
+        width: 5ch;
+        color: var(--faint);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .title {
+        flex: none;
+    }
+
+    .lead {
+        flex: 1;
+        min-width: 2ch;
+        height: 1px;
+        align-self: center;
+        background-image: radial-gradient(
+            circle at center,
+            var(--faint) 0.5px,
+            transparent 0.6px
+        );
+        background-size: 1ch 2px;
+        background-repeat: repeat-x;
+    }
+
+    .time {
+        flex: none;
+        color: var(--dim);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .desc {
+        max-width: var(--measure);
+        margin: 0.1rem 0 0 6ch;
+        color: var(--dim);
+        font-size: 0.93em;
+    }
+
+    @media (max-width: 640px) {
+        .desc {
+            margin-left: 0;
+        }
+    }
+</style>

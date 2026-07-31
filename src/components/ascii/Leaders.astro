@@ -1,0 +1,48 @@
+---
+/**
+ * The site's signature row:
+ *
+ *   github .................................... Gabriel-Lacorte
+ *
+ * The leader is a repeating radial-gradient rather than a run of "."
+ * characters, so it always reaches exactly to the value, never wraps, and
+ * is not picked up when the row is copied or read aloud.
+ */
+type Row = {
+    k: string;
+    v: string;
+    href?: string;
+    external?: boolean;
+};
+
+type Props = {
+    rows: Row[];
+    class?: string;
+};
+
+const { rows, class: className } = Astro.props;
+---
+
+<ul class:list={["leaders", className]}>
+    {
+        rows.map(({ k, v, href, external }) => (
+            <li>
+                <span class="k">
+                    {href ? (
+                        <a
+                            href={href}
+                            target={external ? "_blank" : undefined}
+                            rel={external ? "noopener noreferrer" : undefined}
+                        >
+                            {k}
+                        </a>
+                    ) : (
+                        k
+                    )}
+                </span>
+                <span class="lead" aria-hidden="true" />
+                <span class="v">{v}</span>
+            </li>
+        ))
+    }
+</ul>

@@ -1,0 +1,26 @@
+---
+/**
+ * ANSI Shadow wordmark, 59 cells wide, coloured down the 5-step ramp.
+ *
+ * Decorative: the readable name lives in the page's real <h1>, so this is
+ * hidden from assistive tech rather than read out one box character at a
+ * time.
+ */
+const ROWS = [
+    "██╗      █████╗  ██████╗  ██████╗ ██████╗ ████████╗███████╗",
+    "██║     ██╔══██╗██╔════╝ ██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝",
+    "██║     ███████║██║      ██║   ██║██████╔╝   ██║   █████╗  ",
+    "██║     ██╔══██║██║      ██║   ██║██╔══██╗   ██║   ██╔══╝  ",
+    "███████╗██║  ██║╚██████╗ ╚██████╔╝██║  ██║   ██║   ███████╗",
+    "╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝",
+];
+
+/* Rows 1-5 walk the ramp; the 6th (the shadow) sits at the darkest step. */
+const ramp = ["r1", "r2", "r3", "r4", "r5", "r5"];
+---
+
+<pre class="ascii banner" aria-hidden="true">{
+    ROWS.map((row, i) => (
+        <span class={ramp[i]}>{row}{i < ROWS.length - 1 ? "\n" : ""}</span>
+    ))
+}</pre>

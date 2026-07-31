@@ -4,7 +4,8 @@ description: "Some ways to hack Kerberos"
 date: "2024-05-04"
 ---
 
-import Callout from "@/components/Callout.astro";
+import Callout from "@components/Callout.astro";
+import Figure from "@components/ascii/Figure.astro";
 
 Hey, in this article I'm going to talk about the kerberos protocol and cover all the main ways of attacking it.
 
@@ -21,9 +22,41 @@ The user then presents the TGT to the KDC, requesting a Ticket Granting Service 
 
 Finally, the user presents the TGS to the desired service, requesting access. The service validates the ticket by decrypting it and, if everything is correct, access is granted.
 
-Simple, isn't it? Take a look at the image below, it represents very well how this protocol works.
+Simple, isn't it? The whole exchange fits in one picture:
 
-![Kerberos Authentication](/kerberos_auth.png)
+<Figure
+  label="fig.1"
+  caption="Kerberos authentication — six messages, three parties, no password on the wire."
+  alt="Sequence diagram of Kerberos authentication. The client sends AS_REQ, a timestamp encrypted with its password hash, to the KDC. The KDC decrypts it to prove identity and replies with AS_REP carrying a TGT encrypted with the krbtgt key. The client then sends TGS_REQ with that TGT and a target SPN; the KDC looks the SPN up and replies with TGS_REP, a ticket encrypted with the service account's key. Finally the client sends AP_REQ with that ticket to the service, which decrypts it and replies AP_REP granting access."
+>
+{`
+ client                      KDC · krbtgt                 service
+   │                              │                          │
+   │ (1) AS_REQ                   │                          │
+   │     timestamp enc. w/ hash   │                          │
+   ├─────────────────────────────►│                          │
+   │                              │ decrypts ⇒ identity      │
+   │ (2) AS_REP                   │           proven         │
+   │     TGT, enc. w/ krbtgt key  │                          │
+   │◄─────────────────────────────┤                          │
+   │                              │                          │
+   │ (3) TGS_REQ  TGT + target SPN│                          │
+   ├─────────────────────────────►│                          │
+   │                              │ resolves SPN ⇒ account   │
+   │ (4) TGS_REP                  │                          │
+   │     TGS, enc. w/ svc acct key│                          │
+   │◄─────────────────────────────┤                          │
+   │                              │                          │
+   │ (5) AP_REQ   presents TGS    │                          │
+   ├──────────────────────────────┼─────────────────────────►│
+   │                              │              decrypts it │
+   │ (6) AP_REP   access granted  │                          │
+   │◄─────────────────────────────┼──────────────────────────┤
+   │                              │                          │
+`}
+</Figure>
+
+Note what never crosses the network: the password. That property is what every attack below has to work around.
 
 ---
 

@@ -1,0 +1,19 @@
+---
+/**
+ * A titled panel. The border is a real 1px CSS border rather than a run of
+ * ┌─┐│└┘ characters: a character border cannot reflow, so it breaks the
+ * moment the panel is narrower than the art inside it. The inset title
+ * keeps it reading as a drawn box.
+ */
+type Props = {
+    title?: string;
+    class?: string;
+};
+
+const { title, class: className } = Astro.props;
+---
+
+<section class:list={["frame", className]}>
+    {title && <h2 class="frame-title">{title}</h2>}
+    <slot />
+</section>

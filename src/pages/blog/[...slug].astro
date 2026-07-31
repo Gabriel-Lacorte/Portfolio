@@ -1,43 +1,115 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
-import Container from "@components/Container.astro";
-import FormattedDate from "@components/FormattedDate.astro";
 import TableOfContents from "@components/TableOfContents.astro";
+import { compact, countWords, readingTime } from "@lib/stats";
 
 export async function getStaticPaths() {
-  const posts = (await getCollection("blog"))
-    .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: post,
-  }));
+    const posts = (await getCollection("blog")).filter(
+        (post) => !post.data.draft,
+    );
+
+    return posts.map((post) => ({
+        params: { slug: post.slug },
+        props: post,
+    }));
 }
+
 type Props = CollectionEntry<"blog">;
 
 const post = Astro.props;
 const { Content, headings } = await post.render();
+
+const words = countWords(post.body);
+const iso = post.data.date.toISOString().slice(0, 10);
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
-  <Container>
-    <div class="animate">
-      <a href="/blog">Back to blog</a>
+    <div class="shell">
+        <a class="back" href="/blog">← ~/blog</a>
+
+        <article class="article">
+            <header class="post-head">
+                <h1>{post.data.title}</h1>
+                <p class="summary">{post.data.description}</p>
+                <dl class="post-meta">
+                    <div>
+                        <dt>date</dt>
+                        <dd><time datetime={iso}>{iso}</time></dd>
+                    </div>
+                    <div>
+                        <dt>read</dt>
+                        <dd>{readingTime(post.body)} min</dd>
+                    </div>
+                    <div>
+                        <dt>words</dt>
+                        <dd>{compact(words)}</dd>
+                    </div>
+                </dl>
+            </header>
+
+            {headings.length > 0 && <TableOfContents headings={headings} />}
+
+            <Content />
+        </article>
     </div>
-    <div class="my-10 space-y-1">
-      <div class="animate flex items-center gap-1.5">
-        <div class="font-base text-sm">
-          <FormattedDate date={post.data.date} />
-        </div>
-      </div>
-      <h1 class="animate text-3xl font-semibold text-black dark:text-white">
-        {post.data.title}
-      </h1>
-    </div>
-    {headings.length > 0 && <TableOfContents headings={headings} />}
-    <article class="animate">
-      <Content />
-    </article>
-  </Container>
 </Layout>
+
+<style>
+    .back {
+        display: inline-block;
+        margin-top: calc(var(--step) * 1.25);
+        color: var(--dim);
+        text-decoration: none;
+        font-size: 0.93em;
+    }
+
+    .back:hover {
+        color: var(--bg);
+        background: var(--accent);
+    }
+
+    .post-head {
+        margin-block: var(--step) calc(var(--step) * 1.5);
+        padding-bottom: var(--step);
+        border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 600;
+        line-height: 1.25;
+        color: var(--bright);
+    }
+
+    .summary {
+        max-width: var(--measure);
+        margin: 0.5rem 0 0;
+        color: var(--dim);
+    }
+
+    /* Metadata as an aligned spec block rather than a run-on byline. */
+    .post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 4ch;
+        margin: var(--step) 0 0;
+        font-size: 0.93em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .post-meta > div {
+        display: flex;
+        gap: 1ch;
+    }
+
+    .post-meta dt {
+        color: var(--faint);
+    }
+
+    .post-meta dd {
+        margin: 0;
+        color: var(--base);
+    }
+</style>
