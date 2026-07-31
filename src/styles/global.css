@@ -1,25 +1,28 @@
 /* ══════════════════════════════════════════════════════════════════════
    lacorte.city
    ──────────────────────────────────────────────────────────────────────
-   Built after bezu.dev, which is the reference. The things that actually
-   make that page work, and that everything here follows:
+   Its own thing now. What it keeps from the references is the register —
+   terminal, 1-bit, no ornament for ornament's sake — and nothing of their
+   chrome:
 
      · it is a DOCUMENT, not a dashboard. One column that flows top to
        bottom. No grid of bordered cards — that is exactly what made the
        previous pass read as a generic admin panel.
      · one base colour, #DBDBDB on #000. Everything else is an accent used
        three or four times on the whole page.
-     · borders are DASHED, never solid. It is the single strongest tell.
-     · section headings are inverted inline chips, not big type. Body and
-       headings are the same 15px; hierarchy comes from the inversion.
+     · borders are hairlines or nothing — the dashed rule was the
+       reference's signature, not ours.
+     · headings are the command whose output follows them.
      · hover is reverse video, everywhere.
-     · the ANSI banner is SMALL and tucked into a corner. It decorates the
-       page; it is not the page.
-     · warmth over polish: buttons, a changelog written in the first
-       person, floating windows you can close.
+     · the page opens on a real piece of art — a die rendered at raster
+       resolution and reduced to 1 bit, because a character cell holds
+       five grey levels over 8x15 pixels and cannot carry an illustration.
+     · bone on ink, one oxide accent. Not the reference's grey and purple.
+     · warmth over polish: buttons, a changelog in the first person,
+       floating windows you can close.
 
-   bezu's own <b> purple is #8400ff, which is 3.43:1 on black and fails
-   for text. Lifted to #b57cff (7.29:1) — same hue, actually readable.
+   Contrast on #0b0b0d — bone 15.20:1, oxide 7.38:1, verdigris 8.90:1,
+   ochre 9.83:1, all AAA. --rule is 2.16:1 and never carries text.
    ══════════════════════════════════════════════════════════════════════ */
 
 @font-face {
@@ -47,29 +50,22 @@
 }
 
 :root {
-    --base: #dbdbdb;
-    --bg: #000000;
-    --dashed: dashed 1px rgba(219, 219, 219, 0.55);
-    --dashed-strong: dashed 1px rgba(219, 219, 219, 0.9);
+    --base: #e6e2d8;      /* bone */
+    --bg: #0b0b0d;        /* ink  */
+    --white: #ffffff;
+    --comment: #9a948a;
+    --rule: #4a4750;
+    --hair: solid 1px #4a4750;
 
-    --comment: #8b88a0;
-    --purple: #b57cff;
-    --green: #4be35f;
-    --red: #ff6b70;
-    --amber: #ffb63d;
+    --accent: #e8845c;    /* oxide  — links, marks */
+    --green: #5fbfa8;     /* verdigris — ok states */
+    --amber: #e0b050;     /* ochre     — warnings  */
+    --red: #e8845c;
 
-    /* Banner ramp, straight off bezu's six-step gradient. */
-    --a1: #e8b7ff;
-    --a2: #cb72ff;
-    --a3: #aa3cf2;
-    --a4: #8725ce;
-    --a5: #66149d;
-    --a6: #380755;
-
-    --win-line: #5a5a5a;
-    --win-bar: #100713;
-    --win-edge: #74358e;
-    --win-title: #d58cff;
+    --win-line: #4a4750;
+    --win-bar: #16151a;
+    --win-edge: #6a6470;
+    --win-title: #e6e2d8;
 
     --mono: "Departure Mono", "Iosevka", ui-monospace, monospace;
     --code: "Iosevka", ui-monospace, "Cascadia Mono", monospace;
@@ -77,29 +73,24 @@
     color-scheme: dark;
 }
 
+/* Paper mode: the same engraving printed rather than lit. */
 html.light {
-    --base: #17161c;
-    --bg: #e9e7e2;
-    --dashed: dashed 1px rgba(23, 22, 28, 0.5);
-    --dashed-strong: dashed 1px rgba(23, 22, 28, 0.85);
+    --base: #141317;
+    --bg: #e6e2d8;
+    --white: #000000;
+    --comment: #55515c;
+    --rule: #a9a49a;
+    --hair: solid 1px #a9a49a;
 
-    --comment: #5b5768;
-    --purple: #6b21c8;
-    --green: #157a25;
-    --red: #b3141c;
-    --amber: #8a5200;
+    --accent: #9c3a17;
+    --green: #0f6b58;
+    --amber: #7a5300;
+    --red: #9c3a17;
 
-    --a1: #3d1152;
-    --a2: #5a1a86;
-    --a3: #7a26b8;
-    --a4: #9b45d4;
-    --a5: #b877e6;
-    --a6: #d7b3f0;
-
-    --win-line: #9a94a5;
-    --win-bar: #ded7e6;
-    --win-edge: #7a4fa8;
-    --win-title: #4a1f80;
+    --win-line: #a9a49a;
+    --win-bar: #dad4c8;
+    --win-edge: #7d7768;
+    --win-title: #141317;
 
     color-scheme: light;
 }
@@ -186,13 +177,8 @@ a:focus-visible {
 }
 
 ::selection {
-    background: rgba(219, 219, 219, 0.99);
-    color: #000;
-}
-
-html.light ::selection {
-    background: #17161c;
-    color: #e9e7e2;
+    background: var(--base);
+    color: var(--bg);
 }
 
 button {
@@ -243,55 +229,15 @@ body.has-windows {
 /* ── header ────────────────────────────────────────────────────────── */
 
 header.site {
-    position: relative;
-    margin: 25px 0 10px;
-    padding-top: 72px;
+    margin: 28px 0 10px;
 }
 
-.ansi-banner {
-    position: absolute;
-    top: 8px;
-    right: -1px;
-    margin: 0;
-    padding: 0;
-    overflow: visible;
-    white-space: pre;
-    font-family: var(--code);
-    font-size: 9px;
-    line-height: 1;
-    letter-spacing: 0;
-    color: var(--a3);
-    text-shadow: 1px 1px 0 #170020;
-    user-select: none;
-}
 
-.ansi-banner .r1 { color: var(--a1); }
-.ansi-banner .r2 { color: var(--a2); }
-.ansi-banner .r3 { color: var(--a3); }
-.ansi-banner .r4 { color: var(--a4); }
-.ansi-banner .r5 { color: var(--a5); }
-.ansi-banner .r6 { color: var(--a6); }
-
-.sigil {
-    position: absolute;
-    top: 0;
-    left: -10px;
-    width: 116px;
-    height: 72px;
-    overflow: hidden;
-    font-family: var(--code);
-    font-size: 7px;
-    line-height: 1;
-    white-space: pre;
-    color: var(--a2);
-    user-select: none;
-}
-
-/* The menu is a dashed rule above and below, links pushed right. */
+/* The menu is a hairline above and below, links pushed right. */
 .menu {
     margin-bottom: 25px;
-    border-top: var(--dashed-strong);
-    border-bottom: var(--dashed-strong);
+    border-top: var(--hair);
+    border-bottom: var(--hair);
 }
 
 .menu ul {
@@ -331,6 +277,34 @@ header.site {
     background: var(--base);
 }
 
+/* ── the plate ─────────────────────────────────────────────────────────
+   The die is a 1-bit dithered raster, not character art: a character cell
+   holds five grey levels over 8x15 pixels, which is nowhere near enough
+   for a detailed illustration — the first attempt read as noise. This is
+   how the reference flyers get their engraved look too. */
+
+.plate {
+    margin: 0 0 6px;
+    text-align: center;
+}
+
+.plate img {
+    display: block;
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+    margin-inline: auto;
+    image-rendering: pixelated;
+}
+
+.plate figcaption {
+    margin-top: 6px;
+    color: var(--comment);
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
 /* ── the command line that heads each section ──────────────────────────
    My own idea rather than the reference's inverted chip: every section is
    the output of a command this person actually runs. It carries the same
@@ -356,7 +330,7 @@ header.site {
 }
 
 .cmd .flag {
-    color: var(--purple);
+    color: var(--accent);
 }
 
 .cmd .icon {
@@ -375,7 +349,7 @@ header.site {
 /* Output sits indented under its command, the way it does in a terminal. */
 .out {
     padding-left: 16px;
-    border-left: var(--dashed);
+    border-left: var(--hair);
 }
 
 /* ── the inverted section chip ─────────────────────────────────────── */
@@ -411,12 +385,12 @@ p:has(> .titulo) {
 }
 
 .purple {
-    color: var(--purple);
+    color: var(--accent);
 }
 
 strong,
 b {
-    color: var(--purple);
+    color: var(--accent);
     font-weight: normal;
     text-decoration: underline;
 }
@@ -450,7 +424,7 @@ ul.plain {
 }
 
 .boxes .bname {
-    color: var(--purple);
+    color: var(--accent);
     text-decoration: underline;
 }
 
@@ -586,7 +560,7 @@ main ul.rows > li::before {
 footer.site {
     margin: 20px auto 15px;
     padding-top: 10px;
-    border-top: var(--dashed-strong);
+    border-top: var(--hair);
     color: var(--base);
 }
 
@@ -660,14 +634,14 @@ footer.site {
 .article blockquote {
     margin: 0;
     padding-left: 12px;
-    border-left: var(--dashed);
+    border-left: var(--hair);
     color: var(--comment);
 }
 
 .article hr {
     margin: 22px 0;
     border: 0;
-    border-top: var(--dashed);
+    border-top: var(--hair);
 }
 
 .article img {
@@ -683,12 +657,12 @@ footer.site {
 .article th,
 .article td {
     padding: 2px 8px;
-    border: var(--dashed);
+    border: var(--hair);
     text-align: left;
 }
 
 .article th {
-    color: var(--purple);
+    color: var(--accent);
     font-weight: normal;
 }
 
@@ -696,7 +670,7 @@ footer.site {
 
 .article :not(pre) > code {
     padding: 0 3px;
-    color: var(--purple);
+    color: var(--accent);
     font-family: var(--code);
     font-size: 14px;
     overflow-wrap: anywhere;
@@ -705,7 +679,7 @@ footer.site {
 .article pre {
     margin: 0;
     padding: 10px 12px;
-    border: var(--dashed);
+    border: var(--hair);
     background: transparent !important;
     overflow-x: auto;
     font-family: var(--code);
@@ -731,8 +705,8 @@ footer.site {
     right: 0;
     padding: 0 8px;
     border: 0;
-    border-left: var(--dashed);
-    border-bottom: var(--dashed);
+    border-left: var(--hair);
+    border-bottom: var(--hair);
     background: var(--bg);
     color: var(--comment);
     font-size: 12px;
@@ -772,31 +746,31 @@ footer.site {
 /* Shiki, near-monochrome with the one purple. Syntax colour should not be
    the loudest thing on a page this quiet. */
 :root {
-    --astro-code-color-text: #dbdbdb;
+    --astro-code-color-text: #e6e2d8;
     --astro-code-color-background: transparent;
-    --astro-code-token-comment: #8b88a0;
-    --astro-code-token-keyword: #b57cff;
+    --astro-code-token-comment: #9a948a;
+    --astro-code-token-keyword: #e8845c;
     --astro-code-token-string: #a8a8a8;
     --astro-code-token-function: #ffffff;
-    --astro-code-token-constant: #ffb63d;
-    --astro-code-token-parameter: #dbdbdb;
+    --astro-code-token-constant: #e0b050;
+    --astro-code-token-parameter: #e6e2d8;
     --astro-code-token-string-expression: #a8a8a8;
     --astro-code-token-punctuation: #8b88a0;
-    --astro-code-token-link: #b57cff;
+    --astro-code-token-link: #e8845c;
 }
 
 html.light {
     --astro-code-color-text: #17161c;
     --astro-code-color-background: transparent;
     --astro-code-token-comment: #5b5768;
-    --astro-code-token-keyword: #6b21c8;
+    --astro-code-token-keyword: #9c3a17;
     --astro-code-token-string: #45414d;
     --astro-code-token-function: #000000;
     --astro-code-token-constant: #8a5200;
     --astro-code-token-parameter: #17161c;
     --astro-code-token-string-expression: #45414d;
     --astro-code-token-punctuation: #5b5768;
-    --astro-code-token-link: #6b21c8;
+    --astro-code-token-link: #9c3a17;
 }
 
 /* ── ascii figures ─────────────────────────────────────────────────── */
@@ -821,16 +795,8 @@ html.light {
 }
 
 @media (max-width: 700px) {
-    header.site {
-        padding-top: 62px;
-    }
-
     .window {
         width: 100%;
-    }
-
-    .ansi-banner {
-        font-size: 7px;
     }
 
     .menu ul {
@@ -840,7 +806,6 @@ html.light {
     .menu li {
         margin: 0 10px 0 0;
     }
-
 }
 
 @media print {
@@ -848,9 +813,9 @@ html.light {
         --bg: #fff;
         --base: #000;
         --comment: #444;
-        --purple: #000;
-        --dashed: dashed 1px #999;
-        --dashed-strong: dashed 1px #333;
+        --accent: #000;
+        --rule: #999;
+        --hair: solid 1px #999;
     }
 
     .taskbar,

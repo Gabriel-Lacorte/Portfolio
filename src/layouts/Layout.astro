@@ -1,7 +1,5 @@
 ---
 import Head from "@components/Head.astro";
-import Banner from "@components/ascii/Banner.astro";
-import Sigil from "@components/ascii/Sigil.astro";
 import { NAV_KEYS, SITE, SOCIALS } from "@consts";
 import { HTML_LANG, LOCALE_LABEL, LOCALES } from "@i18n/ui";
 import {
@@ -52,8 +50,16 @@ const isCurrent = (href: string) =>
 
         <div class="container">
             <header class="site">
-                <Sigil />
-                <Banner />
+                <figure class="plate">
+                    <img
+                        src="/art/die.png"
+                        width="660"
+                        height="440"
+                        alt=""
+                        aria-hidden="true"
+                    />
+                    <figcaption>{SITE.HANDLE}</figcaption>
+                </figure>
 
                 <nav class="menu" aria-label="Main">
                     <ul>
