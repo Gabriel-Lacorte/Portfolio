@@ -157,9 +157,11 @@ metrics and misalign every diagram.
 
 ## Layout constraints worth knowing
 
-- The column is 984px. Floating windows only detach above 1740px, which is
-  where the arithmetic says they fit: the gutter is `(100vw - 984) / 2` and
-  a 340px window plus gaps needs 372px of it.
+- The column is 984px. Floating windows only detach at 1712px, which is
+  where the arithmetic says they fit: `984 + 2 * (340 + 24)`. Keep the gap
+  in that sum and the gap the default placement insets by as one constant.
+  They drifted apart once — threshold derived with 16, placement insetting
+  by 24 — and a window overlapped the prose by exactly those 6px.
 - Prose is capped at 72 characters. The cap sits on the prose elements, not
   on the article container — put it on the container and diagrams and
   pasted hashes get squeezed to reading width too.

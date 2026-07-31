@@ -136,7 +136,31 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
        finish past the bottom of the viewport. Lifting up front, once, at
        a known place removes both. */
     const POS_KEY = "win:pos";
-    const FLOAT_FROM = 900;
+    /* A window may only detach where it actually fits beside the column.
+       That is arithmetic, not taste. The column is 984px and centred, so
+       each gutter is (100vw - 984) / 2, and a window needs WIN_W + GAP of
+       it — hence 984 + 2 * (340 + 24) = 1712. Below that they stay in the
+       document flow, which is also the no-script behaviour.
+
+       GAP has to be the same number the default placement uses, below.
+       It was 900 for a while (where the old CSS media query sat, before
+       the floating moved into script) and a window landed on the prose:
+       at 1100px it sat at x=736 with the column running to 1042. Then it
+       was derived correctly but with GAP=16 while the placement inset by
+       24, and 1700px still overlapped — by exactly the 6px the two
+       constants disagreed about. One constant, used twice. */
+    const COLUMN = 984;
+    const WIN_W = 340;
+    const GAP = 24;
+    const FLOAT_FROM = COLUMN + 2 * (WIN_W + GAP);
+
+    /* The one string this script says out loud. Read off <html lang>
+       rather than imported from the dictionary: importing it would pull
+       both locales and all ~260 keys into the client bundle to use one
+       of them, which is more JavaScript than the whole site ships. */
+    const MOVE_HINT = document.documentElement.lang.startsWith("pt")
+        ? "janela, setas movem"
+        : "window, arrow keys move";
 
     type Pos = { x: number; y: number };
 
@@ -217,7 +241,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
             win.style.zIndex = String(++top);
 
             const fallback = {
-                x: window.innerWidth - width - 24,
+                x: window.innerWidth - width - GAP,
                 y: 96 + i * 240,
             };
             const start = saved[win.id] ?? fallback;
@@ -250,6 +274,37 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 
                 bar.addEventListener("pointermove", move);
                 bar.addEventListener("pointerup", up);
+            });
+
+            /* Dragging is functionality, so it has to work without a
+               pointer too. The bar is only made focusable here, in the
+               branch that actually floats the window — in the flow it
+               moves nothing, and a tab stop that does nothing is worse
+               than no tab stop. */
+            bar.tabIndex = 0;
+            bar.setAttribute("role", "application");
+            bar.setAttribute("aria-roledescription", MOVE_HINT);
+
+            bar.addEventListener("keydown", (e) => {
+                const step = e.shiftKey ? 4 : 16;
+                const by: Record<string, [number, number]> = {
+                    ArrowLeft: [-step, 0],
+                    ArrowRight: [step, 0],
+                    ArrowUp: [0, -step],
+                    ArrowDown: [0, step],
+                };
+                const d = by[e.key];
+                if (!d) return;
+                e.preventDefault();
+                win.style.zIndex = String(++top);
+                savePosition(
+                    win.id,
+                    place(
+                        win,
+                        parseFloat(win.style.left) + d[0],
+                        parseFloat(win.style.top) + d[1],
+                    ),
+                );
             });
         });
 
