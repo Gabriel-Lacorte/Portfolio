@@ -1,0 +1,80 @@
+---
+/**
+ * The one drawing on the site: the wordmark, pixel-drawn in half blocks.
+ *
+ * Hand-tuned 8px-tall bitmaps per glyph, rendered as four rows of ▀▄█.
+ * With line-height 1 each half block is a square pixel (7×7 at 14px
+ * Iosevka, since it advances 0.5em per cell), so the file itself carries
+ * a raster — line work in the site's own characters, never a dither.
+ * The domain dot is the one blood mark.
+ *
+ * A screen reader announces "lacorte.city" once and never hears the
+ * blocks, the same contract as the ASCII figures. Subpages keep the
+ * two-line type ident; this replaces it on home only.
+ */
+type Props = {
+    /** Localised tagline shown under the mark. */
+    tagline: string;
+};
+
+const { tagline } = Astro.props;
+
+/* 66 cells wide: fits without horizontal scroll at 14px desktop (462px),
+   10px ≤700px (330px), 8px ≤370px (264px) — even sizes only. Assembled
+   here and rendered with set:html because a <pre> full of inline
+   expressions trips the template parser; the strings are hand-drawn
+   literals, nothing user-supplied. */
+const R0 = "██   ▄▄▄▄   ▄▄▄▄  ▄▄▄▄  ▄▄▄▄▄  ██   ▄▄▄▄      ▄▄▄▄ ██   ██  ▄▄  ▄▄";
+const R1 = "██   ▄▄▄██ ██    ██  ██ ██ ▀▀ ▀██▀ ██▄▄██    ██        ▀██▀ ██  ██";
+const R2 = `██  ██  ██ ██    ██  ██ ██     ██  ██     <span class="dot">▄▄</span> ██    ██   ██   ▀▀▀██`;
+const R3 = `▀▀▀  ▀▀▀▀▀  ▀▀▀▀  ▀▀▀▀  ▀▀     ▀▀▀  ▀▀▀▀  <span class="dot">▀▀</span>  ▀▀▀▀ ▀▀▀  ▀▀▀  ▄▄▄█▀`;
+
+const ART = [R0, R1, R2, R3].join("\n");
+---
+
+<div class="masthead">
+    <div class="art" role="img" aria-label="lacorte.city">
+        <pre set:html={ART} />
+    </div>
+    <p class="who">{tagline}</p>
+</div>
+
+<style>
+    .masthead {
+        margin: 0 0 10px;
+    }
+
+    /* line-height 1 is what squares the pixels; leading would tear the
+       raster apart. */
+    .art pre {
+        margin: 0;
+        font-family: var(--code);
+        font-size: 14px;
+        line-height: 1;
+        white-space: pre;
+        color: var(--base);
+    }
+
+    /* The injected span carries no scope attribute; keep the rule inside
+       the scoped .art so it stays contained anyway. */
+    .art :global(.dot) {
+        color: var(--accent);
+    }
+
+    .who {
+        margin: 8px 0 0;
+        color: var(--comment);
+    }
+
+    @media (max-width: 700px) {
+        .art pre {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 370px) {
+        .art pre {
+            font-size: 8px;
+        }
+    }
+</style>

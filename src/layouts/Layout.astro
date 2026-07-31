@@ -50,10 +50,12 @@ const isCurrent = (href: string) =>
 
         <div class="container">
             <header class="site">
-                <p class="ident">
-                    <span class="mark">{SITE.HANDLE}</span>
-                    <span class="who">{t("site.tagline")}</span>
-                </p>
+                <slot name="ident">
+                    <p class="ident">
+                        <span class="mark">{SITE.HANDLE}</span>
+                        <span class="who">{t("site.tagline")}</span>
+                    </p>
+                </slot>
 
                 <nav class="menu" aria-label="Main">
                     <ul>

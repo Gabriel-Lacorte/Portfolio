@@ -31,10 +31,18 @@ AMBER = "#e8b04b"
 
 
 # ── icons ──────────────────────────────────────────────────────────────
-# 16x16 pixel grids, one per section heading. '.' is transparent.
-#   x bone   o blood   d dim   g green   a amber
+# 16x16 pixel grids, one per section heading. '.' is transparent, every
+# other character is drawn.
+#
+# These are rendered as solid white on transparent and used as CSS masks,
+# painted with currentColor. They were baked in the palette's colours at
+# first, which meant every palette change stranded them — twice — and on
+# the paper theme they sat at 1.04:1 against the background, invisible.
+# A mask cannot go stale: it follows the text colour of whatever it sits
+# in, in both themes, for ever.
 
-PIXELS = {".": None, "x": BONE, "o": BLOOD, "d": DIM, "g": GREEN, "a": AMBER}
+MASK = "#ffffff"
+PIXELS = {".": None}
 
 ICONS = {
     "term": [
@@ -97,9 +105,8 @@ def build_icons() -> None:
         px = im.load()
         for y, row in enumerate(grid):
             for x, ch in enumerate(row):
-                colour = PIXELS[ch]
-                if colour:
-                    px[x, y] = (*bytes.fromhex(colour[1:]), 255)
+                if ch != ".":
+                    px[x, y] = (*bytes.fromhex(MASK[1:]), 255)
         im.save(out / f"{name}.png")
     print(f"icons    -> {len(ICONS)} files in public/icons/")
 

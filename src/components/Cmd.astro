@@ -39,14 +39,10 @@ const {
 ---
 
 <Tag class="cmd" id={id}>
-    <img
+    <span
         class="icon"
-        src={`/icons/${icon}.png`}
-        width="16"
-        height="16"
-        alt=""
-        aria-hidden="true"
-    />
+        style={`--glyph: url(/icons/${icon}.png)`}
+        aria-hidden="true"></span>
     <span class="run">{run}</span>
     {arg && <span class="flag">{arg}</span>}
     {aside && <span class="aside">{aside}</span>}

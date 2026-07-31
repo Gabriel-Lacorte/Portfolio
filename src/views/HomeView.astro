@@ -1,6 +1,7 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Cmd from "@components/Cmd.astro";
+import Masthead from "@components/Masthead.astro";
 import { postsFor } from "@lib/posts";
 import { compact, getStats, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
@@ -43,6 +44,8 @@ const isNew = (d: Date) =>
     suffix={false}
     windows
 >
+    <Masthead slot="ident" tagline={t("site.tagline")} />
+
     <h1 class="sr-only">{SITE.TITLE} — {t("site.role")}</h1>
 
     <Cmd run="whoami" icon="term" />

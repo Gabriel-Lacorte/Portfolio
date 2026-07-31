@@ -181,6 +181,12 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - **Style:** `padding-left: 16px; border-left: 1px solid {colors.rule}` — output sits indented under its command the way it does in a terminal.
 - This pairing (`.cmd` + `.out`) is the entire page grammar; sections are separated by rhythm (26px), not by boxes.
 
+### Masthead Wordmark (signature, home only)
+- **What:** the one drawing the site allows itself — "lacorte.city" hand-drawn as 8px-tall pixel bitmaps per glyph, rendered as four rows of half blocks (▀▄█) at `line-height: 1`, which squares every half block (7×7px at 14px; 5×5 at 10px ≤700px; 4×4 at 8px ≤370px — even sizes only, 66 cells wide so it never scrolls).
+- **Color:** bone; the domain dot is the one blood mark in the masthead.
+- **Semantics:** `role="img"` + `aria-label="lacorte.city"` — announced once, never block by block. Subpages keep the two-line type ident via the `ident` slot's fallback.
+- **Rule:** it stays the only drawing in the chrome. A second one demotes both.
+
 ### Navigation
 - **Style:** hairline above and below, links pushed right (left-aligned under 700px), each label bracketed: `[ ~/ ] [ blog ] [ projects ]`.
 - **States:** `aria-current="page"` and hover both render full reverse video. The language switch (`EN / PT`) sits after them in comment color.

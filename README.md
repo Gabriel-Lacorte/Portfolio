@@ -131,9 +131,15 @@ python3 scripts/gen-assets.py            # everything
 python3 scripts/gen-assets.py icons      # one group
 ```
 
-**Rerun it after any palette change.** The icons and the buttons have each
-been left behind in a previous palette once already — they are baked
-pixels, not CSS, and nothing warns you.
+**Rerun it after any palette change** — for the buttons. They are baked
+pixels, and they were left behind in an old palette once already with
+nothing to warn you.
+
+The icons no longer have that problem. They are rendered as white-on-
+transparent masks and painted with `currentColor`, so they follow the
+text colour of whatever they sit in. As coloured PNGs they were stranded
+twice, and on the paper theme they measured 1.04:1 against the
+background — invisible. A mask cannot go stale.
 
 The font job needs the upstream package first:
 

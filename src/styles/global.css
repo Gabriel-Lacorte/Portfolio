@@ -17,10 +17,11 @@
        the one committed exception.
      · headings are the command whose output follows them.
      · hover is reverse video, everywhere.
-     · no masthead art. Every image I tried read as clutter on a page
-       whose substance is text, and a 1-bit dither of anything complex is
-       just static. If art ever earns the spot it will be line work, not
-       tone.
+     · one drawing: the home masthead wordmark, pixel-drawn in half
+       blocks with the domain dot in blood. Every image before it read
+       as clutter, and a 1-bit dither of anything complex is just
+       static — this is line work in the site's own characters, the
+       exception that rule was written to permit. Subpages keep type.
      · the chrome speaks Departure Mono; the prose is Iosevka on a 72ch
        measure, because twenty minutes of reading in a pixel face is a
        punishment.
@@ -337,11 +338,13 @@ html.light .menu .mode button[data-theme-set="light"],
 }
 
 /* ── identity ──────────────────────────────────────────────────────────
-   No graphic. Every large decorative image I put here read as clutter on
-   a page whose whole substance is text, and a 1-bit dither of anything
-   complex is just static — the engravings in the references work because
-   they are line work, not tone. So the masthead is two lines of type and
-   the page gets on with it. */
+   The default masthead is two lines of type. Home swaps in the one
+   drawing the site allows itself — the pixel wordmark (Masthead.astro).
+   Everything else I tried here read as clutter, and a 1-bit dither of
+   anything complex is just static; the engravings in the references work
+   because they are line work, not tone. The wordmark is line work in the
+   file's own characters, which is the loophole that sentence always
+   held. Subpages keep the type and get on with it. */
 
 .ident {
     display: flex;
@@ -390,11 +393,18 @@ html.light .menu .mode button[data-theme-set="light"],
     color: var(--accent);
 }
 
+/* Painted with currentColor through a mask rather than served as a
+   coloured PNG. Baked pixels do not follow a palette: these were stranded
+   in an old one twice, and on the paper theme they sat at 1.04:1 against
+   the background — invisible. A mask cannot go stale. */
 .cmd .icon {
+    flex: none;
     width: 16px;
     height: 16px;
-    image-rendering: pixelated;
     align-self: center;
+    background-color: currentColor;
+    -webkit-mask: var(--glyph) center / 16px 16px no-repeat;
+    mask: var(--glyph) center / 16px 16px no-repeat;
 }
 
 /* margin-left:auto pins it to the right edge, which on a phone pushed the
