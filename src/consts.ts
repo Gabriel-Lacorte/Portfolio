@@ -51,15 +51,15 @@ export const PROJECTS_META: Metadata = {
    underneath it. Statuses are deliberately honest — a sheet where every
    row says FLUENT carries no information at all. */
 export const CAPABILITIES: Capability[] = [
-    { NAME: "go · services · tooling", STATUS: "FLUENT" },
-    { NAME: "python · automation", STATUS: "FLUENT" },
-    { NAME: "c · systems programming", STATUS: "FLUENT" },
+    { NAME: "go · services", STATUS: "FLUENT" },
+    { NAME: "python · tooling", STATUS: "FLUENT" },
+    { NAME: "c · systems", STATUS: "FLUENT" },
     { NAME: "linux · syscalls · elf", STATUS: "ACTIVE" },
-    { NAME: "docker · networking · self-host", STATUS: "ACTIVE" },
-    { NAME: "active directory · kerberos", STATUS: "FIELD" },
-    { NAME: "reverse engineering · malware", STATUS: "FIELD" },
-    { NAME: "kvm · vmx · ept · paging", STATUS: "STUDY" },
-    { NAME: "compilers · ir · codegen", STATUS: "STUDY" },
+    { NAME: "docker · networking", STATUS: "ACTIVE" },
+    { NAME: "active directory", STATUS: "FIELD" },
+    { NAME: "reverse engineering", STATUS: "FIELD" },
+    { NAME: "kvm · vmx · ept", STATUS: "STUDY" },
+    { NAME: "compilers · codegen", STATUS: "STUDY" },
 ];
 
 /* TODO(gabriel): review — carried over from lacorte.neocities.org and the

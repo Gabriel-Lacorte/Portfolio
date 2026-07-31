@@ -276,8 +276,11 @@ a:focus-visible {
     gap: 0.5ch;
 }
 
-.titlebar .controls span,
-.titlebar .controls button {
+/* Scoped to the chrome glyphs only. As `.controls span` this also caught
+   the language switcher — 0,3,0 beat its own 0,1,0 rule and squeezed EN
+   and PT into one 2.2ch grid cell, stacked on top of each other. */
+.titlebar .controls > .chrome,
+.titlebar .controls > button {
     display: grid;
     width: 2.2ch;
     height: 1.35rem;
@@ -454,6 +457,9 @@ a:focus-visible {
     align-items: baseline;
     gap: 1ch;
     padding-block: 0.06rem;
+    /* Hard stop: whatever the content, a row stays inside its panel. */
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .spec .k {
@@ -479,7 +485,6 @@ a:focus-visible {
 
 .spec .v {
     flex: none;
-    min-width: 7ch;
     text-align: right;
     color: var(--bright);
     font-variant-numeric: tabular-nums;

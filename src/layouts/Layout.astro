@@ -111,17 +111,23 @@ const isCurrent = (href: string) =>
 </html>
 
 <style>
+    /* Its own flex row, and each link sized like the chrome buttons
+       beside it rather than inheriting their grid placement. */
     .lang {
         display: flex;
+        align-items: stretch;
         margin-right: 1ch;
         border: 1px solid var(--rule);
+        line-height: 1;
     }
 
     .lang a {
+        display: flex;
+        align-items: center;
+        height: 1.35rem;
         padding-inline: 0.7ch;
         color: var(--dim);
         font-size: 11px;
-        line-height: 1.35rem;
     }
 
     .lang a + a {
