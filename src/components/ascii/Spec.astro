@@ -1,8 +1,8 @@
 ---
 /**
- * The site's signature row:
+ * The site's grammar:
  *
- *   github .................................... Gabriel-Lacorte
+ *   GO / SERVICES ......................... FLUENT
  *
  * The leader is a repeating radial-gradient rather than a run of "."
  * characters, so it always reaches exactly to the value, never wraps, and
@@ -13,6 +13,8 @@ type Row = {
     v: string;
     href?: string;
     external?: boolean;
+    /** Renders the value muted — for secondary or pending entries. */
+    dim?: boolean;
 };
 
 type Props = {
@@ -23,9 +25,9 @@ type Props = {
 const { rows, class: className } = Astro.props;
 ---
 
-<ul class:list={["leaders", className]}>
+<ul class:list={["spec", className]}>
     {
-        rows.map(({ k, v, href, external }) => (
+        rows.map(({ k, v, href, external, dim }) => (
             <li>
                 <span class="k">
                     {href ? (
@@ -41,7 +43,9 @@ const { rows, class: className } = Astro.props;
                     )}
                 </span>
                 <span class="lead" aria-hidden="true" />
-                <span class="v">{v}</span>
+                <span class="v" data-tone={dim ? "dim" : undefined}>
+                    {v}
+                </span>
             </li>
         ))
     }

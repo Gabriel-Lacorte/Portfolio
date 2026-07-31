@@ -87,9 +87,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
     function paintToggle() {
         const theme = current();
         const button = document.getElementById("theme-toggle");
-        const label = button?.querySelector("[data-theme-label]");
-        if (label) label.textContent = theme === "light" ? "☀" : "☾";
-        button?.setAttribute(
+        if (!button) return;
+        button.textContent = theme === "light" ? "☀" : "☾";
+        button.setAttribute(
             "aria-label",
             `Switch to ${theme === "light" ? "dark" : "light"} theme`,
         );

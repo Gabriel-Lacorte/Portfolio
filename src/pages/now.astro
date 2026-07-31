@@ -1,76 +1,51 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import Panel from "@components/ascii/Panel.astro";
 import { NOW } from "@consts";
 ---
 
-<Layout
-    title="Now"
-    description="What I am working on and reading at the moment."
->
-    <div class="shell">
-        <header class="page-head">
-            <h1>~/now</h1>
-            <p class="lede">
-                What has my attention at the moment. Updated when it changes,
-                not on a schedule.
-            </p>
-        </header>
+<Layout title="Now" description="What I am working on and reading at the moment.">
+  <div class="stack-gap">
+    <Panel title="~/now" note={NOW.UPDATED} as="h1">
+      <p class="lede">
+        What has my attention at the moment. Updated when it changes, not on a
+        schedule.
+      </p>
+    </Panel>
 
-        <ul class="lines reveal">
-            {NOW.LINES.map((line) => <li>{line}</li>)}
-        </ul>
-
-        <p class="updated">
-            last updated <time datetime={NOW.UPDATED}>{NOW.UPDATED}</time>
-        </p>
-    </div>
+    <Panel title="signal" note={`${NOW.LINES.length} active`}>
+      <ul class="signal">
+        {
+          NOW.LINES.map((line, i) => (
+            <li>
+              <span class="idx" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              <span>{line}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </Panel>
+  </div>
 </Layout>
 
 <style>
-    .page-head {
-        padding-top: calc(var(--step) * 1.5);
-        margin-bottom: calc(var(--step) * 1.5);
-    }
+  .lede {
+    max-width: var(--measure);
+  }
 
-    h1 {
-        margin: 0;
-        font-family: var(--font-display);
-        font-size: 1.5rem;
-        font-weight: 400;
-        letter-spacing: 0.06em;
-        color: var(--bright);
-    }
+  .signal > li {
+    display: flex;
+    gap: 1.5ch;
+    max-width: var(--measure);
+  }
 
-    .lede {
-        max-width: var(--measure);
-        margin: 0.5rem 0 0;
-        color: var(--base);
-    }
+  .signal > li + li {
+    margin-top: 0.5rem;
+  }
 
-    .lines {
-        max-width: var(--measure);
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
-
-    .lines > li {
-        padding-left: 3ch;
-        text-indent: -3ch;
-    }
-
-    .lines > li::before {
-        content: "─ ";
-        color: var(--accent);
-    }
-
-    .lines > li + li {
-        margin-top: 0.5rem;
-    }
-
-    .updated {
-        margin-top: calc(var(--step) * 1.5);
-        color: var(--faint);
-        font-size: 0.93em;
-    }
+  .idx {
+    flex: none;
+    color: var(--dot);
+    font-variant-numeric: tabular-nums;
+  }
 </style>

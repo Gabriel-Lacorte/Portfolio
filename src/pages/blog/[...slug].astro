@@ -1,6 +1,8 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
+import Panel from "@components/ascii/Panel.astro";
+import Spec from "@components/ascii/Spec.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import { compact, countWords, readingTime } from "@lib/stats";
 
@@ -20,96 +22,65 @@ type Props = CollectionEntry<"blog">;
 const post = Astro.props;
 const { Content, headings } = await post.render();
 
-const words = countWords(post.body);
 const iso = post.data.date.toISOString().slice(0, 10);
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
-    <div class="shell">
-        <a class="back" href="/blog">← ~/blog</a>
+    <div class="stack-gap">
+        <Panel title={post.data.title} note={iso} as="h1">
+            <p class="summary">{post.data.description}</p>
+            <Spec
+                class="meta"
+                rows={[
+                    { k: "filed", v: iso },
+                    { k: "read", v: `${readingTime(post.body)} min` },
+                    { k: "words", v: compact(countWords(post.body)) },
+                    ...(post.data.tags.length
+                        ? [{ k: "tags", v: post.data.tags.join(" · ") }]
+                        : []),
+                ]}
+            />
+        </Panel>
 
-        <article class="article">
-            <header class="post-head">
-                <h1>{post.data.title}</h1>
-                <p class="summary">{post.data.description}</p>
-                <dl class="post-meta">
-                    <div>
-                        <dt>date</dt>
-                        <dd><time datetime={iso}>{iso}</time></dd>
-                    </div>
-                    <div>
-                        <dt>read</dt>
-                        <dd>{readingTime(post.body)} min</dd>
-                    </div>
-                    <div>
-                        <dt>words</dt>
-                        <dd>{compact(words)}</dd>
-                    </div>
-                </dl>
-            </header>
+        {
+            headings.length > 0 && (
+                <Panel title="contents" note={`${headings.length} sections`}>
+                    <TableOfContents headings={headings} />
+                </Panel>
+            )
+        }
 
-            {headings.length > 0 && <TableOfContents headings={headings} />}
+        <div class="panel">
+            <div class="panel-body">
+                <article class="article">
+                    <Content />
+                </article>
+            </div>
+        </div>
 
-            <Content />
-        </article>
+        <a class="back" href="/blog">◂ back to ~/blog</a>
     </div>
 </Layout>
 
 <style>
-    .back {
-        display: inline-block;
-        margin-top: calc(var(--step) * 1.25);
-        color: var(--dim);
-        text-decoration: none;
-        font-size: 0.93em;
-    }
-
-    .back:hover {
-        color: var(--bg);
-        background: var(--accent);
-    }
-
-    .post-head {
-        margin-block: var(--step) calc(var(--step) * 1.5);
-        padding-bottom: var(--step);
-        border-bottom: 1px solid var(--line);
-    }
-
-    h1 {
-        margin: 0;
-        font-size: 1.6rem;
-        font-weight: 600;
-        line-height: 1.25;
-        color: var(--bright);
-    }
-
     .summary {
         max-width: var(--measure);
-        margin: 0.5rem 0 0;
         color: var(--dim);
     }
 
-    /* Metadata as an aligned spec block rather than a run-on byline. */
-    .post-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0 4ch;
-        margin: var(--step) 0 0;
-        font-size: 0.93em;
-        font-variant-numeric: tabular-nums;
+    :global(.spec.meta) {
+        max-width: 52ch;
+        margin-top: var(--step);
     }
 
-    .post-meta > div {
-        display: flex;
-        gap: 1ch;
-    }
-
-    .post-meta dt {
-        color: var(--faint);
-    }
-
-    .post-meta dd {
-        margin: 0;
-        color: var(--base);
+    .back {
+        display: inline-block;
+        align-self: start;
+        padding: 0.2rem 1ch;
+        border: 1px solid var(--rule);
+        color: var(--dim);
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
     }
 </style>

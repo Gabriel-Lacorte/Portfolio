@@ -1,61 +1,42 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Leaders from "@components/ascii/Leaders.astro";
-import Rule from "@components/ascii/Rule.astro";
+import Panel from "@components/ascii/Panel.astro";
+import Spec from "@components/ascii/Spec.astro";
 import { USES } from "@consts";
 ---
 
 <Layout
-    title="Uses"
-    description="Hardware, editor, and the machines this site and my homelab run on."
+  title="Uses"
+  description="Hardware, editor, and the machines this site and my homelab run on."
 >
-    <div class="shell">
-        <header class="page-head">
-            <h1>~/uses</h1>
-            <p class="lede">
-                What I type on, what I type into, and what it all runs on.
-            </p>
-        </header>
+  <div class="stack-gap">
+    <Panel title="~/uses" note={`${USES.length} groups`} as="h1">
+      <p class="lede">
+        What I type on, what I type into, and what it all runs on.
+      </p>
+    </Panel>
 
-        {
-            USES.map(({ GROUP, ROWS }) => (
-                <section class="group reveal">
-                    <Rule label={GROUP} as="h2" />
-                    <Leaders
-                        rows={ROWS.map((row) => ({
-                            k: row.k,
-                            v: row.v,
-                            href: row.v.startsWith("/") ? row.v : undefined,
-                        }))}
-                    />
-                </section>
-            ))
-        }
+    <div class="grid-2">
+      {
+        USES.map(({ GROUP, ROWS }) => (
+          <Panel title={GROUP} note={`${ROWS.length} rows`}>
+            <Spec
+              rows={ROWS.map((row) => ({
+                k: row.k,
+                v: row.v,
+                href: row.v.startsWith("/") ? row.v : undefined,
+                dim: row.v === "—",
+              }))}
+            />
+          </Panel>
+        ))
+      }
     </div>
+  </div>
 </Layout>
 
 <style>
-    .page-head {
-        padding-top: calc(var(--step) * 1.5);
-        margin-bottom: calc(var(--step) * 1.5);
-    }
-
-    h1 {
-        margin: 0;
-        font-family: var(--font-display);
-        font-size: 1.5rem;
-        font-weight: 400;
-        letter-spacing: 0.06em;
-        color: var(--bright);
-    }
-
-    .lede {
-        max-width: var(--measure);
-        margin: 0.5rem 0 0;
-        color: var(--base);
-    }
-
-    .group + .group {
-        margin-top: calc(var(--step) * 1.5);
-    }
+  .lede {
+    max-width: var(--measure);
+  }
 </style>

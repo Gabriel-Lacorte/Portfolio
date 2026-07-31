@@ -1,102 +1,38 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import Panel from "@components/ascii/Panel.astro";
+import Spec from "@components/ascii/Spec.astro";
+import Dither from "@components/ascii/Dither.astro";
 import { NAV } from "@consts";
 ---
 
-<Layout
-    title="404"
-    description="That path does not resolve."
-    suffix={false}
->
-    <div class="shell wrap">
-        <pre class="ascii art" aria-hidden="true"><span class="r2">    ██╗  ██╗ ██████╗ ██╗  ██╗</span>
-<span class="r3">    ██║  ██║██╔═══██╗██║  ██║</span>
-<span class="r3">    ███████║██║   ██║███████║</span>
-<span class="r4">    ╚════██║██║   ██║╚════██║</span>
-<span class="r4">         ██║╚██████╔╝     ██║</span>
-<span class="r5">         ╚═╝ ╚═════╝      ╚═╝</span></pre>
+<Layout title="404 — no such file or directory" description="That path does not resolve." suffix={false}>
+  <div class="stack-gap">
+    <Panel title="fault" note="err 404" as="h1">
+      <Dither pattern="check" />
+      <p class="msg">
+        The path <code>{Astro.url.pathname}</code> does not resolve. It may have
+        moved, or it may never have existed.
+      </p>
+      <Dither pattern="check" />
+    </Panel>
 
-        <h1>404 — no such file or directory</h1>
-
-        <p class="msg">
-            The path <code>{Astro.url.pathname}</code> does not resolve. It may
-            have moved, or it may never have existed.
-        </p>
-
-        <nav aria-label="Recover">
-            <ul>
-                {
-                    NAV.map(({ LABEL, HREF }) => (
-                        <li>
-                            <a href={HREF}>{LABEL}</a>
-                        </li>
-                    ))
-                }
-            </ul>
-        </nav>
-    </div>
+    <Panel title="recover" note={`${NAV.length} routes`}>
+      <Spec rows={NAV.map(({ LABEL, HREF }) => ({ k: LABEL, v: HREF, href: HREF }))} />
+    </Panel>
+  </div>
 </Layout>
 
 <style>
-    .wrap {
-        padding-block: calc(var(--step) * 3);
-    }
+  .msg {
+    max-width: var(--measure);
+    margin-block: var(--step);
+  }
 
-    .art {
-        font-size: clamp(8px, 2.2vw, 15px);
-        margin-bottom: var(--step);
-    }
-
-    .art .r2 {
-        color: var(--ramp-2);
-    }
-    .art .r3 {
-        color: var(--ramp-3);
-    }
-    .art .r4 {
-        color: var(--ramp-4);
-    }
-    .art .r5 {
-        color: var(--ramp-5);
-    }
-
-    h1 {
-        margin: 0;
-        font-size: 1.15rem;
-        font-weight: 600;
-        color: var(--bright);
-    }
-
-    .msg {
-        max-width: var(--measure);
-        margin: 0.6rem 0 0;
-        color: var(--dim);
-    }
-
-    code {
-        padding: 0.1em 0.5ch;
-        border: 1px solid var(--line);
-        background: var(--bg-raised);
-        color: var(--accent);
-        overflow-wrap: anywhere;
-    }
-
-    nav ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0 2ch;
-        margin: var(--step) 0 0;
-        padding: 0;
-        list-style: none;
-    }
-
-    nav a {
-        color: var(--dim);
-        text-decoration: none;
-    }
-
-    nav a:hover {
-        color: var(--bg);
-        background: var(--accent);
-    }
+  code {
+    padding: 0.05em 0.5ch;
+    border: 1px solid var(--rule);
+    color: var(--bright);
+    overflow-wrap: anywhere;
+  }
 </style>

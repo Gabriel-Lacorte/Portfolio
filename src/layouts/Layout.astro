@@ -1,8 +1,7 @@
 ---
 import Head from "@components/Head.astro";
-import Header from "@components/Header.astro";
-import Footer from "@components/Footer.astro";
-import { SITE } from "@consts";
+import { NAV, SITE } from "@consts";
+import { compact, getStats } from "@lib/stats";
 
 type Props = {
     title: string;
@@ -12,6 +11,14 @@ type Props = {
 };
 
 const { title, description, suffix = true } = Astro.props;
+
+const stats = await getStats();
+
+/* Trailing slashes normalised so /blog/kerberos-attacks marks BLOG as
+   current, and ~/ only ever marks itself. */
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const isCurrent = (href: string) =>
+    href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
 ---
 
 <!doctype html>
@@ -23,11 +30,74 @@ const { title, description, suffix = true } = Astro.props;
         />
     </head>
     <body>
-        <a class="skip-link" href="#content">Skip to content</a>
-        <Header />
-        <main id="content" tabindex="-1">
-            <slot />
-        </main>
-        <Footer />
+        <a class="skip-link" href="#screen">Skip to content</a>
+
+        <div class="chassis">
+            <div class="enclosure">
+                <div class="titlebar">
+                    <span class="designation">{SITE.DESIGNATION}</span>
+                    <span class="controls" aria-hidden="true">
+                        <span>_</span>
+                        <span>□</span>
+                        <button
+                            id="theme-toggle"
+                            type="button"
+                            class="no-print"
+                            data-theme-label>·</button
+                        >
+                    </span>
+                </div>
+
+                <nav class="menubar" aria-label="Main">
+                    {
+                        NAV.map(({ LABEL, HREF }) => (
+                            <a
+                                href={HREF}
+                                aria-current={
+                                    isCurrent(HREF) ? "page" : undefined
+                                }
+                            >
+                                {LABEL}
+                            </a>
+                        ))
+                    }
+                </nav>
+
+                <main class="screen" id="screen" tabindex="-1">
+                    <slot />
+                </main>
+
+                <div class="statusbar">
+                    <span>online</span>
+                    <span class="sep" aria-hidden="true">│</span>
+                    <span>posts <b>{stats.posts}</b></span>
+                    <span class="sep" aria-hidden="true">│</span>
+                    <span>words <b>{compact(stats.words)}</b></span>
+                    <span class="sep" aria-hidden="true">│</span>
+                    <span>build <b>{stats.commit}</b></span>
+                    <span class="sep" aria-hidden="true">│</span>
+                    <span>{stats.built}</span>
+                    <span class="sep push" aria-hidden="true">│</span>
+                    <span class="mail">
+                        <a href={`mailto:${SITE.EMAIL}`}>{SITE.EMAIL}</a>
+                    </span>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
+
+<style>
+    /* Pushes the address to the far end on wide screens and simply wraps
+       with everything else when there is no room. */
+    .statusbar .push {
+        margin-left: auto;
+    }
+
+    @media (max-width: 680px) {
+        .statusbar .push,
+        .statusbar .mail {
+            display: none;
+        }
+    }
+</style>

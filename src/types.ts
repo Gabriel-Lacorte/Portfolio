@@ -1,10 +1,11 @@
 export type Site = {
     TITLE: string;
     HANDLE: string;
+    DESIGNATION: string;
     ROLE: string;
-    TAGLINE: string;
     DESCRIPTION: string;
     EMAIL: string;
+    LOCATION: string;
 };
 
 export type Metadata = {
@@ -17,9 +18,12 @@ export type NavItem = {
     HREF: string;
 };
 
-export type Focus = {
-    AREA: string;
-    ITEMS: string;
+/** A row on the capability sheet: what it is, and how far along it is. */
+export type Capability = {
+    NAME: string;
+    /** FLUENT = ship it daily · FIELD = used in anger · ACTIVE = in hand
+     *  · STUDY = deliberately learning. Kept honest on purpose. */
+    STATUS: "FLUENT" | "FIELD" | "ACTIVE" | "STUDY";
 };
 
 export type Project = {
@@ -30,14 +34,9 @@ export type Project = {
     YEAR: string;
 };
 
-export type StackLayer = {
-    RING: string;
-    NAME: string;
-    /** Block character the density bar is drawn from. */
-    FILL: string;
-    DETAIL: string;
-    /** Marks the layer this site is about. */
-    HERE?: boolean;
+export type ChangelogEntry = {
+    DATE: string;
+    TEXT: string;
 };
 
 export type UsesGroup = {

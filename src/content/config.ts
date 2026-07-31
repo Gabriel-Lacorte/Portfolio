@@ -6,6 +6,9 @@ const blog = defineCollection({
         title: z.string(),
         description: z.string(),
         date: z.coerce.date(),
+        /* Lower-case, single words where possible — they are rendered as
+           chips and long labels wreck the row rhythm. */
+        tags: z.array(z.string()).default([]),
         draft: z.boolean().optional(),
     }),
 });

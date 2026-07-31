@@ -1,174 +1,323 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
-import Banner from "@components/ascii/Banner.astro";
-import Frame from "@components/ascii/Frame.astro";
-import Leaders from "@components/ascii/Leaders.astro";
-import Rule from "@components/ascii/Rule.astro";
-import Stack from "@components/ascii/Stack.astro";
-import { FOCUS, HOME, PROJECTS, SITE, SOCIALS } from "@consts";
+import Dither from "@components/ascii/Dither.astro";
+import Figure from "@components/ascii/Figure.astro";
+import Panel from "@components/ascii/Panel.astro";
+import Spec from "@components/ascii/Spec.astro";
+import Wordmark from "@components/ascii/Wordmark.astro";
+import {
+    CAPABILITIES,
+    CHANGELOG,
+    HOME,
+    NOW,
+    PIPELINE,
+    PIPELINE_ALT,
+    PROJECTS,
+    SITE,
+    SOCIALS,
+} from "@consts";
 import { readingTime } from "@lib/stats";
 
 const posts = (await getCollection("blog"))
     .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-    .slice(0, 4);
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 ---
 
 <Layout title={SITE.TITLE} description={HOME.DESCRIPTION} suffix={false}>
-    <div class="shell">
-        <section class="hero">
-            <Banner />
-            <h1 class="sr-only">{SITE.TITLE} — {SITE.ROLE}</h1>
-            <p class="tagline" aria-hidden="true">{SITE.TAGLINE}</p>
+    <div class="stack-gap">
+        <section class="masthead panel">
+            <div class="panel-body">
+                <Wordmark />
+                <h1 class="sr-only">{SITE.TITLE} — {SITE.ROLE}</h1>
+                <p class="crossbar" aria-hidden="true">
+                    systems · compilers · operating systems
+                </p>
+                <p class="statement">
+                    I work below the abstraction line — hypervisors, compilers,
+                    and operating systems. This is where I write down what I
+                    find when I take them apart.
+                </p>
+            </div>
+            <Dither />
         </section>
 
-        <p class="intro reveal">
-            I work below the abstraction line — hypervisors, compilers, and
-            operating systems. This is where I write down what I find when I
-            take them apart.
-        </p>
-
-        <Frame title="where I work" class="reveal">
-            <Stack />
-        </Frame>
-
-        <div class="two-up">
-            <section class="reveal">
-                <Rule
-                    label="writing"
-                    note={`${posts.length} recent`}
-                    as="h2"
+        <div class="grid-2">
+            <Panel title="operator" note="active">
+                <Spec
+                    rows={[
+                        { k: "name", v: SITE.TITLE },
+                        { k: "role", v: SITE.ROLE },
+                        { k: "based", v: SITE.LOCATION },
+                        { k: "writing about", v: "systems · compilers" },
+                        { k: "logged", v: `${posts.length} posts` },
+                        { k: "reachable", v: "yes" },
+                        ...SOCIALS.map(({ NAME, HANDLE, HREF }) => ({
+                            k: NAME,
+                            v: HANDLE,
+                            href: HREF,
+                            external: true,
+                        })),
+                        {
+                            k: "mail",
+                            v: SITE.EMAIL,
+                            href: `mailto:${SITE.EMAIL}`,
+                        },
+                    ]}
                 />
-                <ul class="entries">
-                    {
-                        posts.map((post) => (
-                            <li>
-                                <a href={`/blog/${post.slug}`}>
-                                    {post.data.title}
-                                </a>
-                                <div class="entry-meta">
-                                    <time datetime={iso(post.data.date)}>
-                                        {iso(post.data.date)}
-                                    </time>
-                                    <span aria-hidden="true">·</span>
-                                    <span>{readingTime(post.body)} min</span>
-                                </div>
-                            </li>
-                        ))
-                    }
-                </ul>
-                <a class="more" href="/blog">all posts →</a>
-            </section>
+            </Panel>
 
-            <section class="reveal">
-                <Rule
-                    label="building"
-                    note={`${PROJECTS.length} listed`}
-                    as="h2"
+            <Panel title="capability" note="self-assessed">
+                <Spec
+                    rows={CAPABILITIES.map(({ NAME, STATUS }) => ({
+                        k: NAME,
+                        v: STATUS,
+                        dim: STATUS === "STUDY",
+                    }))}
                 />
-                <ul class="entries">
+            </Panel>
+        </div>
+
+        <Panel
+            title="transmissions"
+            note={`${posts.length} logged`}
+            bodyClass="flush"
+        >
+            <ol class="log">
+                {
+                    posts.map((post) => (
+                        <li>
+                            <a href={`/blog/${post.slug}`}>
+                                <time
+                                    class="stamp"
+                                    datetime={iso(post.data.date)}
+                                >
+                                    {iso(post.data.date)}
+                                </time>
+                                <span class="name">{post.data.title}</span>
+                                <span class="lead" aria-hidden="true" />
+                                <span class="len">
+                                    {readingTime(post.body)} min
+                                </span>
+                            </a>
+                            <p class="sub">
+                                {post.data.description}
+                                {post.data.tags.length > 0 && (
+                                    <span class="tags">
+                                        {post.data.tags.map((tag) => (
+                                            <span class="tag">{tag}</span>
+                                        ))}
+                                    </span>
+                                )}
+                            </p>
+                        </li>
+                    ))
+                }
+            </ol>
+        </Panel>
+
+        <div class="grid-2">
+            <Panel title="builds" note={`${PROJECTS.length} listed`}>
+                <ul class="builds">
                     {
                         PROJECTS.map((project) => (
                             <li>
                                 <a href={project.HREF}>{project.NAME}</a>
-                                <div class="entry-meta">
-                                    {project.STACK.slice(0, 3).join(" · ")}
-                                </div>
+                                <p class="sub">{project.SUMMARY}</p>
+                                <p class="kit">{project.STACK.join(" · ")}</p>
                             </li>
                         ))
                     }
                 </ul>
-                <a class="more" href="/projects">all projects →</a>
-            </section>
+                <a class="more" href="/projects">all builds ▸</a>
+            </Panel>
+
+            {/* Two shorter panels stacked, so the column closes level with
+                the taller one beside it instead of trailing dead space. */}
+            <div class="stack-gap">
+                <Panel title="signal" note={NOW.UPDATED}>
+                    <ul class="signal">
+                        {
+                            NOW.LINES.map((line, i) => (
+                                <li>
+                                    <span class="idx" aria-hidden="true">
+                                        {String(i + 1).padStart(2, "0")}
+                                    </span>
+                                    <span>{line}</span>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                    <a class="more" href="/now">full signal ▸</a>
+                </Panel>
+
+                <Panel title="log" note={`${CHANGELOG.length} entries`}>
+                    <Spec
+                        rows={CHANGELOG.map(({ DATE, TEXT }) => ({
+                            k: DATE,
+                            v: TEXT,
+                            dim: true,
+                        }))}
+                        class="logspec"
+                    />
+                </Panel>
+            </div>
         </div>
 
-        <section class="reveal block">
-            <Rule label="focus" as="h2" />
-            <Leaders
-                rows={FOCUS.map(({ AREA, ITEMS }) => ({ k: AREA, v: ITEMS }))}
-            />
-        </section>
-
-        <section class="reveal block">
-            <Rule label="elsewhere" as="h2" />
-            <Leaders
-                rows={[
-                    ...SOCIALS.map(({ NAME, HANDLE, HREF }) => ({
-                        k: NAME,
-                        v: HANDLE,
-                        href: HREF,
-                        external: true,
-                    })),
-                    {
-                        k: "mail",
-                        v: SITE.EMAIL,
-                        href: `mailto:${SITE.EMAIL}`,
-                    },
-                ]}
-            />
-        </section>
+        <Panel title="what I'm building toward" note="fig. a">
+            <Figure
+                alt={PIPELINE_ALT}
+                caption="The half of the stack I am teaching myself properly: everything between source text and an ELF binary."
+                bare
+            >
+                {PIPELINE}
+            </Figure>
+        </Panel>
     </div>
 </Layout>
 
 <style>
-    .hero {
-        padding-top: calc(var(--step) * 1.5);
+    .masthead {
+        overflow: hidden;
     }
 
-    .tagline {
-        margin: 0.6rem 0 0;
+    .masthead .panel-body {
+        padding-bottom: calc(var(--step) * 0.6);
+    }
+
+    .crossbar {
+        margin-top: 0.9rem;
+    }
+
+    .statement {
+        max-width: var(--measure);
+        margin-top: 0.9rem;
+        color: var(--ink);
+    }
+
+    /* ── Transmissions: a directory listing ───────────────────────── */
+    :global(.panel-body.flush) {
+        padding-inline: 0;
+        padding-block: 0;
+    }
+
+    .log > li {
+        padding: 0.5rem var(--pad);
+    }
+
+    .log > li + li {
+        border-top: 1px solid var(--rule);
+    }
+
+    .log a {
+        display: flex;
+        align-items: baseline;
+        gap: 1ch;
+    }
+
+    .log .stamp {
+        flex: none;
         color: var(--dim);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .log .name {
+        flex: none;
+        color: var(--bright);
+        text-transform: uppercase;
         letter-spacing: 0.04em;
     }
 
-    .intro {
-        max-width: var(--measure);
-        margin: var(--step) 0 0;
-        color: var(--base);
+    .log .lead {
+        flex: 1;
+        min-width: 2ch;
+        height: 1px;
+        align-self: center;
+        background-image: radial-gradient(
+            circle at center,
+            var(--dot) 0.5px,
+            transparent 0.6px
+        );
+        background-size: 1ch 2px;
+        background-repeat: repeat-x;
     }
 
-    .two-up {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(38ch, 1fr));
-        gap: var(--step) 4ch;
-        margin-top: calc(var(--step) * 1.5);
+    .log a:hover .lead {
+        opacity: 0;
     }
 
-    .block {
-        margin-top: calc(var(--step) * 1.75);
+    .log .len {
+        flex: none;
+        color: var(--dim);
+        font-variant-numeric: tabular-nums;
     }
 
-    .entries {
-        margin: 0;
-        padding: 0;
-        list-style: none;
+    .log a:hover .stamp,
+    .log a:hover .len,
+    .log a:hover .name {
+        color: inherit;
     }
 
-    .entries > li + li {
-        margin-top: 0.75rem;
-        padding-top: 0.75rem;
-        border-top: 1px solid var(--line);
-    }
-
-    .entries a {
-        color: var(--base);
-        text-decoration: none;
-    }
-
-    .entries a:hover {
-        color: var(--bg);
-        background: var(--accent);
-    }
-
-    .entry-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0 1ch;
+    .sub {
+        margin-top: 0.1rem;
         color: var(--dim);
         font-size: 0.93em;
+    }
+
+    .log .sub {
+        padding-left: 12ch;
+    }
+
+    .tags {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 0.3rem 1ch;
+        margin-left: 1ch;
+        vertical-align: middle;
+    }
+
+    /* ── Builds ───────────────────────────────────────────────────── */
+    .builds > li + li {
+        margin-top: 0.7rem;
+        padding-top: 0.7rem;
+        border-top: 1px solid var(--rule);
+    }
+
+    .builds a {
+        color: var(--bright);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .builds a::before {
+        content: "▸ ";
+        color: var(--dim);
+    }
+
+    .kit {
+        margin-top: 0.15rem;
+        color: var(--dot);
+        font-size: 0.88em;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    /* ── Signal ───────────────────────────────────────────────────── */
+    .signal > li {
+        display: flex;
+        gap: 1.5ch;
+        color: var(--dim);
+    }
+
+    .signal > li + li {
+        margin-top: 0.4rem;
+    }
+
+    .signal .idx {
+        flex: none;
+        color: var(--dot);
         font-variant-numeric: tabular-nums;
     }
 
@@ -176,12 +325,48 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
         display: inline-block;
         margin-top: 0.9rem;
         color: var(--dim);
-        font-size: 0.93em;
-        text-decoration: none;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
     }
 
-    .more:hover {
-        color: var(--bg);
-        background: var(--accent);
+    /* The log reads as prose and now sits in a narrow column, so its rows
+       stack: date above, entry below, leader dropped. */
+    :global(.logspec > li) {
+        display: block;
+    }
+
+    :global(.logspec > li + li) {
+        margin-top: 0.35rem;
+    }
+
+    :global(.logspec .lead) {
+        display: none;
+    }
+
+    :global(.logspec .k) {
+        font-variant-numeric: tabular-nums;
+        color: var(--dot);
+    }
+
+    :global(.logspec .v) {
+        display: block;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--dim);
+    }
+
+    @media (max-width: 680px) {
+        .log a {
+            flex-wrap: wrap;
+        }
+
+        .log .lead {
+            display: none;
+        }
+
+        .log .sub {
+            padding-left: 0;
+        }
     }
 </style>
