@@ -1,5 +1,7 @@
 import type {
     ChangelogEntry,
+    LabBox,
+    ReadingItem,
     Metadata,
     NavItem,
     Project,
@@ -149,6 +151,42 @@ export const CHANGELOG: ChangelogEntry[] = [
         DATE: "2024-05-04",
         TEXT: "New post: attacking Kerberos in Active Directory.",
     },
+];
+
+/* The homelab, from the machine itself. Real numbers out of the
+   home-server post; update them when the box changes.
+   TODO(gabriel): confirm the specs and add anything you have since put
+   in there. */
+export const LAB: LabBox[] = [
+    {
+        NAME: "nyx",
+        ROLE: "web · docker host",
+        SPEC: "2x salvaged desktops · 8GB DDR3",
+        OS: "Debian 12",
+        STATE: "up",
+    },
+    {
+        NAME: "cloudflared",
+        ROLE: "ingress tunnel",
+        SPEC: "outbound only · no open port",
+        OS: "container",
+        STATE: "up",
+    },
+    {
+        NAME: "nginx",
+        ROLE: "reverse proxy",
+        SPEC: ":80 behind the tunnel",
+        OS: "container",
+        STATE: "up",
+    },
+];
+
+/* TODO(gabriel): this is the one part I cannot invent for you — put the
+   books and papers you are actually on. */
+export const READING: ReadingItem[] = [
+    { TITLE: "Intel SDM, vol. 3", NOTE: "VMX chapters, slowly", STATE: "now" },
+    { TITLE: "—", NOTE: "add yours", STATE: "queued" },
+    { TITLE: "—", NOTE: "add yours", STATE: "queued" },
 ];
 
 /* TODO(gabriel): a /now page is only worth having if it is current.

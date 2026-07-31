@@ -42,6 +42,7 @@ const en = {
     "home.intro2":
         "This is where I write down what I find when I take those things apart. No tracking, no javascript, no newsletter. Just the notes.",
     "win.status": "Blog status",
+    "win.lab": "Homelab status",
     "win.close": "Close window",
     "win.windows": "Windows",
 
@@ -155,6 +156,7 @@ const ptBR: Record<UIKey, string> = {
     "home.intro2":
         "É aqui que eu anoto o que encontro quando desmonto essas coisas. Sem rastreio, sem javascript, sem newsletter. Só as anotações.",
     "win.status": "Status do blog",
+    "win.lab": "Status do homelab",
     "win.close": "Fechar janela",
     "win.windows": "Janelas",
 

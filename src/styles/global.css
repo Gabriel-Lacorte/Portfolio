@@ -331,6 +331,53 @@ header.site {
     background: var(--base);
 }
 
+/* ── the command line that heads each section ──────────────────────────
+   My own idea rather than the reference's inverted chip: every section is
+   the output of a command this person actually runs. It carries the same
+   terminal weight, but it says something about him instead of being
+   borrowed decoration. */
+
+.cmd {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 26px 0 10px;
+    font-weight: normal;
+    font-size: 15px;
+}
+
+.cmd::before {
+    content: "$";
+    color: var(--green);
+}
+
+.cmd .run {
+    color: var(--base);
+}
+
+.cmd .flag {
+    color: var(--purple);
+}
+
+.cmd .icon {
+    width: 16px;
+    height: 16px;
+    image-rendering: pixelated;
+    align-self: center;
+}
+
+.cmd .aside {
+    margin-left: auto;
+    color: var(--comment);
+    font-size: 14px;
+}
+
+/* Output sits indented under its command, the way it does in a terminal. */
+.out {
+    padding-left: 16px;
+    border-left: var(--dashed);
+}
+
 /* ── the inverted section chip ─────────────────────────────────────── */
 
 /* The chip carries the section break, so it needs the space a heading
@@ -390,6 +437,33 @@ main ul:not(.plain) > li::before {
 ul.plain {
     list-style: none;
     padding: 0;
+}
+
+/* ── boxes: name, role, state ──────────────────────────────────────── */
+
+.boxes > li {
+    padding: 2px 0;
+}
+
+.boxes > li::before {
+    content: none;
+}
+
+.boxes .bname {
+    color: var(--purple);
+    text-decoration: underline;
+}
+
+.boxes .state[data-s="up"] {
+    color: var(--green);
+}
+
+.boxes .state[data-s="down"] {
+    color: var(--red);
+}
+
+.boxes .state[data-s="idle"] {
+    color: var(--amber);
 }
 
 /* ── row lists: [date] title ───────────────────────────────────────── */

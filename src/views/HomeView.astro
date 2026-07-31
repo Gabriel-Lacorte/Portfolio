@@ -3,7 +3,15 @@ import Layout from "@layouts/Layout.astro";
 import { postsFor } from "@lib/posts";
 import { compact, getStats, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
-import { CHANGELOG, NOW, PROJECTS, SITE, STACK_GROUPS } from "@consts";
+import {
+    CHANGELOG,
+    LAB,
+    NOW,
+    PROJECTS,
+    READING,
+    SITE,
+    STACK_GROUPS,
+} from "@consts";
 
 type Props = { locale: Locale };
 const { locale } = Astro.props;
@@ -20,8 +28,8 @@ const br = (d: Date) =>
         .reverse()
         .join("/");
 
-/* Anything filed in the last 90 days carries the [new] marker. Measured
-   against the build date so it is decided once, at build time. */
+/* Anything filed in the last 90 days carries the [new] marker, decided
+   once against the build date. */
 const NEW_FOR_DAYS = 90;
 const isNew = (d: Date) =>
     (Date.parse(stats.built) - d.valueOf()) / 86_400_000 < NEW_FOR_DAYS;
@@ -36,82 +44,155 @@ const isNew = (d: Date) =>
 >
     <h1 class="sr-only">{SITE.TITLE} — {t("site.role")}</h1>
 
-    <p><span class="titulo">{t("home.about")}</span></p>
+    <h2 class="cmd">
+        <img class="icon" src="/icons/term.png" width="16" height="16" alt="" />
+        <span class="run">whoami</span>
+    </h2>
+    <div class="out">
+        <p>
+            {t("home.intro1")}
+            <br />
+            {t("home.intro2")}
+        </p>
+    </div>
 
-    <p>
-        {t("home.intro1")}
-        <br />
-        {t("home.intro2")}
-    </p>
+    <h2 class="cmd">
+        <img class="icon" src="/icons/note.png" width="16" height="16" alt="" />
+        <span class="run">ls -la</span> <span class="flag">~/writing</span>
+        <span class="aside">
+            {posts.length} {t("unit.posts")} · {compact(stats.words)}
+            {t("unit.words")}
+        </span>
+    </h2>
+    <div class="out">
+        <ul class="rows">
+            {
+                posts.map((post) => (
+                    <li>
+                        <span class="when">{br(post.data.date)}</span>
+                        <a href={L(`/blog/${post.data.translationKey}`)}>
+                            {post.data.title}
+                        </a>
+                        {isNew(post.data.date) && (
+                            <span class="new">[new]</span>
+                        )}
+                        <span class="len">{readingTime(post.body)} min</span>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
 
-    <p><span class="titulo">{t("home.changelog")}</span></p>
+    <h2 class="cmd">
+        <img class="icon" src="/icons/disk.png" width="16" height="16" alt="" />
+        <span class="run">systemctl status</span> <span class="flag">lab</span>
+    </h2>
+    <div class="out">
+        <ul class="boxes">
+            {
+                LAB.map(({ NAME, ROLE, SPEC, OS, STATE }) => (
+                    <li>
+                        <span class="bname">{NAME}</span>{" "}
+                        <span class="state" data-s={STATE}>
+                            ● {STATE}
+                        </span>{" "}
+                        <span class="comment">
+                            {ROLE} · {OS} · {SPEC}
+                        </span>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
 
-    {
-        CHANGELOG.slice(0, 2).map(({ DATE, TEXT }) => (
-            <p>
-                <b>{br(new Date(DATE))}</b> {TEXT}
-            </p>
-        ))
-    }
+    <h2 class="cmd">
+        <img class="icon" src="/icons/chip.png" width="16" height="16" alt="" />
+        <span class="run">cat</span> <span class="flag">~/.config/stack</span>
+    </h2>
+    <div class="out">
+        <ul>
+            {
+                STACK_GROUPS.map(({ GROUP, ITEMS }) => (
+                    <li>
+                        <b>{GROUP}</b> {ITEMS.join(", ")}
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
 
-    <p><span class="titulo">{t("home.latest")}</span></p>
+    <h2 class="cmd">
+        <img class="icon" src="/icons/star.png" width="16" height="16" alt="" />
+        <span class="run">ls</span> <span class="flag">~/projects</span>
+    </h2>
+    <div class="out">
+        <ul>
+            {
+                PROJECTS.map((project) => (
+                    <li>
+                        <a
+                            href={
+                                project.HREF.startsWith("http")
+                                    ? project.HREF
+                                    : L(project.HREF)
+                            }
+                        >
+                            {project.NAME}
+                        </a>{" "}
+                        <span class="comment">{project.SUMMARY}</span>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
 
-    <ul class="rows">
-        {
-            posts.map((post) => (
-                <li>
-                    <span class="when">[{br(post.data.date)}]</span>
-                    <a href={L(`/blog/${post.data.translationKey}`)}>
-                        {post.data.title}
-                    </a>
-                    {isNew(post.data.date) && <span class="new">[new]</span>}
-                    <span class="len">{readingTime(post.body)} min</span>
-                </li>
-            ))
-        }
-    </ul>
+    <h2 class="cmd">
+        <img class="icon" src="/icons/book.png" width="16" height="16" alt="" />
+        <span class="run">cat</span> <span class="flag">~/reading</span>
+    </h2>
+    <div class="out">
+        <ul>
+            {
+                READING.map(({ TITLE, NOTE, STATE }) => (
+                    <li>
+                        <span class:list={[STATE === "now" && "purple"]}>
+                            {TITLE}
+                        </span>{" "}
+                        <span class="comment">— {NOTE}</span>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
 
-    <p><span class="titulo">{t("home.projects")}</span></p>
+    <h2 class="cmd">
+        <img class="icon" src="/icons/term.png" width="16" height="16" alt="" />
+        <span class="run">tail</span> <span class="flag">~/now</span>
+        <span class="aside">{NOW.UPDATED}</span>
+    </h2>
+    <div class="out">
+        <ul>
+            {NOW.LINES.map((line) => <li>{line}</li>)}
+        </ul>
+    </div>
 
-    <ul>
-        {
-            PROJECTS.map((project) => (
-                <li>
-                    <a
-                        href={
-                            project.HREF.startsWith("http")
-                                ? project.HREF
-                                : L(project.HREF)
-                        }
-                    >
-                        {project.NAME}
-                    </a>{" "}
-                    <span class="comment">{project.SUMMARY}</span>
-                </li>
-            ))
-        }
-    </ul>
-
-    <p><span class="titulo">{t("home.stack")}</span></p>
-
-    <ul>
-        {
-            STACK_GROUPS.map(({ GROUP, ITEMS }) => (
-                <li>
-                    <b>{GROUP}</b> {ITEMS.join(", ")}
-                </li>
-            ))
-        }
-    </ul>
-
-    <p>
-        <span class="titulo">{t("home.now")}</span>{" "}
-        <span class="comment">— {NOW.UPDATED}</span>
-    </p>
-
-    <ul>
-        {NOW.LINES.map((line) => <li>{line}</li>)}
-    </ul>
+    <h2 class="cmd">
+        <img class="icon" src="/icons/warn.png" width="16" height="16" alt="" />
+        <span class="run">git log</span>
+        <span class="flag">--oneline</span>
+    </h2>
+    <div class="out">
+        <ul class="rows">
+            {
+                CHANGELOG.map(({ DATE, TEXT }) => (
+                    <li>
+                        <span class="when">{br(new Date(DATE))}</span>
+                        <span>{TEXT}</span>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
 
     <p><br /></p>
 
@@ -136,6 +217,25 @@ words...... {compact(stats.words)}
 build...... {stats.commit}
 updated.... {stats.built}</pre>
         </aside>
+
+        <aside id="win-lab" class="window" aria-label={t("win.lab")}>
+            <div class="window__bar">
+                <span>lab</span>
+                <span class="window__controls">
+                    <button
+                        type="button"
+                        data-window-close="win-lab"
+                        aria-label={t("win.close")}>x</button
+                    >
+                </span>
+            </div>
+            <pre
+                class="window__body"><span class="prompt">$</span> systemctl status lab
+{LAB.map((b) => `${b.NAME.padEnd(12, ".")} ${b.STATE}`).join("\n")}
+
+ingress..... cloudflare tunnel
+open ports.. <span class="green">none</span></pre>
+        </aside>
     </Fragment>
 
     <Fragment slot="taskbar">
@@ -146,23 +246,35 @@ updated.... {stats.built}</pre>
                 aria-controls="win-status"
                 aria-pressed="true">status</button
             >
+            <button
+                type="button"
+                data-window-task="win-lab"
+                aria-controls="win-lab"
+                aria-pressed="true">lab</button
+            >
         </nav>
     </Fragment>
 </Layout>
 
 <style>
-    /* Parked beside the column, the way the reference floats its own.
-       The breakpoint is arithmetic, not a guess: the column is 984px and
-       centred, so the gutter beside it is (100vw - 984) / 2. Fitting a
-       340px window plus gaps needs that gutter to reach 372px, which is
-       100vw >= 1728. At my earlier 1320 the window simply sat on top of
-       the prose. Below the breakpoint it joins the flow. */
+    /* Parked beside the column, the way the reference floats its own. The
+       breakpoint is arithmetic, not a guess: the column is 984px and
+       centred, so the gutter beside it is (100vw - 984) / 2, and fitting a
+       340px window plus gaps needs that gutter to reach 372px — which is
+       100vw >= 1728. Below it the windows simply join the flow. */
     @media (min-width: 1740px) {
         .window {
             position: fixed;
-            top: 210px;
             right: max(16px, calc((100vw - 984px) / 2 - 356px));
             margin: 0;
+        }
+
+        #win-status {
+            top: 200px;
+        }
+
+        #win-lab {
+            top: 430px;
         }
     }
 </style>
