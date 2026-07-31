@@ -1,7 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Dither from "@components/ascii/Dither.astro";
-import Emblem from "@components/ascii/Emblem.astro";
 import Figure from "@components/ascii/Figure.astro";
 import Panel from "@components/ascii/Panel.astro";
 import Meter from "@components/ascii/Meter.astro";
@@ -21,7 +20,7 @@ import {
     SITE,
     SOCIALS,
 } from "@consts";
-import { readingTime } from "@lib/stats";
+import { getSelfTest, getStats, readingTime } from "@lib/stats";
 
 type Props = { locale: Locale };
 const { locale } = Astro.props;
@@ -29,6 +28,8 @@ const t = useTranslations(locale);
 const L = (path: string) => localised(path, locale);
 
 const posts = await postsFor(locale);
+const stats = await getStats();
+const selftest = getSelfTest(stats);
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -45,27 +46,40 @@ const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
     <div class="stack-gap">
         <section class="masthead panel">
             <div class="panel-body">
-                <div class="mark">
-                    <Emblem />
-                    <div class="mark-type">
-                        <Wordmark />
-                        <h1 class="sr-only">{SITE.TITLE} — {SITE.ROLE}</h1>
-                        <p class="crossbar" aria-hidden="true">
-                            {t("site.tagline")}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="readout">
-                    <p class="statement">{t("site.statement")}</p>
-                    <div class="band">
-                        <span class="band-label" aria-hidden="true">{t("panel.signal")}</span>
-                        <Waterfall />
-                    </div>
-                </div>
+                <p class="overline" aria-hidden="true">
+                    {t("site.overline")}
+                </p>
+                <Wordmark />
+                <h1 class="sr-only">{SITE.TITLE} — {t("site.role")}</h1>
+                <p class="crossbar" aria-hidden="true">{t("site.tagline")}</p>
             </div>
             <Dither />
         </section>
+
+        <div class="grid-2">
+            <Panel title={t("panel.selfTest")} note={stats.built}>
+                <ul class="spec selftest">
+                    {
+                        selftest.map(({ k, v, s }) => (
+                            <li>
+                                <span class="k">{k}</span>
+                                <span class="lead" aria-hidden="true" />
+                                <span class="val">{v}</span>
+                                <span class="ok" aria-hidden="true">▲▲▲</span>
+                                <span class="v">{s}</span>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </Panel>
+
+            <Panel title={t("panel.signalBand")} note="rf-1">
+                <p class="statement">{t("site.statement")}</p>
+                <div class="band">
+                    <Waterfall />
+                </div>
+            </Panel>
+        </div>
 
         <div class="grid-2">
             <Panel title={t("panel.operator")} note={t("value.active")}>
@@ -216,34 +230,40 @@ const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
 <style>
     .masthead {
         overflow: hidden;
-    }
-
-    .masthead .panel-body {
-        padding-bottom: calc(var(--step) * 0.6);
-    }
-
-    /* Emblem left, type right — and the emblem drops out below the fold
-       width rather than shrinking the wordmark to nothing. */
-    .mark {
-        display: flex;
-        align-items: center;
-        gap: 3ch;
-    }
-
-    /* The wordmark is 72 cells wide and Iosevka advances 0.5em per cell,
-       so 72 * 0.5 = 36em fills the column at font-size = 100/36 ≈ 2.7cqw.
-       Sizing it against the viewport instead let the emblem crop the E. */
-    .mark-type {
         container-type: inline-size;
     }
 
-    .mark-type :global(.wordmark) {
-        font-size: min(2.6cqw, 11px);
+    .overline {
+        margin-bottom: 0.6rem;
     }
 
-    .mark-type {
-        flex: 1;
-        min-width: 0;
+    .crossbar {
+        margin-top: 0.4rem;
+    }
+
+    /* Self-test rows carry a value AND a status, so the leader sits
+       between the label and the value and the status pins to the end. */
+    :global(.spec.selftest .val) {
+        flex: none;
+        color: var(--dim);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    :global(.spec.selftest .ok) {
+        flex: none;
+        color: var(--dim);
+        letter-spacing: -0.05em;
+        user-select: none;
+    }
+
+    /* Fills the panel rather than floating mid-column. */
+    .band {
+        width: 100%;
+        margin-top: var(--step);
+        padding-top: 0.6rem;
+        border-top: 1px solid var(--rule);
+        container-type: inline-size;
         overflow: hidden;
     }
 
@@ -251,57 +271,9 @@ const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
         margin-top: 0.9rem;
     }
 
-    .readout {
-        display: flex;
-        align-items: flex-end;
-        gap: 3ch;
-        margin-top: 1.1rem;
-    }
-
     .statement {
-        flex: 1;
         max-width: var(--measure);
         color: var(--ink);
-    }
-
-    .band {
-        flex: none;
-        width: 34ch;
-        container-type: inline-size;
-        border: 1px solid var(--rule);
-        padding: 0.35rem 1ch 0.25rem;
-        overflow: hidden;
-    }
-
-    .band-label {
-        display: block;
-        margin-bottom: 0.2rem;
-        color: var(--dim);
-        font-size: 10.5px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-    }
-
-    @media (max-width: 900px) {
-        .mark {
-            gap: 2ch;
-        }
-
-        .readout {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 1rem;
-        }
-
-        .band {
-            width: 100%;
-        }
-    }
-
-    @media (max-width: 680px) {
-        .mark :global(.emblem) {
-            display: none;
-        }
     }
 
     /* ── Transmissions: a directory listing ───────────────────────── */

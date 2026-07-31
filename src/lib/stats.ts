@@ -70,3 +70,22 @@ export async function getStats(): Promise<SiteStats> {
 export function compact(n: number): string {
     return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 }
+
+/**
+ * The self-test readout, in the idiom of the avionics panels this design
+ * is drawn from. Every line is a fact about this build rather than a
+ * slogan — which is the only reason it is worth putting on the page.
+ */
+export function getSelfTest(stats: SiteStats) {
+    return [
+        { k: "build", v: stats.commit, s: "PASS" },
+        { k: "content", v: `${stats.posts} posts · ${compact(stats.words)}`, s: "PASS" },
+        { k: "output", v: "static html", s: "PASS" },
+        { k: "javascript required", v: "none", s: "PASS" },
+        { k: "third-party", v: "none", s: "PASS" },
+        { k: "trackers · cookies", v: "none", s: "PASS" },
+        { k: "type", v: "self-hosted · ofl", s: "PASS" },
+        { k: "contrast", v: "aaa on #000", s: "PASS" },
+        { k: "locales", v: "en · pt-br", s: "PASS" },
+    ];
+}

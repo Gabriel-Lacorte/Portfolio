@@ -27,6 +27,7 @@ const en = {
     "site.designation": "lacorte.city — systems engineering notebook",
     "site.role": "systems engineer",
     "site.tagline": "systems · compilers · operating systems",
+    "site.overline": "the systems engineering notebook of",
     "site.statement":
         "I work below the abstraction line — hypervisors, compilers, and operating systems. This is where I write down what I find when I take them apart.",
 
@@ -46,6 +47,8 @@ const en = {
     "panel.fault": "fault",
     "panel.recover": "recover",
     "panel.buildingToward": "what I'm building toward",
+    "panel.selfTest": "self-test",
+    "panel.signalBand": "signal",
 
     "field.name": "name",
     "field.role": "role",
@@ -123,6 +126,7 @@ const ptBR: Record<UIKey, string> = {
     "site.designation": "lacorte.city — caderno de engenharia de sistemas",
     "site.role": "engenheiro de sistemas",
     "site.tagline": "sistemas · compiladores · sistemas operacionais",
+    "site.overline": "o caderno de engenharia de sistemas de",
     "site.statement":
         "Trabalho abaixo da linha de abstração — hipervisores, compiladores e sistemas operacionais. É aqui que anoto o que encontro quando desmonto essas coisas.",
 
@@ -142,6 +146,8 @@ const ptBR: Record<UIKey, string> = {
     "panel.fault": "falha",
     "panel.recover": "recuperar",
     "panel.buildingToward": "o que estou construindo",
+    "panel.selfTest": "autoteste",
+    "panel.signalBand": "sinal",
 
     "field.name": "nome",
     "field.role": "função",
