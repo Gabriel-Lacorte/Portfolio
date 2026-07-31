@@ -50,22 +50,34 @@
 }
 
 :root {
-    --base: #e6e2d8;      /* bone */
-    --bg: #0b0b0d;        /* ink  */
+    --base: #ece4e2;          /* warm bone */
+    --bg: #0a0507;            /* near-black, red undertone */
     --white: #ffffff;
-    --comment: #9a948a;
-    --rule: #4a4750;
-    --hair: solid 1px #4a4750;
+    --comment: #a39694;
 
-    --accent: #e8845c;    /* oxide  — links, marks */
-    --green: #5fbfa8;     /* verdigris — ok states */
-    --amber: #e0b050;     /* ochre     — warnings  */
-    --red: #e8845c;
+    /* Blood is the signature, not a rare accent. --blood is the one that
+       carries text (6.23:1); --blood-deep and --blood-dark are fills and
+       rules and never do. */
+    --blood: #ff4d5c;
+    --blood-deep: #a30f1e;
+    /* Code-block ground. #33070d read as a wall of red boxes down a page
+       full of listings, and dropped the comment token to 4.36:1 against
+       it — the syntax colours had only been checked against the page
+       background, not this one. All seven pass here. */
+    --blood-dark: #1f0509;
 
-    --win-line: #4a4750;
-    --win-bar: #16151a;
-    --win-edge: #6a6470;
-    --win-title: #e6e2d8;
+    --rule: #5e2a2f;
+    --hair: solid 1px #5e2a2f;
+
+    --accent: var(--blood);
+    --green: #4fd67f;
+    --amber: #e8b04b;
+    --red: var(--blood);
+
+    --win-line: #7a2b33;
+    --win-bar: #1a0a0e;
+    --win-edge: #a30f1e;
+    --win-title: #ff4d5c;
 
     --mono: "Departure Mono", "Iosevka", ui-monospace, monospace;
     --code: "Iosevka", ui-monospace, "Cascadia Mono", monospace;
@@ -73,24 +85,28 @@
     color-scheme: dark;
 }
 
-/* Paper mode: the same engraving printed rather than lit. */
 html.light {
-    --base: #141317;
-    --bg: #e6e2d8;
+    --base: #17100f;
+    --bg: #f0e9e6;
     --white: #000000;
-    --comment: #55515c;
-    --rule: #a9a49a;
-    --hair: solid 1px #a9a49a;
+    --comment: #6b5c59;
 
-    --accent: #9c3a17;
-    --green: #0f6b58;
+    --blood: #a8071a;
+    --blood-deep: #d9394a;
+    --blood-dark: #f7e7e5;
+
+    --rule: #c2a5a2;
+    --hair: solid 1px #c2a5a2;
+
+    --accent: var(--blood);
+    --green: #0d6b38;
     --amber: #7a5300;
-    --red: #9c3a17;
+    --red: var(--blood);
 
-    --win-line: #a9a49a;
-    --win-bar: #dad4c8;
-    --win-edge: #7d7768;
-    --win-title: #141317;
+    --win-line: #c2a5a2;
+    --win-bar: #e6d5d2;
+    --win-edge: #a8071a;
+    --win-title: #a8071a;
 
     color-scheme: light;
 }
@@ -480,6 +496,9 @@ main ul.rows > li::before {
 }
 
 .window__bar {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
     display: flex;
     min-height: 26px;
     align-items: center;
@@ -492,9 +511,14 @@ main ul.rows > li::before {
     line-height: 1;
 }
 
+.window__bar[data-dragging] {
+    cursor: grabbing;
+}
+
 .window__controls {
     display: flex;
     gap: 4px;
+    cursor: default;
 }
 
 .window__controls button {
@@ -666,8 +690,10 @@ footer.site {
 /* ── code ──────────────────────────────────────────────────────────── */
 
 .article :not(pre) > code {
-    padding: 0 3px;
-    color: var(--accent);
+    padding: 0 4px;
+    border: var(--hair);
+    background: var(--blood-dark);
+    color: var(--blood);
     font-family: var(--code);
     font-size: 14px;
     overflow-wrap: anywhere;
@@ -677,13 +703,13 @@ footer.site {
     margin: 0;
     padding: 10px 12px;
     border: var(--hair);
-    background: transparent !important;
+    background: var(--blood-dark) !important;
     overflow-x: auto;
     font-family: var(--code);
     /* Even size: Iosevka advances 0.5em per cell, so an odd font-size lands
        every glyph on a half pixel and box rules render dashed. */
     font-size: 14px;
-    line-height: 1.45;
+    line-height: 1.5;
     tab-size: 4;
 }
 
@@ -692,33 +718,47 @@ footer.site {
     color: inherit;
 }
 
+/* The wrapper carries a strip naming the language and holding the copy
+   button, so a block reads as a file rather than an unlabelled slab. */
 .code-wrap {
-    position: relative;
+    margin: 15px 0;
+    border: var(--hair);
+    background: var(--blood-dark);
+}
+
+.code-wrap > pre {
+    border: 0;
+    border-top: var(--hair);
+}
+
+.code-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 3px 10px;
+    background: var(--win-bar);
+    color: var(--blood);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 }
 
 .code-copy {
-    position: absolute;
-    top: 0;
-    right: 0;
     padding: 0 8px;
-    border: 0;
-    border-left: var(--hair);
-    border-bottom: var(--hair);
-    background: var(--bg);
+    border: var(--hair);
+    background: transparent;
     color: var(--comment);
     font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     cursor: pointer;
-    opacity: 0;
-}
-
-.code-wrap:hover .code-copy,
-.code-copy:focus-visible {
-    opacity: 1;
 }
 
 .code-copy:hover {
+    border-color: var(--blood);
+    background: var(--blood);
     color: var(--bg);
-    background: var(--base);
 }
 
 .article pre::-webkit-scrollbar,
@@ -743,31 +783,31 @@ footer.site {
 /* Shiki, near-monochrome with the one purple. Syntax colour should not be
    the loudest thing on a page this quiet. */
 :root {
-    --astro-code-color-text: #e6e2d8;
+    --astro-code-color-text: #ece4e2;
     --astro-code-color-background: transparent;
-    --astro-code-token-comment: #9a948a;
-    --astro-code-token-keyword: #e8845c;
-    --astro-code-token-string: #a8a8a8;
-    --astro-code-token-function: #ffffff;
-    --astro-code-token-constant: #e0b050;
-    --astro-code-token-parameter: #e6e2d8;
-    --astro-code-token-string-expression: #a8a8a8;
-    --astro-code-token-punctuation: #8b88a0;
-    --astro-code-token-link: #e8845c;
+    --astro-code-token-comment: #8a7a78;
+    --astro-code-token-keyword: #ff5c6a;
+    --astro-code-token-string: #e8b04b;
+    --astro-code-token-function: #ffd9d4;
+    --astro-code-token-constant: #ff8f5e;
+    --astro-code-token-parameter: #ece4e2;
+    --astro-code-token-string-expression: #e8b04b;
+    --astro-code-token-punctuation: #a39694;
+    --astro-code-token-link: #ff4d5c;
 }
 
 html.light {
-    --astro-code-color-text: #17161c;
+    --astro-code-color-text: #17100f;
     --astro-code-color-background: transparent;
-    --astro-code-token-comment: #5b5768;
-    --astro-code-token-keyword: #9c3a17;
-    --astro-code-token-string: #45414d;
-    --astro-code-token-function: #000000;
-    --astro-code-token-constant: #8a5200;
-    --astro-code-token-parameter: #17161c;
-    --astro-code-token-string-expression: #45414d;
-    --astro-code-token-punctuation: #5b5768;
-    --astro-code-token-link: #9c3a17;
+    --astro-code-token-comment: #6b5a58;
+    --astro-code-token-keyword: #a8071a;
+    --astro-code-token-string: #7a5300;
+    --astro-code-token-function: #5c1018;
+    --astro-code-token-constant: #9c3a00;
+    --astro-code-token-parameter: #17100f;
+    --astro-code-token-string-expression: #7a5300;
+    --astro-code-token-punctuation: #6b5c59;
+    --astro-code-token-link: #a8071a;
 }
 
 /* ── ascii figures ─────────────────────────────────────────────────── */

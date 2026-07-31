@@ -75,10 +75,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 </script>
 
 <script>
-    /* Copy buttons live on a wrapper, not inside <pre>: appending the
-       button to the code block itself meant its label became part of the
-       copied text and had to be stripped back out. */
-    function copyButtons() {
+    /* Code blocks get a strip naming their language and holding the copy
+       button. The button lives on the wrapper, never inside <pre>: putting
+       it in the code block made its label part of the copied text. */
+    function codeBlocks() {
         document
             .querySelectorAll<HTMLPreElement>(".article pre")
             .forEach((pre) => {
@@ -87,14 +87,22 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
                 const wrap = document.createElement("div");
                 wrap.className = "code-wrap";
                 pre.replaceWith(wrap);
-                wrap.append(pre);
+
+                const bar = document.createElement("div");
+                bar.className = "code-bar";
+
+                const lang = document.createElement("span");
+                lang.textContent =
+                    pre.dataset.language && pre.dataset.language !== "plaintext"
+                        ? pre.dataset.language
+                        : "text";
+                bar.append(lang);
 
                 const button = document.createElement("button");
                 button.type = "button";
                 button.className = "code-copy";
                 button.textContent = "copy";
                 button.setAttribute("aria-label", "Copy code to clipboard");
-
                 button.addEventListener("click", async () => {
                     try {
                         await navigator.clipboard.writeText(pre.innerText);
@@ -104,15 +112,48 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
                     }
                     setTimeout(() => (button.textContent = "copy"), 1600);
                 });
+                bar.append(button);
 
-                wrap.append(button);
+                wrap.append(bar, pre);
             });
     }
 
-    /* Closable windows and the taskbar that reopens them. Entirely an
-       enhancement: with scripting off the window is simply always open,
-       which is the correct fallback for a panel of static text. */
+    /* Windows: closable, reopenable from the taskbar, and draggable by
+       their title bar.
+
+       All of it is an enhancement. Without scripting a window is simply
+       always open and sits in the document flow, which is the right
+       fallback for a panel of static text — so the markup ships in flow
+       and this lifts it out, rather than the other way round.
+
+       The first version lifted a window to fixed positioning lazily, on
+       first drag. That left it measured from wherever it happened to sit
+       in the flow, so a restored position never matched and a drag could
+       finish past the bottom of the viewport. Lifting up front, once, at
+       a known place removes both. */
+    const POS_KEY = "win:pos";
+    const FLOAT_FROM = 900;
+
+    type Pos = { x: number; y: number };
+
+    function readPositions(): Record<string, Pos> {
+        try {
+            return JSON.parse(localStorage.getItem(POS_KEY) ?? "{}");
+        } catch {
+            return {};
+        }
+    }
+
+    function savePosition(id: string, pos: Pos) {
+        const all = readPositions();
+        all[id] = pos;
+        localStorage.setItem(POS_KEY, JSON.stringify(all));
+    }
+
     function windows() {
+        const wins = [...document.querySelectorAll<HTMLElement>(".window")];
+        if (!wins.length) return;
+
         const setOpen = (id: string, open: boolean) => {
             const win = document.getElementById(id);
             const task = document.querySelector<HTMLButtonElement>(
@@ -138,10 +179,87 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
                     setOpen(id, b.getAttribute("aria-pressed") !== "true");
                 }),
             );
+
+        /* Too narrow to float anything without covering the text. */
+        if (window.innerWidth < FLOAT_FROM) return;
+
+        const saved = readPositions();
+        let top = 50;
+
+        const clamp = (win: HTMLElement, x: number, y: number): Pos => {
+            const maxX = Math.max(0, window.innerWidth - win.offsetWidth);
+            const maxY = Math.max(0, window.innerHeight - win.offsetHeight);
+            return {
+                x: Math.min(Math.max(0, x), maxX),
+                y: Math.min(Math.max(0, y), maxY),
+            };
+        };
+
+        const place = (win: HTMLElement, x: number, y: number) => {
+            const p = clamp(win, x, y);
+            win.style.left = `${p.x}px`;
+            win.style.top = `${p.y}px`;
+            return p;
+        };
+
+        wins.forEach((win, i) => {
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            if (!bar) return;
+
+            const width = Math.min(340, window.innerWidth - 32);
+            win.style.position = "fixed";
+            win.style.margin = "0";
+            win.style.width = `${width}px`;
+            win.style.zIndex = String(++top);
+
+            const fallback = {
+                x: window.innerWidth - width - 24,
+                y: 96 + i * 240,
+            };
+            const start = saved[win.id] ?? fallback;
+            place(win, start.x, start.y);
+
+            bar.addEventListener("pointerdown", (e) => {
+                if ((e.target as HTMLElement).closest("button")) return;
+                e.preventDefault();
+                win.style.zIndex = String(++top);
+
+                const r = win.getBoundingClientRect();
+                const dx = e.clientX - r.left;
+                const dy = e.clientY - r.top;
+                bar.setPointerCapture(e.pointerId);
+                bar.dataset.dragging = "1";
+
+                const move = (ev: PointerEvent) =>
+                    place(win, ev.clientX - dx, ev.clientY - dy);
+
+                const up = (ev: PointerEvent) => {
+                    delete bar.dataset.dragging;
+                    bar.releasePointerCapture(ev.pointerId);
+                    bar.removeEventListener("pointermove", move);
+                    bar.removeEventListener("pointerup", up);
+                    savePosition(win.id, {
+                        x: parseFloat(win.style.left),
+                        y: parseFloat(win.style.top),
+                    });
+                };
+
+                bar.addEventListener("pointermove", move);
+                bar.addEventListener("pointerup", up);
+            });
+        });
+
+        /* A resize can strand a window past the new edge. */
+        window.addEventListener("resize", () => {
+            wins.forEach((win) => {
+                if (win.style.position !== "fixed") return;
+                place(win, parseFloat(win.style.left), parseFloat(win.style.top));
+            });
+        });
     }
 
     function init() {
-        copyButtons();
+        codeBlocks();
         windows();
     }
 

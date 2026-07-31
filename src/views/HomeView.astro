@@ -228,24 +228,12 @@ open ports.. <span class="green">none</span></pre>
 </Layout>
 
 <style>
-    /* Parked beside the column, the way the reference floats its own. The
-       breakpoint is arithmetic, not a guess: the column is 984px and
-       centred, so the gutter beside it is (100vw - 984) / 2, and fitting a
-       340px window plus gaps needs that gutter to reach 372px — which is
-       100vw >= 1728. Below it the windows simply join the flow. */
-    @media (min-width: 1740px) {
-        .window {
-            position: fixed;
-            right: max(16px, calc((100vw - 984px) / 2 - 356px));
-            margin: 0;
-        }
-
-        #win-status {
-            top: 200px;
-        }
-
-        #win-lab {
-            top: 430px;
-        }
+    /* No floating rules here any more: the script lifts the windows once,
+       at a known position, above 900px. Leaving a media query to do it as
+       well meant CSS and JS disagreed about where a window was, and a
+       restored position never matched. In the flow is the no-script
+       fallback. */
+    .window {
+        max-width: 100%;
     }
 </style>
