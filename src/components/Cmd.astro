@@ -1,0 +1,46 @@
+---
+/**
+ * A section heading rendered as the command whose output follows it.
+ *
+ *   $ [icon] ls -la ~/writing                        3 posts · 4.0k words
+ *
+ * The `$` is drawn by CSS and the icon is decorative, so what a screen
+ * reader actually announces is the heading text — "ls -la ~/writing" —
+ * rather than a prompt character and an image.
+ */
+type Props = {
+    /** The command itself, e.g. "ls -la". */
+    run: string;
+    /** Its argument, coloured apart. */
+    arg?: string;
+    /** Right-aligned note: a count, a date. */
+    aside?: string;
+    /** Filename in public/icons, without the extension. */
+    icon?: string;
+    as?: "h1" | "h2" | "h3";
+    id?: string;
+};
+
+const {
+    run,
+    arg,
+    aside,
+    icon = "term",
+    as: Tag = "h2",
+    id,
+} = Astro.props;
+---
+
+<Tag class="cmd" id={id}>
+    <img
+        class="icon"
+        src={`/icons/${icon}.png`}
+        width="16"
+        height="16"
+        alt=""
+        aria-hidden="true"
+    />
+    <span class="run">{run}</span>
+    {arg && <span class="flag">{arg}</span>}
+    {aside && <span class="aside">{aside}</span>}
+</Tag>

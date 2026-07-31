@@ -113,6 +113,7 @@ const en = {
         "Hardware, editor, and the machines this site and my homelab run on.",
     "meta.usesLede":
         "What I type on, what I type into, and what it all runs on.",
+    "uses.unset": "(unset)",
     "meta.nowTitle": "Now",
     "meta.nowDescription": "What I am working on and reading at the moment.",
     "meta.nowLede":
@@ -122,8 +123,9 @@ const en = {
 
     "err.title": "404 — no such file or directory",
     "err.description": "That path does not resolve.",
+    "err.noent": "No such file or directory",
     "err.body":
-        "does not resolve. It may have moved, or it may never have existed.",
+        "It may have moved, or it may never have existed.",
 
     "status.online": "online",
     "status.posts": "posts",
@@ -227,6 +229,7 @@ const ptBR: Record<UIKey, string> = {
         "Hardware, editor e as máquinas onde este site e meu homelab rodam.",
     "meta.usesLede":
         "No que eu digito, para onde eu digito, e onde tudo isso roda.",
+    "uses.unset": "(não definido)",
     "meta.nowTitle": "Agora",
     "meta.nowDescription": "No que estou trabalhando e lendo neste momento.",
     "meta.nowLede":
@@ -236,7 +239,8 @@ const ptBR: Record<UIKey, string> = {
 
     "err.title": "404 — arquivo ou diretório inexistente",
     "err.description": "Esse caminho não resolve.",
-    "err.body": "não resolve. Pode ter mudado, ou pode nunca ter existido.",
+    "err.noent": "Arquivo ou diretório inexistente",
+    "err.body": "Pode ter mudado, ou pode nunca ter existido.",
 
     "status.online": "online",
     "status.posts": "posts",

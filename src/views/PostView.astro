@@ -1,7 +1,8 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
 import TableOfContents from "@components/TableOfContents.astro";
-import { isFallback, type Post } from "@lib/posts";
+import { isFallback, localeOf, type Post } from "@lib/posts";
 import { compact, countWords, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 
@@ -18,28 +19,62 @@ const br = iso.split("-").reverse().join("/");
    blocking publication on a translation. */
 const borrowed = isFallback(post, locale);
 const hasToc = headings.filter((h) => h.depth <= 3).length > 1;
+
+/* The file the reader is notionally reading — the post's own source. */
+const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
 ---
 
-<Layout locale={locale} title={post.data.title} description={post.data.description}>
-  <p><span class="titulo">{post.data.title}</span></p>
+<Layout
+    locale={locale}
+    title={post.data.title}
+    description={post.data.description}
+>
+    <Cmd
+        run="cat"
+        arg={file}
+        icon="note"
+        as="h1"
+        aside={`${br} · ${readingTime(post.body)} min`}
+    />
 
-  <p>
-    {post.data.description}
-    <br />
-    <span class="comment">
-      [{br}] · {readingTime(post.body)} min · {compact(countWords(post.body))} {t("unit.words")}
-      {post.data.tags.length > 0 && <> · {post.data.tags.join(", ")}</>}
-    </span>
-  </p>
+    <div class="out">
+        <p>
+            <b>{post.data.title}</b>
+            <br />
+            {post.data.description}
+            <br />
+            <span class="comment">
+                {compact(countWords(post.body))} {t("unit.words")}
+                {post.data.tags.length > 0 && (
+                    <> · {post.data.tags.join(", ")}</>
+                )}
+            </span>
+        </p>
 
-  {borrowed && <p class="amber">! {t("fallback.notice")}</p>}
+        {borrowed && <p class="amber">! {t("fallback.notice")}</p>}
 
-  {hasToc && <TableOfContents headings={headings} label={t("panel.contents")} />}
+        {
+            hasToc && (
+                <TableOfContents
+                    headings={headings}
+                    label={t("panel.contents")}
+                />
+            )
+        }
 
-  <article class="article">
-    <Content />
-  </article>
+        <article class="article">
+            <Content />
+        </article>
+    </div>
 
-  <p><br /></p>
-  <p><a href={localised("/blog", locale)}>&lt;- {t("action.backToBlog")}</a></p>
+    <Cmd run="cd" arg="~/writing" icon="term" />
+    <div class="out">
+        <p>
+            <a href={localised("/blog", locale)}>
+                &lt;- {t("action.backToBlog")}
+            </a>
+        </p>
+    </div>
+
+    <p><br /></p>
 </Layout>

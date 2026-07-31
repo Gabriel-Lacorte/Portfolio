@@ -1,5 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
 import { NAV_KEYS } from "@consts";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 
@@ -11,21 +12,29 @@ const t = useTranslations(locale);
 <Layout locale={locale} title={t("err.title")} description={t("err.description")} suffix={false}>
   <h1 class="sr-only">{t("err.title")}</h1>
 
-  <p><span class="titulo">404</span></p>
+  {/* The page is the command that failed. It is the one place where the
+      conceit lands exactly on the real thing. */}
+  <Cmd run="cat" arg={`.${Astro.url.pathname}`} icon="warn" />
+  <div class="out">
+    <p>
+      <span class="red">cat: {Astro.url.pathname}: {t("err.noent")}</span>
+      <br />
+      <span class="comment">{t("err.body")}</span>
+    </p>
+  </div>
 
-  <p>
-    <span class="red">{Astro.url.pathname}</span> {t("err.body")}
-  </p>
-
-  <ul>
-    {
-      NAV_KEYS.map(({ KEY, HREF }) => (
-        <li>
-          <a href={localised(HREF, locale)}>{t(KEY)}</a>
-        </li>
-      ))
-    }
-  </ul>
+  <Cmd run="ls" arg="~/" icon="term" />
+  <div class="out">
+    <ul>
+      {
+        NAV_KEYS.map(({ KEY, HREF }) => (
+          <li>
+            <a href={localised(HREF, locale)}>{t(KEY)}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 
   <p><br /></p>
 </Layout>

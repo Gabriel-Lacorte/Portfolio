@@ -1,5 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
 import { PROJECTS } from "@consts";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 
@@ -16,26 +17,35 @@ const external = (href: string) => href.startsWith("http");
 >
   <h1 class="sr-only">{t("meta.projectsTitle")}</h1>
 
-  <p><span class="titulo">{t("meta.projectsTitle")}</span></p>
-  <p>{t("meta.projectsDescription")}</p>
+  <Cmd
+    run="ls -la"
+    arg="~/projects"
+    icon="star"
+    aside={`${PROJECTS.length} ${t("unit.listed")}`}
+  />
+  <div class="out">
+    <p>{t("meta.projectsDescription")}</p>
+  </div>
 
   {
     PROJECTS.map((project) => (
       <>
-        <p>
-          <b>{project.NAME}</b>{" "}
-          <a
-            href={external(project.HREF) ? project.HREF : localised(project.HREF, locale)}
-            target={external(project.HREF) ? "_blank" : undefined}
-            rel={external(project.HREF) ? "noopener noreferrer" : undefined}
-          >
-            ({external(project.HREF) ? t("field.source") : t("field.writeup")})
-          </a>
-          <br />
-          {project.SUMMARY}
-          <br />
-          <span class="comment">{project.STACK.join(", ")}</span>
-        </p>
+        <Cmd run="cat" arg={`~/projects/${project.NAME}/README`} icon="book" aside={project.YEAR} />
+        <div class="out">
+          <p>
+            {project.SUMMARY}
+            <br />
+            <span class="comment">{project.STACK.join(", ")}</span>
+            <br />
+            <a
+              href={external(project.HREF) ? project.HREF : localised(project.HREF, locale)}
+              target={external(project.HREF) ? "_blank" : undefined}
+              rel={external(project.HREF) ? "noopener noreferrer" : undefined}
+            >
+              {external(project.HREF) ? t("field.source") : t("field.writeup")} -&gt;
+            </a>
+          </p>
+        </div>
       </>
     ))
   }

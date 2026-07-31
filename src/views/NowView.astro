@@ -1,6 +1,7 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import { NOW } from "@consts";
+import Cmd from "@components/Cmd.astro";
+import { NOW, READING } from "@consts";
 import { useTranslations, type Locale } from "@i18n/utils";
 
 type Props = { locale: Locale };
@@ -11,16 +12,27 @@ const t = useTranslations(locale);
 <Layout locale={locale} title={t("meta.nowTitle")} description={t("meta.nowDescription")}>
   <h1 class="sr-only">{t("meta.nowTitle")}</h1>
 
-  <p>
-    <span class="titulo">{t("meta.nowTitle")}</span>{" "}
-    <span class="comment">— {NOW.UPDATED}</span>
-  </p>
+  <Cmd run="tail -f" arg="~/now" icon="term" aside={NOW.UPDATED} />
+  <div class="out">
+    <p>{t("meta.nowLede")}</p>
+    <ul>
+      {NOW.LINES.map((line) => <li>{line}</li>)}
+    </ul>
+  </div>
 
-  <p>{t("meta.nowLede")}</p>
-
-  <ul>
-    {NOW.LINES.map((line) => <li>{line}</li>)}
-  </ul>
+  <Cmd run="cat" arg="~/reading" icon="book" />
+  <div class="out">
+    <ul>
+      {
+        READING.map(({ TITLE, NOTE, STATE }) => (
+          <li>
+            <span class:list={[STATE === "now" && "purple"]}>{TITLE}</span>{" "}
+            <span class="comment">— {NOTE}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 
   <p><br /></p>
 </Layout>

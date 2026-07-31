@@ -1,5 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
 import { postsFor } from "@lib/posts";
 import { compact, getStats, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
@@ -44,10 +45,7 @@ const isNew = (d: Date) =>
 >
     <h1 class="sr-only">{SITE.TITLE} — {t("site.role")}</h1>
 
-    <h2 class="cmd">
-        <img class="icon" src="/icons/term.png" width="16" height="16" alt="" />
-        <span class="run">whoami</span>
-    </h2>
+    <Cmd run="whoami" icon="term" />
     <div class="out">
         <p>
             {t("home.intro1")}
@@ -56,14 +54,7 @@ const isNew = (d: Date) =>
         </p>
     </div>
 
-    <h2 class="cmd">
-        <img class="icon" src="/icons/note.png" width="16" height="16" alt="" />
-        <span class="run">ls -la</span> <span class="flag">~/writing</span>
-        <span class="aside">
-            {posts.length} {t("unit.posts")} · {compact(stats.words)}
-            {t("unit.words")}
-        </span>
-    </h2>
+    <Cmd run="ls -la" arg="~/writing" icon="note" aside={`${posts.length} ${t("unit.posts")} · ${compact(stats.words)} ${t("unit.words")}`} />
     <div class="out">
         <ul class="rows">
             {
@@ -83,10 +74,7 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <h2 class="cmd">
-        <img class="icon" src="/icons/disk.png" width="16" height="16" alt="" />
-        <span class="run">systemctl status</span> <span class="flag">lab</span>
-    </h2>
+    <Cmd run="systemctl status" arg="lab" icon="disk" />
     <div class="out">
         <ul class="boxes">
             {
@@ -105,10 +93,7 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <h2 class="cmd">
-        <img class="icon" src="/icons/chip.png" width="16" height="16" alt="" />
-        <span class="run">cat</span> <span class="flag">~/.config/stack</span>
-    </h2>
+    <Cmd run="cat" arg="~/.config/stack" icon="chip" />
     <div class="out">
         <ul>
             {
@@ -121,10 +106,7 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <h2 class="cmd">
-        <img class="icon" src="/icons/star.png" width="16" height="16" alt="" />
-        <span class="run">ls</span> <span class="flag">~/projects</span>
-    </h2>
+    <Cmd run="ls" arg="~/projects" icon="star" />
     <div class="out">
         <ul>
             {
@@ -146,10 +128,7 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <h2 class="cmd">
-        <img class="icon" src="/icons/book.png" width="16" height="16" alt="" />
-        <span class="run">cat</span> <span class="flag">~/reading</span>
-    </h2>
+    <Cmd run="cat" arg="~/reading" icon="book" />
     <div class="out">
         <ul>
             {
@@ -165,22 +144,14 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <h2 class="cmd">
-        <img class="icon" src="/icons/term.png" width="16" height="16" alt="" />
-        <span class="run">tail</span> <span class="flag">~/now</span>
-        <span class="aside">{NOW.UPDATED}</span>
-    </h2>
+    <Cmd run="tail" arg="~/now" icon="term" aside={NOW.UPDATED} />
     <div class="out">
         <ul>
             {NOW.LINES.map((line) => <li>{line}</li>)}
         </ul>
     </div>
 
-    <h2 class="cmd">
-        <img class="icon" src="/icons/warn.png" width="16" height="16" alt="" />
-        <span class="run">git log</span>
-        <span class="flag">--oneline</span>
-    </h2>
+    <Cmd run="git log" arg="--oneline" icon="warn" />
     <div class="out">
         <ul class="rows">
             {

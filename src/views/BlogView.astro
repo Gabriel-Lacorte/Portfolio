@@ -1,5 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
 import { postsFor } from "@lib/posts";
 import { compact, countWords, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
@@ -10,10 +11,9 @@ const t = useTranslations(locale);
 
 const posts = await postsFor(locale);
 const totalWords = posts.reduce((sum, p) => sum + countWords(p.body), 0);
-
-const years = [
-  ...new Set(posts.map((p) => p.data.date.getUTCFullYear())),
-].sort((a, b) => b - a);
+const years = [...new Set(posts.map((p) => p.data.date.getUTCFullYear()))].sort(
+  (a, b) => b - a,
+);
 
 const br = (d: Date) =>
   d.toLocaleDateString("en-CA", { timeZone: "UTC" }).split("-").reverse().join("/");
@@ -22,36 +22,58 @@ const br = (d: Date) =>
 <Layout locale={locale} title={t("meta.blogTitle")} description={t("meta.blogDescription")}>
   <h1 class="sr-only">{t("meta.blogTitle")}</h1>
 
-  <p><span class="titulo">{t("meta.blogTitle")}</span></p>
-
-  <p>
-    {t("meta.blogDescription")}
-    <br />
-    <span class="comment">
-      {posts.length} {t("unit.posts")} · {compact(totalWords)} {t("unit.words")}
-    </span>
-  </p>
+  <Cmd
+    run="ls -la"
+    arg="~/writing"
+    icon="note"
+    aside={`${posts.length} ${t("unit.posts")} · ${compact(totalWords)} ${t("unit.words")}`}
+  />
+  <div class="out">
+    <p>{t("meta.blogDescription")}</p>
+  </div>
 
   {
     years.map((year) => (
       <>
-        <p><span class="titulo">{year}</span></p>
-        <ul class="rows">
-          {posts
-            .filter((p) => p.data.date.getUTCFullYear() === year)
-            .map((post) => (
-              <li>
-                <span class="when">[{br(post.data.date)}]</span>
-                <a href={localised(`/blog/${post.data.translationKey}`, locale)}>
-                  {post.data.title}
-                </a>
-                <span class="len">{readingTime(post.body)} min</span>
-              </li>
-            ))}
-        </ul>
+        <Cmd run="cd" arg={`~/writing/${year}`} icon="disk" />
+        <div class="out">
+          <ul class="rows">
+            {posts
+              .filter((p) => p.data.date.getUTCFullYear() === year)
+              .map((post) => (
+                <li>
+                  <span class="when">{br(post.data.date)}</span>
+                  <a href={localised(`/blog/${post.data.translationKey}`, locale)}>
+                    {post.data.title}
+                  </a>
+                  <span class="len">{readingTime(post.body)} min</span>
+                </li>
+              ))}
+          </ul>
+          <ul class="plain">
+            {posts
+              .filter((p) => p.data.date.getUTCFullYear() === year)
+              .map((post) => (
+                <li class="desc">
+                  <span class="comment">
+                    {post.data.description}
+                    {post.data.tags.length > 0 && <> · {post.data.tags.join(", ")}</>}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </div>
       </>
     ))
   }
 
   <p><br /></p>
 </Layout>
+
+<style>
+  /* The descriptions belong to the rows above them, so they read as a
+     second column of the same listing rather than a separate list. */
+  .desc {
+    padding: 1px 0;
+  }
+</style>
