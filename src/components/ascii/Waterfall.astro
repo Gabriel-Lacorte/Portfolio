@@ -1,0 +1,27 @@
+---
+/**
+ * A spectrum band, lifted from the waterfall display on the avionics
+ * panels in the references. Pure texture: it breaks a wide panel the way
+ * a rule cannot, and it is generated rather than drawn so the dither
+ * stays even.
+ */
+---
+
+<pre class="ascii waterfall" aria-hidden="true">              ░░░▒▒▓▓▓▓▓▒▒░░           ░ ░
+            ░ ░░▒▒▓▓█▓█▓▓▒▒░░ ░       ░░░ 
+             ░░▒▒▓▓█████▓▓▒▒░░         ░ ░
+░           ░░▒▒▓▓███████▓▓▒▒░░       ░░░░
+             ░░▒▒▒▓▓▓█▓▓▓▒▒▒░░         ░ ░</pre>
+
+<style>
+    /* 42 cells at Iosevka's 0.5em advance is 21em, so font-size =
+       100/21 ≈ 4.7cqw fills whatever box it is dropped into. */
+    .waterfall {
+        width: 42ch;
+        font-size: min(4.7cqw, 9px);
+        line-height: 1;
+        color: var(--ramp-3);
+        overflow: visible;
+        user-select: none;
+    }
+</style>

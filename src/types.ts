@@ -1,3 +1,5 @@
+import type { UIKey } from "@i18n/ui";
+
 export type Site = {
     TITLE: string;
     HANDLE: string;
@@ -14,7 +16,7 @@ export type Metadata = {
 };
 
 export type NavItem = {
-    LABEL: string;
+    KEY: UIKey;
     HREF: string;
 };
 

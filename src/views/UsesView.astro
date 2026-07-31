@@ -1,0 +1,46 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Panel from "@components/ascii/Panel.astro";
+import Spec from "@components/ascii/Spec.astro";
+import { USES } from "@consts";
+import { localised, useTranslations, type Locale } from "@i18n/utils";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<Layout
+  locale={locale}
+  title={t("meta.usesTitle")}
+  description={t("meta.usesDescription")}
+>
+  <div class="stack-gap">
+    <Panel title="~/uses" note={`${USES.length} ${t("unit.groups")}`} as="h1">
+      <p class="lede">{t("meta.usesLede")}</p>
+    </Panel>
+
+    <div class="grid-2">
+      {
+        USES.map(({ GROUP, ROWS }) => (
+          <Panel title={GROUP} note={`${ROWS.length} ${t("unit.rows")}`}>
+            <Spec
+              rows={ROWS.map((row) => ({
+                k: row.k,
+                v: row.v,
+                href: row.v.startsWith("/") ? localised(row.v, locale) : undefined,
+                dim: row.v === "—",
+              }))}
+            />
+          </Panel>
+        ))
+      }
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .lede {
+    max-width: var(--measure);
+  }
+</style>

@@ -1,0 +1,479 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Dither from "@components/ascii/Dither.astro";
+import Emblem from "@components/ascii/Emblem.astro";
+import Figure from "@components/ascii/Figure.astro";
+import Panel from "@components/ascii/Panel.astro";
+import Meter from "@components/ascii/Meter.astro";
+import Spec from "@components/ascii/Spec.astro";
+import Waterfall from "@components/ascii/Waterfall.astro";
+import Wordmark from "@components/ascii/Wordmark.astro";
+import { postsFor } from "@lib/posts";
+import { localised, useTranslations, type Locale } from "@i18n/utils";
+import {
+    CAPABILITIES,
+    CHANGELOG,
+    NOW,
+    PIPELINE,
+    PIPELINE_ALT,
+    PIPELINE_CAPTION,
+    PROJECTS,
+    SITE,
+    SOCIALS,
+} from "@consts";
+import { readingTime } from "@lib/stats";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const L = (path: string) => localised(path, locale);
+
+const posts = await postsFor(locale);
+
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+/* Filled cells per status, so the bar and the word always agree. */
+const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
+---
+
+<Layout
+    locale={locale}
+    title={SITE.TITLE}
+    description={t("meta.homeDescription")}
+    suffix={false}
+>
+    <div class="stack-gap">
+        <section class="masthead panel">
+            <div class="panel-body">
+                <div class="mark">
+                    <Emblem />
+                    <div class="mark-type">
+                        <Wordmark />
+                        <h1 class="sr-only">{SITE.TITLE} — {SITE.ROLE}</h1>
+                        <p class="crossbar" aria-hidden="true">
+                            {t("site.tagline")}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="readout">
+                    <p class="statement">{t("site.statement")}</p>
+                    <div class="band">
+                        <span class="band-label" aria-hidden="true">{t("panel.signal")}</span>
+                        <Waterfall />
+                    </div>
+                </div>
+            </div>
+            <Dither />
+        </section>
+
+        <div class="grid-2">
+            <Panel title={t("panel.operator")} note={t("value.active")}>
+                <Spec
+                    rows={[
+                        { k: t("field.name"), v: SITE.TITLE },
+                        { k: t("field.role"), v: t("site.role") },
+                        { k: t("field.based"), v: SITE.LOCATION },
+                        { k: t("field.writingAbout"), v: t("value.systemsCompilers") },
+                        { k: t("field.logged"), v: `${posts.length} ${t("unit.posts")}` },
+                        { k: t("field.reachable"), v: t("value.yes") },
+                        ...SOCIALS.map(({ NAME, HANDLE, HREF }) => ({
+                            k: NAME,
+                            v: HANDLE,
+                            href: HREF,
+                            external: true,
+                        })),
+                        {
+                            k: t("field.mail"),
+                            v: SITE.EMAIL,
+                            href: `mailto:${SITE.EMAIL}`,
+                        },
+                    ]}
+                />
+            </Panel>
+
+            <Panel title={t("panel.capability")} note={t("value.selfAssessed")}>
+                <ul class="spec">
+                    {
+                        CAPABILITIES.map(({ NAME, STATUS }) => (
+                            <li>
+                                <span class="k">{NAME}</span>
+                                <span class="lead" aria-hidden="true" />
+                                <Meter level={LEVEL[STATUS]} />
+                                <span
+                                    class="v"
+                                    data-tone={
+                                        STATUS === "STUDY" ? "dim" : undefined
+                                    }
+                                >
+                                    {STATUS}
+                                </span>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </Panel>
+        </div>
+
+        <Panel
+            title={t("panel.transmissions")}
+            note={`${posts.length} ${t("unit.logged")}`}
+            bodyClass="flush"
+        >
+            <ol class="log">
+                {
+                    posts.map((post) => (
+                        <li>
+                            <a href={L(`/blog/${post.data.translationKey}`)}>
+                                <time
+                                    class="stamp"
+                                    datetime={iso(post.data.date)}
+                                >
+                                    {iso(post.data.date)}
+                                </time>
+                                <span class="name">{post.data.title}</span>
+                                <span class="lead" aria-hidden="true" />
+                                <span class="len">
+                                    {readingTime(post.body)} {t("unit.min")}
+                                </span>
+                            </a>
+                            <p class="sub">
+                                {post.data.description}
+                                {post.data.tags.length > 0 && (
+                                    <span class="tags">
+                                        {post.data.tags.map((tag) => (
+                                            <span class="tag">{tag}</span>
+                                        ))}
+                                    </span>
+                                )}
+                            </p>
+                        </li>
+                    ))
+                }
+            </ol>
+        </Panel>
+
+        <div class="grid-2">
+            <Panel title={t("panel.builds")} note={`${PROJECTS.length} ${t("unit.listed")}`}>
+                <ul class="builds">
+                    {
+                        PROJECTS.map((project) => (
+                            <li>
+                                <a href={project.HREF.startsWith("/") ? L(project.HREF) : project.HREF}>{project.NAME}</a>
+                                <p class="sub">{project.SUMMARY}</p>
+                                <p class="kit">{project.STACK.join(" · ")}</p>
+                            </li>
+                        ))
+                    }
+                </ul>
+                <a class="more" href={L("/projects")}>{t("action.allBuilds")} ▸</a>
+            </Panel>
+
+            {/* Two shorter panels stacked, so the column closes level with
+                the taller one beside it instead of trailing dead space. */}
+            <div class="stack-gap">
+                <Panel title={t("panel.signal")} note={NOW.UPDATED}>
+                    <ul class="signal">
+                        {
+                            NOW.LINES.map((line, i) => (
+                                <li>
+                                    <span class="idx" aria-hidden="true">
+                                        {String(i + 1).padStart(2, "0")}
+                                    </span>
+                                    <span>{line}</span>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                    <a class="more" href={L("/now")}>{t("action.fullSignal")} ▸</a>
+                </Panel>
+
+                <Panel title={t("panel.log")} note={`${CHANGELOG.length} ${t("unit.entries")}`}>
+                    <Spec
+                        rows={CHANGELOG.map(({ DATE, TEXT }) => ({
+                            k: DATE,
+                            v: TEXT,
+                            dim: true,
+                        }))}
+                        class="logspec"
+                    />
+                </Panel>
+            </div>
+        </div>
+
+        <Panel title={t("panel.buildingToward")} note="fig. a">
+            <Figure
+                alt={PIPELINE_ALT[locale]}
+                caption={PIPELINE_CAPTION[locale]}
+                bare
+            >
+                {PIPELINE}
+            </Figure>
+        </Panel>
+    </div>
+</Layout>
+
+<style>
+    .masthead {
+        overflow: hidden;
+    }
+
+    .masthead .panel-body {
+        padding-bottom: calc(var(--step) * 0.6);
+    }
+
+    /* Emblem left, type right — and the emblem drops out below the fold
+       width rather than shrinking the wordmark to nothing. */
+    .mark {
+        display: flex;
+        align-items: center;
+        gap: 3ch;
+    }
+
+    /* The wordmark is 72 cells wide and Iosevka advances 0.5em per cell,
+       so 72 * 0.5 = 36em fills the column at font-size = 100/36 ≈ 2.7cqw.
+       Sizing it against the viewport instead let the emblem crop the E. */
+    .mark-type {
+        container-type: inline-size;
+    }
+
+    .mark-type :global(.wordmark) {
+        font-size: min(2.6cqw, 11px);
+    }
+
+    .mark-type {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .crossbar {
+        margin-top: 0.9rem;
+    }
+
+    .readout {
+        display: flex;
+        align-items: flex-end;
+        gap: 3ch;
+        margin-top: 1.1rem;
+    }
+
+    .statement {
+        flex: 1;
+        max-width: var(--measure);
+        color: var(--ink);
+    }
+
+    .band {
+        flex: none;
+        width: 34ch;
+        container-type: inline-size;
+        border: 1px solid var(--rule);
+        padding: 0.35rem 1ch 0.25rem;
+        overflow: hidden;
+    }
+
+    .band-label {
+        display: block;
+        margin-bottom: 0.2rem;
+        color: var(--dim);
+        font-size: 10.5px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+        .mark {
+            gap: 2ch;
+        }
+
+        .readout {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .band {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 680px) {
+        .mark :global(.emblem) {
+            display: none;
+        }
+    }
+
+    /* ── Transmissions: a directory listing ───────────────────────── */
+    :global(.panel-body.flush) {
+        padding-inline: 0;
+        padding-block: 0;
+    }
+
+    .log > li {
+        padding: 0.5rem var(--pad);
+    }
+
+    .log > li + li {
+        border-top: 1px solid var(--rule);
+    }
+
+    .log a {
+        display: flex;
+        align-items: baseline;
+        gap: 1ch;
+    }
+
+    .log .stamp {
+        flex: none;
+        color: var(--dim);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .log .name {
+        flex: none;
+        color: var(--bright);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .log .lead {
+        flex: 1;
+        min-width: 2ch;
+        height: 1px;
+        align-self: center;
+        background-image: radial-gradient(
+            circle at center,
+            var(--dot) 0.5px,
+            transparent 0.6px
+        );
+        background-size: 1ch 2px;
+        background-repeat: repeat-x;
+    }
+
+    .log a:hover .lead {
+        opacity: 0;
+    }
+
+    .log .len {
+        flex: none;
+        color: var(--dim);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .log a:hover .stamp,
+    .log a:hover .len,
+    .log a:hover .name {
+        color: inherit;
+    }
+
+    .sub {
+        margin-top: 0.1rem;
+        color: var(--dim);
+        font-size: 0.93em;
+    }
+
+    .log .sub {
+        padding-left: 12ch;
+    }
+
+    .tags {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 0.3rem 1ch;
+        margin-left: 1ch;
+        vertical-align: middle;
+    }
+
+    /* ── Builds ───────────────────────────────────────────────────── */
+    .builds > li + li {
+        margin-top: 0.7rem;
+        padding-top: 0.7rem;
+        border-top: 1px solid var(--rule);
+    }
+
+    .builds a {
+        color: var(--bright);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .builds a::before {
+        content: "▸ ";
+        color: var(--dim);
+    }
+
+    .kit {
+        margin-top: 0.15rem;
+        color: var(--dot);
+        font-size: 0.88em;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    /* ── Signal ───────────────────────────────────────────────────── */
+    .signal > li {
+        display: flex;
+        gap: 1.5ch;
+        color: var(--dim);
+    }
+
+    .signal > li + li {
+        margin-top: 0.4rem;
+    }
+
+    .signal .idx {
+        flex: none;
+        color: var(--dot);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .more {
+        display: inline-block;
+        margin-top: 0.9rem;
+        color: var(--dim);
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    /* The log reads as prose and now sits in a narrow column, so its rows
+       stack: date above, entry below, leader dropped. */
+    :global(.logspec > li) {
+        display: block;
+    }
+
+    :global(.logspec > li + li) {
+        margin-top: 0.35rem;
+    }
+
+    :global(.logspec .lead) {
+        display: none;
+    }
+
+    :global(.logspec .k) {
+        font-variant-numeric: tabular-nums;
+        color: var(--dot);
+    }
+
+    :global(.logspec .v) {
+        display: block;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--dim);
+    }
+
+    @media (max-width: 680px) {
+        .log a {
+            flex-wrap: wrap;
+        }
+
+        .log .lead {
+            display: none;
+        }
+
+        .log .sub {
+            padding-left: 0;
+        }
+    }
+</style>

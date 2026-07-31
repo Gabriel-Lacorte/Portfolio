@@ -20,12 +20,14 @@ export const SITE: Site = {
     LOCATION: "Brazil",
 };
 
-export const NAV: NavItem[] = [
-    { LABEL: "~/", HREF: "/" },
-    { LABEL: "blog", HREF: "/blog" },
-    { LABEL: "projects", HREF: "/projects" },
-    { LABEL: "uses", HREF: "/uses" },
-    { LABEL: "now", HREF: "/now" },
+/* Labels come from the UI dictionary, so the menu translates with
+   everything else instead of being pinned to English here. */
+export const NAV_KEYS: NavItem[] = [
+    { KEY: "nav.home", HREF: "/" },
+    { KEY: "nav.blog", HREF: "/blog" },
+    { KEY: "nav.projects", HREF: "/projects" },
+    { KEY: "nav.uses", HREF: "/uses" },
+    { KEY: "nav.now", HREF: "/now" },
 ];
 
 export const HOME: Metadata = {
@@ -158,8 +160,21 @@ export const PIPELINE = `front end source ──►  lex   ──► parse ─�
 back end   IR ──►  opt   ──► regalloc ──►  emit  ──► ELF
           SSA     passes      vregs       object`;
 
-export const PIPELINE_ALT =
+/** Caption for the pipeline figure, per locale. */
+export const PIPELINE_CAPTION: Record<"en" | "pt-br", string> = {
+    en: "The half of the stack I am teaching myself properly: everything between source text and an ELF binary.",
+    "pt-br":
+        "A metade da pilha que estou aprendendo direito: tudo que existe entre o texto-fonte e um binário ELF.",
+};
+
+export const PIPELINE_ALT_EN =
     "Diagram of a compiler pipeline. The front end runs source (.c) through lex to tokens, parse to a tree, and on to a typed AST. The back end takes IR in SSA form through optimisation passes, then register allocation over virtual registers, then emits an object file and finally an ELF binary.";
+
+export const PIPELINE_ALT: Record<"en" | "pt-br", string> = {
+    en: PIPELINE_ALT_EN,
+    "pt-br":
+        "Diagrama de um pipeline de compilador. O front end leva o fonte (.c) por lex até tokens, parse até uma árvore, e daí a uma AST tipada. O back end pega a IR em forma SSA, passa pelos passes de otimização, depois pela alocação de registradores sobre registradores virtuais, e por fim emite um objeto e um binário ELF.",
+};
 
 export const SOCIALS: Socials = [
     {

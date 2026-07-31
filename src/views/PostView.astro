@@ -1,0 +1,123 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Panel from "@components/ascii/Panel.astro";
+import Spec from "@components/ascii/Spec.astro";
+import TableOfContents from "@components/TableOfContents.astro";
+import { isFallback, type Post } from "@lib/posts";
+import { compact, countWords, readingTime } from "@lib/stats";
+import { localised, useTranslations, type Locale } from "@i18n/utils";
+
+type Props = {
+    locale: Locale;
+    post: Post;
+};
+
+const { locale, post } = Astro.props;
+const t = useTranslations(locale);
+
+const { Content, headings } = await post.render();
+const iso = post.data.date.toISOString().slice(0, 10);
+
+/* True when this locale has no translation yet and is reading the
+   original. Saying so is the honest alternative to either hiding the post
+   or blocking publication on a translation. */
+const borrowed = isFallback(post, locale);
+---
+
+<Layout
+    locale={locale}
+    title={post.data.title}
+    description={post.data.description}
+>
+    <div class="stack-gap">
+        <Panel title={post.data.title} note={iso} as="h1">
+            <p class="summary">{post.data.description}</p>
+            <Spec
+                class="meta"
+                rows={[
+                    { k: t("field.filed"), v: iso },
+                    {
+                        k: t("field.read"),
+                        v: `${readingTime(post.body)} ${t("unit.min")}`,
+                    },
+                    { k: t("field.words"), v: compact(countWords(post.body)) },
+                    ...(post.data.tags.length
+                        ? [
+                              {
+                                  k: t("field.tags"),
+                                  v: post.data.tags.join(" · "),
+                              },
+                          ]
+                        : []),
+                ]}
+            />
+        </Panel>
+
+        {
+            borrowed && (
+                <p class="fallback" role="note">
+                    {t("fallback.notice")}
+                </p>
+            )
+        }
+
+        {
+            headings.length > 0 && (
+                <Panel
+                    title={t("panel.contents")}
+                    note={`${headings.length} ${t("unit.sections")}`}
+                >
+                    <TableOfContents headings={headings} />
+                </Panel>
+            )
+        }
+
+        <div class="panel">
+            <div class="panel-body">
+                <article class="article">
+                    <Content />
+                </article>
+            </div>
+        </div>
+
+        <a class="back" href={localised("/blog", locale)}>
+            ◂ {t("action.backToBlog")}
+        </a>
+    </div>
+</Layout>
+
+<style>
+    .summary {
+        max-width: var(--measure);
+        color: var(--dim);
+    }
+
+    :global(.spec.meta) {
+        max-width: 52ch;
+        margin-top: var(--step);
+    }
+
+    .fallback {
+        padding: 0.4rem var(--pad);
+        border: 1px solid var(--rule);
+        background: var(--strip);
+        color: var(--dim);
+        font-size: 0.9em;
+    }
+
+    .fallback::before {
+        content: "! ";
+        color: var(--bright);
+    }
+
+    .back {
+        display: inline-block;
+        align-self: start;
+        padding: 0.2rem 1ch;
+        border: 1px solid var(--rule);
+        color: var(--dim);
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+</style>

@@ -4,7 +4,9 @@
         "strictNullChecks": true,
         "baseUrl": ".",
         "paths": {
-            "@*": ["./src/*"]
+            "@*": ["./src/*"],
+            "@i18n/*": ["./src/i18n/*"],
+            "@views/*": ["./src/views/*"]
         }
     }
 }

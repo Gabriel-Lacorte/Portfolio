@@ -357,10 +357,29 @@ a:focus-visible {
    ══════════════════════════════════════════════════════════════════════ */
 
 .panel {
+    position: relative;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--rule);
     background: var(--panel);
+}
+
+/* Corner ticks. The reference panels all have crisp registration marks at
+   the corners; two gradients cost nothing and do the whole job. */
+.panel::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    pointer-events: none;
+    background:
+        linear-gradient(var(--bright) 0 0) 0 0 / 5px 1px no-repeat,
+        linear-gradient(var(--bright) 0 0) 0 0 / 1px 5px no-repeat,
+        linear-gradient(var(--bright) 0 0) 100% 0 / 5px 1px no-repeat,
+        linear-gradient(var(--bright) 0 0) 100% 0 / 1px 5px no-repeat,
+        linear-gradient(var(--bright) 0 0) 0 100% / 5px 1px no-repeat,
+        linear-gradient(var(--bright) 0 0) 0 100% / 1px 5px no-repeat,
+        linear-gradient(var(--bright) 0 0) 100% 100% / 5px 1px no-repeat,
+        linear-gradient(var(--bright) 0 0) 100% 100% / 1px 5px no-repeat;
 }
 
 .panel > .panel-head {
@@ -370,12 +389,26 @@ a:focus-visible {
     gap: 2ch;
     padding: 0.15rem var(--pad);
     border-bottom: 1px solid var(--rule);
+    background: var(--strip);
     font-family: var(--font-display);
     font-size: 12px;
     font-weight: 400;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--bright);
+}
+
+/* [ OPERATOR ] — the bracketed label the reference flyers set every
+   heading in. Brackets are decoration, so they are drawn rather than
+   written into the text a screen reader announces. */
+.panel > .panel-head > span:first-child::before {
+    content: "[ ";
+    color: var(--dim);
+}
+
+.panel > .panel-head > span:first-child::after {
+    content: " ]";
+    color: var(--dim);
 }
 
 .panel > .panel-head .note {
@@ -446,6 +479,8 @@ a:focus-visible {
 
 .spec .v {
     flex: none;
+    min-width: 7ch;
+    text-align: right;
     color: var(--bright);
     font-variant-numeric: tabular-nums;
     text-transform: uppercase;
@@ -508,12 +543,19 @@ a:focus-visible {
     white-space: nowrap;
 }
 
+/* A double rule, so it reads as a run of "=" the way the flyers set it,
+   while still flexing to any width. */
 .crossbar::before,
 .crossbar::after {
     content: "";
     flex: 1;
-    height: 0;
-    border-top: 1px solid var(--rule);
+    height: 3px;
+    background-image: linear-gradient(
+        to bottom,
+        var(--rule) 0 1px,
+        transparent 1px 2px,
+        var(--rule) 2px 3px
+    );
 }
 
 .tag {

@@ -7,7 +7,7 @@ import { postsFor } from "@lib/posts";
    postsFor() also supplies the English original for any post this locale
    has not translated yet, so no path 404s mid-translation. */
 export async function getStaticPaths() {
-    const posts = await postsFor("en");
+    const posts = await postsFor("pt-br");
     return posts.map((post) => ({
         params: { slug: post.data.translationKey },
         props: { post },
@@ -17,4 +17,4 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 ---
 
-<PostView locale="en" post={post} />
+<PostView locale="pt-br" post={post} />

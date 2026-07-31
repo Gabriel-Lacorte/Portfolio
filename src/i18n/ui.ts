@@ -1,0 +1,218 @@
+/**
+ * UI strings, one dictionary per locale.
+ *
+ * `en` is the source of truth: its keys define the `UIKey` type, so a
+ * missing or misspelt Portuguese key is a build error rather than a
+ * silently English word in the middle of a Portuguese page.
+ */
+
+export const LOCALES = ["en", "pt-br"] as const;
+export type Locale = (typeof LOCALES)[number];
+
+export const DEFAULT_LOCALE: Locale = "en";
+
+/** What the language switcher shows for each locale. */
+export const LOCALE_LABEL: Record<Locale, string> = {
+    en: "EN",
+    "pt-br": "PT",
+};
+
+/** Goes in <html lang="…">. */
+export const HTML_LANG: Record<Locale, string> = {
+    en: "en",
+    "pt-br": "pt-BR",
+};
+
+const en = {
+    "site.designation": "lacorte.city — systems engineering notebook",
+    "site.role": "systems engineer",
+    "site.tagline": "systems · compilers · operating systems",
+    "site.statement":
+        "I work below the abstraction line — hypervisors, compilers, and operating systems. This is where I write down what I find when I take them apart.",
+
+    "nav.home": "~/",
+    "nav.blog": "blog",
+    "nav.projects": "projects",
+    "nav.uses": "uses",
+    "nav.now": "now",
+
+    "panel.operator": "operator",
+    "panel.capability": "capability",
+    "panel.transmissions": "transmissions",
+    "panel.builds": "builds",
+    "panel.signal": "signal",
+    "panel.log": "log",
+    "panel.contents": "contents",
+    "panel.fault": "fault",
+    "panel.recover": "recover",
+    "panel.buildingToward": "what I'm building toward",
+
+    "field.name": "name",
+    "field.role": "role",
+    "field.based": "based",
+    "field.writingAbout": "writing about",
+    "field.logged": "logged",
+    "field.reachable": "reachable",
+    "field.mail": "mail",
+    "field.filed": "filed",
+    "field.read": "read",
+    "field.words": "words",
+    "field.tags": "tags",
+    "field.stack": "stack",
+    "field.source": "source",
+
+    "value.yes": "yes",
+    "value.active": "active",
+    "value.selfAssessed": "self-assessed",
+    "value.systemsCompilers": "systems · compilers",
+
+    "unit.posts": "posts",
+    "unit.words": "words",
+    "unit.min": "min",
+    "unit.logged": "logged",
+    "unit.listed": "listed",
+    "unit.entries": "entries",
+    "unit.groups": "groups",
+    "unit.rows": "rows",
+    "unit.routes": "routes",
+    "unit.sections": "sections",
+
+    "action.allBuilds": "all builds",
+    "action.fullSignal": "full signal",
+    "action.backToBlog": "back to ~/blog",
+    "action.skip": "Skip to content",
+    "action.copy": "copy",
+    "action.copied": "copied",
+    "action.copyFailed": "failed",
+
+    "meta.blogTitle": "Blog",
+    "meta.blogDescription":
+        "Notes on systems, compilers, and low-level engineering.",
+    "meta.projectsTitle": "Projects",
+    "meta.projectsDescription": "Things I have built.",
+    "meta.usesTitle": "Uses",
+    "meta.usesDescription":
+        "Hardware, editor, and the machines this site and my homelab run on.",
+    "meta.usesLede":
+        "What I type on, what I type into, and what it all runs on.",
+    "meta.nowTitle": "Now",
+    "meta.nowDescription": "What I am working on and reading at the moment.",
+    "meta.nowLede":
+        "What has my attention at the moment. Updated when it changes, not on a schedule.",
+    "meta.homeDescription":
+        "Systems engineer — hypervisors, compilers, and operating systems.",
+
+    "err.title": "404 — no such file or directory",
+    "err.description": "That path does not resolve.",
+    "err.body":
+        "does not resolve. It may have moved, or it may never have existed.",
+
+    "status.online": "online",
+    "status.posts": "posts",
+    "status.words": "words",
+    "status.build": "build",
+
+    "fallback.notice":
+        "This post has not been translated yet — showing the English original.",
+    "lang.switch": "Change language",
+} as const;
+
+export type UIKey = keyof typeof en;
+
+const ptBR: Record<UIKey, string> = {
+    "site.designation": "lacorte.city — caderno de engenharia de sistemas",
+    "site.role": "engenheiro de sistemas",
+    "site.tagline": "sistemas · compiladores · sistemas operacionais",
+    "site.statement":
+        "Trabalho abaixo da linha de abstração — hipervisores, compiladores e sistemas operacionais. É aqui que anoto o que encontro quando desmonto essas coisas.",
+
+    "nav.home": "~/",
+    "nav.blog": "blog",
+    "nav.projects": "projetos",
+    "nav.uses": "setup",
+    "nav.now": "agora",
+
+    "panel.operator": "operador",
+    "panel.capability": "capacidade",
+    "panel.transmissions": "transmissões",
+    "panel.builds": "construções",
+    "panel.signal": "sinal",
+    "panel.log": "registro",
+    "panel.contents": "índice",
+    "panel.fault": "falha",
+    "panel.recover": "recuperar",
+    "panel.buildingToward": "o que estou construindo",
+
+    "field.name": "nome",
+    "field.role": "função",
+    "field.based": "base",
+    "field.writingAbout": "escrevo sobre",
+    "field.logged": "registrado",
+    "field.reachable": "contactável",
+    "field.mail": "e-mail",
+    "field.filed": "data",
+    "field.read": "leitura",
+    "field.words": "palavras",
+    "field.tags": "tags",
+    "field.stack": "stack",
+    "field.source": "fonte",
+
+    "value.yes": "sim",
+    "value.active": "ativo",
+    "value.selfAssessed": "autoavaliado",
+    "value.systemsCompilers": "sistemas · compiladores",
+
+    "unit.posts": "posts",
+    "unit.words": "palavras",
+    "unit.min": "min",
+    "unit.logged": "registrados",
+    "unit.listed": "listados",
+    "unit.entries": "entradas",
+    "unit.groups": "grupos",
+    "unit.rows": "linhas",
+    "unit.routes": "rotas",
+    "unit.sections": "seções",
+
+    "action.allBuilds": "todas as construções",
+    "action.fullSignal": "sinal completo",
+    "action.backToBlog": "voltar para ~/blog",
+    "action.skip": "Ir para o conteúdo",
+    "action.copy": "copiar",
+    "action.copied": "copiado",
+    "action.copyFailed": "falhou",
+
+    "meta.blogTitle": "Blog",
+    "meta.blogDescription":
+        "Anotações sobre sistemas, compiladores e engenharia de baixo nível.",
+    "meta.projectsTitle": "Projetos",
+    "meta.projectsDescription": "Coisas que eu construí.",
+    "meta.usesTitle": "Setup",
+    "meta.usesDescription":
+        "Hardware, editor e as máquinas onde este site e meu homelab rodam.",
+    "meta.usesLede":
+        "No que eu digito, para onde eu digito, e onde tudo isso roda.",
+    "meta.nowTitle": "Agora",
+    "meta.nowDescription": "No que estou trabalhando e lendo neste momento.",
+    "meta.nowLede":
+        "O que tem minha atenção neste momento. Atualizado quando muda, não por cronograma.",
+    "meta.homeDescription":
+        "Engenheiro de sistemas — hipervisores, compiladores e sistemas operacionais.",
+
+    "err.title": "404 — arquivo ou diretório inexistente",
+    "err.description": "Esse caminho não resolve.",
+    "err.body": "não resolve. Pode ter mudado, ou pode nunca ter existido.",
+
+    "status.online": "online",
+    "status.posts": "posts",
+    "status.words": "palavras",
+    "status.build": "build",
+
+    "fallback.notice":
+        "Este post ainda não foi traduzido — exibindo o original em inglês.",
+    "lang.switch": "Mudar idioma",
+};
+
+export const UI: Record<Locale, Record<UIKey, string>> = {
+    en,
+    "pt-br": ptBR,
+};

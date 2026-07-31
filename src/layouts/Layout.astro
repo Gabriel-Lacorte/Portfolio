@@ -1,63 +1,85 @@
 ---
 import Head from "@components/Head.astro";
-import { NAV, SITE } from "@consts";
+import { NAV_KEYS, SITE } from "@consts";
 import { compact, getStats } from "@lib/stats";
+import { HTML_LANG, LOCALE_LABEL, LOCALES } from "@i18n/ui";
+import {
+    localised,
+    unlocalised,
+    useTranslations,
+    type Locale,
+} from "@i18n/utils";
 
 type Props = {
+    locale: Locale;
     title: string;
     description: string;
     /** Home passes false — its <title> is just the site name. */
     suffix?: boolean;
 };
 
-const { title, description, suffix = true } = Astro.props;
-
+const { locale, title, description, suffix = true } = Astro.props;
+const t = useTranslations(locale);
 const stats = await getStats();
 
 /* Trailing slashes normalised so /blog/kerberos-attacks marks BLOG as
-   current, and ~/ only ever marks itself. */
-const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+   current, and ~/ only ever marks itself. Compared with the locale
+   segment stripped, so the same logic serves both languages. */
+const here = unlocalised(Astro.url.pathname);
 const isCurrent = (href: string) =>
-    href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
+    href === "/" ? here === "/" : here === href || here.startsWith(href + "/");
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={HTML_LANG[locale]}>
     <head>
         <Head
+            locale={locale}
             title={suffix ? `${title} — ${SITE.TITLE}` : title}
             description={description}
         />
     </head>
     <body>
-        <a class="skip-link" href="#screen">Skip to content</a>
+        <a class="skip-link" href="#screen">{t("action.skip")}</a>
 
         <div class="chassis">
             <div class="enclosure">
                 <div class="titlebar">
-                    <span class="designation">{SITE.DESIGNATION}</span>
-                    <span class="controls" aria-hidden="true">
-                        <span>_</span>
-                        <span>□</span>
-                        <button
-                            id="theme-toggle"
-                            type="button"
-                            class="no-print"
-                            data-theme-label>·</button
+                    <span class="designation">{t("site.designation")}</span>
+                    <span class="controls">
+                        <span class="lang" role="group" aria-label={t("lang.switch")}>
+                            {
+                                LOCALES.map((code) => (
+                                    <a
+                                        href={localised(here, code)}
+                                        hreflang={HTML_LANG[code]}
+                                        aria-current={
+                                            code === locale ? "true" : undefined
+                                        }
+                                    >
+                                        {LOCALE_LABEL[code]}
+                                    </a>
+                                ))
+                            }
+                        </span>
+                        <span aria-hidden="true" class="chrome">_</span>
+                        <span aria-hidden="true" class="chrome">□</span>
+                        <button id="theme-toggle" type="button" class="no-print"
+                            >·</button
                         >
                     </span>
                 </div>
 
                 <nav class="menubar" aria-label="Main">
                     {
-                        NAV.map(({ LABEL, HREF }) => (
+                        NAV_KEYS.map(({ KEY, HREF }) => (
                             <a
-                                href={HREF}
+                                href={localised(HREF, locale)}
                                 aria-current={
                                     isCurrent(HREF) ? "page" : undefined
                                 }
                             >
-                                {LABEL}
+                                {t(KEY)}
                             </a>
                         ))
                     }
@@ -68,13 +90,14 @@ const isCurrent = (href: string) =>
                 </main>
 
                 <div class="statusbar">
-                    <span>online</span>
+                    <span>{t("status.online")}</span>
                     <span class="sep" aria-hidden="true">│</span>
-                    <span>posts <b>{stats.posts}</b></span>
+                    <span>{t("status.posts")} <b>{stats.posts}</b></span>
                     <span class="sep" aria-hidden="true">│</span>
-                    <span>words <b>{compact(stats.words)}</b></span>
+                    <span>{t("status.words")} <b>{compact(stats.words)}</b></span
+                    >
                     <span class="sep" aria-hidden="true">│</span>
-                    <span>build <b>{stats.commit}</b></span>
+                    <span>{t("status.build")} <b>{stats.commit}</b></span>
                     <span class="sep" aria-hidden="true">│</span>
                     <span>{stats.built}</span>
                     <span class="sep push" aria-hidden="true">│</span>
@@ -88,7 +111,29 @@ const isCurrent = (href: string) =>
 </html>
 
 <style>
-    /* Pushes the address to the far end on wide screens and simply wraps
+    .lang {
+        display: flex;
+        margin-right: 1ch;
+        border: 1px solid var(--rule);
+    }
+
+    .lang a {
+        padding-inline: 0.7ch;
+        color: var(--dim);
+        font-size: 11px;
+        line-height: 1.35rem;
+    }
+
+    .lang a + a {
+        border-left: 1px solid var(--rule);
+    }
+
+    .lang a[aria-current="true"] {
+        background: var(--invert-bg);
+        color: var(--invert-fg);
+    }
+
+    /* Pushes the address to the far end on wide screens, and simply wraps
        with everything else when there is no room. */
     .statusbar .push {
         margin-left: auto;
@@ -96,7 +141,8 @@ const isCurrent = (href: string) =>
 
     @media (max-width: 680px) {
         .statusbar .push,
-        .statusbar .mail {
+        .statusbar .mail,
+        .titlebar .chrome {
             display: none;
         }
     }
