@@ -300,6 +300,9 @@ header.site {
     display: none;
     margin-left: 18px;
     color: var(--comment);
+    /* The pair wraps as one unit; "crt /" orphaned on a line reads as a
+       typo rather than a control. */
+    white-space: nowrap;
 }
 
 html.js .menu .mode {

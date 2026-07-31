@@ -72,7 +72,9 @@ const { alt, caption, label, bare = false } = Astro.props;
 
     .fig-label {
         margin-right: 8px;
-        color: var(--purple);
+        /* --purple never existed; the .purple class always meant the
+           accent. Cite the real token. */
+        color: var(--accent);
     }
 
     @media (max-width: 700px) {

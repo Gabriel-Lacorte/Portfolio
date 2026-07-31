@@ -1,0 +1,400 @@
+---
+title: "Guia de Home Server"
+description: "Um guia para montar e configurar seu próprio servidor em casa"
+date: "2024-06-01"
+tags: ["linux", "self-hosting", "docker"]
+translationKey: "home-server-guide"
+---
+
+import Figure from "@components/ascii/Figure.astro";
+
+Neste post vou cobrir os passos necessários para montar e configurar seu próprio home server, incluindo dicas de escolha de hardware, instalação do sistema operacional, configuração de aplicações e como expor o servidor para a internet.
+
+## Escolhendo as peças do servidor 🌟
+
+Montar um home server pode ser feito de várias formas, dependendo do que você tem à disposição. Dá para reaproveitar peças ou computadores antigos, ou investir em peças novas. No meu caso usei dois computadores velhos, combinando os dois em um só. Não é a solução ideal, mas funciona bem para o que preciso.
+
+Se você quer algo mais profissional ou não tem hardware antigo para reaproveitar, a melhor opção é comprar. Recomendo procurar em sites como AliExpress ou comprar peças usadas. No AliExpress dá para achar kits Xeon, que oferecem processadores de boa qualidade a preço baixo. Não precisa de GPU dedicada; vídeo integrado é suficiente na maioria dos casos. O foco principal do servidor é a CPU, e um processador básico dá conta. Sobre RAM, ela é importante para o desempenho: recomendo 8GB, ou no mínimo 4GB. No meu servidor uso 8GB DDR3.
+
+Quanto ao armazenamento, a escolha depende do que você pretende fazer. Se planeja hospedar arquivos ou montar um NAS, um SSD é essencial. Já para hospedar sites e coisas do tipo, um HD de 500GB basta.
+
+## Instalando e configurando o sistema operacional 💻
+
+Neste guia vamos usar o Debian 12 netinstall como sistema operacional ([baixar ISO](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso)), por ser leve, seguro e estável. A escolha pode variar conforme sua preferência: para quem está começando em self-hosting, recomendo o Debian; fora isso, opções como Ubuntu Server ou Fedora também servem. Para um NAS, o TrueNAS é altamente recomendado.
+
+O sistema não precisa — e não deve — ter interface gráfica, já que só será acessado por SSH. Durante a instalação, marque a opção de instalar o servidor SSH. Terminada a instalação, você acessa o sistema assim:
+
+```sh
+ssh user@server_ip
+```
+
+Troque "user" pelo nome de usuário que você criou durante a instalação, ou use "root". Digite a senha e você estará conectado ao servidor.
+
+Ao entrar, o primeiro passo é acessar como root e atualizar os pacotes:
+
+```sh
+su root
+apt update && apt upgrade
+```
+
+Com os pacotes atualizados, o próximo passo é instalar o sudo e adicionar seu usuário ao grupo sudo:
+
+```sh
+apt install sudo
+/usr/sbin/usermod -aG sudo <seu_usuario>
+```
+
+Depois saia e entre de novo pelo SSH para aplicar as mudanças.
+
+Agora algumas dicas de configuração do SSH — por padrão ele é um pouco inseguro. O arquivo de configuração fica em `/etc/ssh/sshd_config`. As mudanças que recomendo são trocar a porta padrão (22) e desabilitar o login como root:
+
+```sh
+Port 2222
+PermitRootLogin no
+```
+
+Feitas as mudanças, reinicie o serviço SSH para aplicar:
+
+```sh
+systemctl restart sshd
+```
+
+Assim seu SSH já fica um pouco mais seguro. Não é muita coisa, mas já ajuda.
+
+Outra configuração importante é adicionar atualizações automáticas para os pacotes de segurança. Para isso podemos usar o unattended-upgrades:
+
+1. Instale o unattended-upgrades, o apt-listchanges e o apticron:
+
+```sh
+sudo apt install unattended-upgrades apt-listchanges apticron
+```
+
+2. Crie o arquivo `/etc/apt/apt.conf.d/51myunattended-upgrades` e adicione o seguinte conteúdo:
+
+```plaintext
+// Enable the update/upgrade script (0=disable)
+APT::Periodic::Enable "1";
+
+// Do "apt-get update" automatically every n-days (0=disable)
+APT::Periodic::Update-Package-Lists "1";
+
+// Do "apt-get upgrade --download-only" every n-days (0=disable)
+APT::Periodic::Download-Upgradeable-Packages "1";
+
+// Do "apt-get autoclean" every n-days (0=disable)
+APT::Periodic::AutocleanInterval "7";
+
+// Send report mail to root
+//     0:  no report             (or null string)
+//     1:  progress report       (actually any string)
+//     2:  + command outputs     (remove -qq, remove 2>/dev/null, add -d)
+APT::Periodic::Verbose "2";
+APT::Periodic::Unattended-Upgrade "1";
+
+// Automatically upgrade packages from these
+Unattended-Upgrade::Origins-Pattern {
+    "o=Debian,a=stable";
+    "o=Debian,a=stable-updates";
+    "origin=Debian,codename=${distro_codename},label=Debian-Security";
+};
+
+// You can specify your own packages to NOT automatically upgrade here
+Unattended-Upgrade::Package-Blacklist {
+};
+
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+
+// Perform the upgrade when the machine is running because we won't be shutting our server down often
+Unattended-Upgrade::InstallOnShutdown "false";
+
+// Send an email to this address with information about the packages upgraded.
+Unattended-Upgrade::Mail "root";
+
+// Always send an e-mail
+Unattended-Upgrade::MailOnlyOnError "false";
+
+// Remove all unused dependencies after the upgrade has finished
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+// Remove any new unused dependencies after the upgrade has finished
+Unattended-Upgrade::Remove-New-Unused-Dependencies "true";
+
+// Automatically reboot WITHOUT CONFIRMATION if the file /var/run/reboot-required is found after the upgrade.
+Unattended-Upgrade::Automatic-Reboot "true";
+
+// Automatically reboot even if users are logged in.
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+```
+
+3. Rode o unattended-upgrade em modo de teste para conferir se está tudo certo:
+
+```sh
+sudo unattended-upgrades --dry-run --debug
+```
+
+4. Se estiver tudo bem, habilite o unattended-upgrade e reinicie o servidor:
+
+```sh
+sudo systemctl enable --now unattended-upgrades
+sudo reboot
+```
+
+Se tudo foi configurado corretamente, você está pronto para continuar.
+
+---
+
+## Instalando e configurando as primeiras aplicações 🔨
+
+Neste post vamos usar Docker e Docker Compose para instalar e configurar as aplicações — o que é altamente recomendado. Se você não tem experiência com Docker, é uma boa hora para estudar um pouco. Vamos começar instalando o Docker:
+
+```sh
+sudo apt install docker.io docker-compose
+```
+
+Gosto de organizar minhas aplicações em pastas dentro da home e usar essas pastas como volumes no Docker. Você pode organizar do jeito que preferir, mas vou mostrar como costumo fazer:
+
+```plaintext
+📁 .
+├── 📁 app1
+│   ├── 📄 docker-compose.yml
+│   └── 📁 app1_data
+├── 📁 app2
+│   ├── 📄 docker-compose.yml
+│   └── 📁 app2_data
+└── 📁 app3
+    ├── 📄 docker-compose.yml
+    └── 📁 app3_data
+```
+
+Outra dica é usar portas web na faixa 800x (8001, 8002, 8003 e assim por diante) para manter as coisas organizadas.
+
+Agora vamos hospedar a primeira aplicação. Começando por um servidor web com Apache2. Primeiro crie uma pasta "www" na sua home e coloque um arquivo docker-compose.yml dentro dela:
+
+```plaintext
+.
+└── 📁 www
+    └── 📄 docker-compose.yml
+```
+
+Dentro do docker-compose.yml você define o serviço do Apache2 assim:
+
+```yaml
+version: "3"
+services:
+    apache:
+        image: httpd:latest
+        volumes:
+            - /home/<seu_usuario>/www:/usr/local/apache2/htdocs
+            - /home/<seu_usuario>/www/httpd.conf:/usr/local/apache2/conf/httpd.conf
+        ports:
+            - 8001:8001
+        restart: unless-stopped
+```
+
+No volume, troque o caminho para a pasta onde quer guardar os arquivos do site, substituindo `<seu_usuario>` pelo seu usuário. Em ports você pode adicionar mais portas conforme a necessidade:
+
+```yaml
+ports:
+    - 8001:8001
+    - 8002:8002
+    - 8003:8003
+```
+
+Agora suba o container do Apache2:
+
+```sh
+sudo docker-compose up -d
+```
+
+Você vai ver alguns arquivos sendo criados na pasta "www", incluindo o httpd.conf. Abra o arquivo e adicione as configurações do seu site no final dele:
+
+```plaintext
+Listen 8001
+<VirtualHost *:8001>
+    DocumentRoot /usr/local/apache2/htdocs/<PASTA_DO_SEU_SITE>/
+    ServerName <DOMINIO_DO_SITE>
+</VirtualHost>
+```
+
+Troque `<PASTA_DO_SEU_SITE>` pelo nome da pasta com os arquivos do site. Se você não tem domínio, pode deixar "localhost". Confira se a porta bate com a que você definiu no Docker Compose.
+
+Por exemplo, se você criou a estrutura de pastas assim:
+
+```plaintext
+.
+└── 📁 www
+    ├── 📁 meu_site
+    │   └── 📄 index.html
+    ├── 📄 httpd.conf
+    └── 📄 docker-compose.yml
+```
+
+Você deve trocar `<PASTA_DO_SEU_SITE>` por "meu_site".
+
+Depois de alterar o httpd.conf, reinicie o container do Apache:
+
+```sh
+sudo docker-compose restart
+```
+
+Se estiver tudo certo, você vai conseguir acessar seu site na porta configurada.
+
+Para adicionar mais sites, basta acrescentar mais blocos VirtualHost no httpd.conf, junto com as respectivas pastas e as portas no Docker Compose. Assim dá para hospedar quantos sites quiser no servidor.
+
+```plaintext
+Listen 8001
+<VirtualHost *:8001>
+    DocumentRoot /usr/local/apache2/htdocs/site1/
+    ServerName <DOMINIO_1>
+</VirtualHost>
+
+Listen 8002
+<VirtualHost *:8002>
+    DocumentRoot /usr/local/apache2/htdocs/site2/
+    ServerName <DOMINIO_2>
+</VirtualHost>
+```
+
+---
+
+## Expondo o servidor para a internet 🌐
+
+Agora que você tem um servidor web no ar, seria interessante deixar seu site acessível para outras pessoas, ou até colocar um domínio nele. Muita gente tem dificuldade nessa parte, porque um home server geralmente não tem IP público fixo e também não tem proteção contra ataques DDoS. Para resolver isso vamos usar o Cloudflare Tunnel.
+
+<Figure
+  label="fig.1"
+  caption="O formato da coisa: o túnel disca para fora, então o roteador nunca precisa de porta aberta para dentro."
+  alt="Diagrama de topologia. O tráfego da internet chega à borda da Cloudflare por TLS na porta 443, onde são aplicados WAF, proteção contra DDoS e Zero Trust. O daemon cloudflared no home server mantém um túnel exclusivamente de saída até essa borda, de modo que nenhuma porta de entrada é aberta no roteador. Atrás dele, no home server, ficam o nginx na porta 80 e os serviços em Docker."
+>
+{`
+              internet
+                  │
+                  │  TLS 443
+                  ▼
+      ┌───────────────────────┐
+      │    cloudflare edge    │  WAF · DDoS · Zero Trust
+      └───────────────────────┘
+                  ╎  só túnel de saída —
+                  ╎  nenhuma porta aberta
+                  ▼
+      ┌───────────────────────┐
+      │      cloudflared      │
+      └───────────────────────┘
+      ════════ home server ════
+                  ▼
+      ┌───────────────────────┐
+      │       nginx  :80      │
+      └───────────────────────┘
+                  ▼
+      ┌───────────────────────┐
+      │    serviços docker    │
+      └───────────────────────┘
+`}
+</Figure>
+
+Primeiro, crie uma conta na Cloudflare — é um processo simples e direto. Depois adicione seu domínio à conta seguindo as instruções. Após algumas horas seu site vai aparecer na Cloudflare.
+
+![Cloudflare Create Account](/cloudflare_create_account.png)
+
+Agora vá até a área Zero Trust da Cloudflare para encontrar a opção de configurar o túnel.
+
+![Zero Trust](/zerotrust.png)
+
+Provavelmente vão pedir um cartão de crédito, mas fique tranquilo: não vão cobrar nada, o plano gratuito é muito bom e mais que suficiente.
+
+Na plataforma Zero Trust, clique em "Networks" e depois em "Tunnels". Aqui você cria seu primeiro túnel.
+
+![Create Tunnel](/cloudflare_create_account.png)
+
+Selecione o tipo do túnel como Cloudflared e dê um nome a ele (por exemplo, "Home server"). Clique em salvar. Depois rode o comando que vai aparecer para o seu sistema operacional (Debian), para instalar o Cloudflared e conectar o túnel. Deve ser parecido com isto:
+
+```sh
+curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb &&
+sudo dpkg -i cloudflared.deb &&
+sudo cloudflared service install <TOKEN>
+```
+
+![Setup Tunnel](/setup_tunnel.png)
+
+Depois de conectar sua máquina, clique em "Next" e comece a configurar o túnel. Escolha o domínio onde o site vai ficar, o caminho ou subdomínio se quiser, e a porta do servidor. Para um site simples, selecione HTTP e preencha as informações necessárias.
+
+![Tunnel Config](/tunnel_config.png)
+
+Você pode adicionar quantos túneis quiser, para quantos sites e portas precisar. O Cloudflared é uma ótima ferramenta para isso.
+
+---
+
+## Algumas aplicações para instalar 📦
+
+Agora que você já aprendeu quase tudo, vamos instalar algumas aplicações úteis e legais no servidor. Aqui vão algumas sugestões do que dá para hospedar por conta própria.
+
+### Gerenciador de senhas: Vaultwarden 🔑
+
+Um gerenciador de senhas é ferramenta essencial para manter suas senhas seguras. Hospedar o seu próprio, como o VaultWarden (uma versão modificada do BitWarden), é uma opção segura e confiável. Primeiro crie uma pasta chamada "vault" na sua home e adicione o docker-compose.yml a seguir:
+
+```yaml
+version: "3"
+
+services:
+    vaultwarden:
+        container_name: vaultwarden
+        image: vaultwarden/server:latest
+        restart: unless-stopped
+        volumes:
+            - /home/<seu_usuario>/vault/data/:/data/
+        ports:
+            - 8002:80
+```
+
+Mude o caminho do volume para a pasta que quiser e a porta conforme necessário. Depois rode o comando abaixo para subir o container:
+
+```sh
+sudo docker-compose up -d
+```
+
+Você acessa seu gerenciador de senhas em [http://localhost:8002](http://localhost:8002). Para criar uma conta, é preciso acessar o site com SSL — o que dá para fazer via Cloudflared, que adiciona automaticamente, ou consultando a documentação do VaultWarden sobre como adicionar um certificado. Criada a conta, você já pode gerenciar suas senhas.
+
+### Motor de busca: SearxNG 🔍
+
+Ter um motor de busca privado e seguro hospedado por você mesmo é uma excelente adição ao home server. Dá para usar o SearxNG. Crie uma pasta na home chamada "searxng" e adicione o docker-compose.yml a seguir:
+
+```yaml
+version: "3"
+services:
+    searxng:
+        image: searxng/searxng:latest
+        container_name: searxng
+        environment:
+            - SEARXNG_BASE_URL=https://example.com
+        cap_drop:
+            - ALL
+        cap_add:
+            - CHOWN
+            - SETGID
+            - SETUID
+            - DAC_OVERRIDE
+        volumes:
+            - /home/<seu_usuario>/searxng:/etc/searxng
+        ports:
+            - 8003:8080
+        restart: unless-stopped
+```
+
+Ajuste o caminho do volume, a porta e o domínio conforme necessário. Depois suba o container com:
+
+```sh
+sudo docker-compose up -d
+```
+
+Agora você acessa seu motor de busca em [http://localhost:8003](http://localhost:8003). Para customizar mais, dá para editar o arquivo settings.yml dentro da pasta "searxng".
+
+---
+
+Esse foi o guia para montar seu home server. Ainda há muito o que aprender, então deixo aqui a lista de recursos que me foram muito úteis quando montei o meu pela primeira vez:
+
+-   [https://noted.lol/](https://noted.lol/) — artigos sobre aplicações úteis para o servidor
+-   [https://github.com/imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server) — dicas de como deixar o servidor seguro
+-   [https://awesome-selfhosted.net/](https://awesome-selfhosted.net/) — diversas aplicações para o servidor
+-   [https://www.youtube.com/watch?v=hzpN-JhBJBQ](https://www.youtube.com/watch?v=hzpN-JhBJBQ) — tutorial de configuração inicial, muito útil
+
+Se você tiver dúvidas ou quiser sugerir algo para este guia, é só me chamar.

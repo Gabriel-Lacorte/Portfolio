@@ -19,7 +19,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="generator" content={Astro.generator} />
 <meta name="color-scheme" content="dark light" />
-<meta name="theme-color" content="#0b0b0d" />
+<meta name="theme-color" content="#0a0507" />
 
 <title>{title}</title>
 <meta name="title" content={title} />
@@ -283,7 +283,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
                     String((b.dataset.themeSet === "light") === light),
                 ),
             );
-            meta?.setAttribute("content", light ? "#e6e2d8" : "#0b0b0d");
+            /* Read the live token so a palette change can never strand a
+               stale hex here. */
+            const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
+            if (bg) meta?.setAttribute("content", bg);
         };
 
         buttons.forEach((b) =>

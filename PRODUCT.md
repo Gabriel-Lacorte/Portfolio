@@ -45,14 +45,14 @@ Largely codified in the manifesto atop `src/styles/global.css`; kept here delibe
 ## Design Principles
 
 1. **The command is the heading.** Every section is the output of something he would actually run (`$ whoami`, `$ ls ~/writing`, `$ systemctl status lab`). A new surface must find its command, not invent chrome.
-2. **One base pair; accents counted on one hand.** Bone on ink. Oxide, verdigris, and ochre each appear a few times per page with fixed meanings (links/marks, ok, warn). An accent used more than ~4 times is decoration and gets cut.
+2. **One base pair, one signature, margin marks counted on one hand.** Bone on ink; blood is the signature and may carry a page — though within its triad only `--blood` ever carries text. Green (ok) and amber (warn) keep fixed meanings and a handful of uses each; a margin mark used more than ~4 times is decoration and gets cut.
 3. **Reading is the conversion.** Every choice is judged by whether it helps a peer finish a post: measure, contrast, and code-block legibility outrank any flourish.
 4. **JS is garnish, never load-bearing.** With scripting off the site works completely (windows sit in the flow, copy buttons vanish). The "no javascript" claim in the copy means no *required* JavaScript — keep it true.
 5. **Warmth over polish.** Prefer the handmade move — first-person changelog, closable windows, hotlinkable buttons — to the professional one.
 
 ## Accessibility & Inclusion
 
-- **Contrast: AAA**, documented per color for both themes in the `global.css` header (bone 15.20:1, oxide 7.38:1, verdigris 8.90:1, ochre 9.83:1 on ink). Keep that table true when the palette moves; `--rule` (2.16:1) never carries text.
+- **Contrast: the ledger beside the tokens in `global.css` is normative.** Bone on ink holds AAA; blood text is 6.23:1 (AA for body, AAA for large) and is the floor — within its triad only `--blood` carries text, `--blood-deep`/`--blood-dark` are fills and grounds, and `--rule` never carries text. Keep the notes true when the palette moves.
 - **Works without JavaScript** — everything scripted is a progressive enhancement with a sensible static fallback.
 - `prefers-reduced-motion` honored globally; print stylesheet; skip link; `sr-only` page headings.
 - **Bilingual en / pt-BR as equals**: every UI string flows through the typed dictionary (a missing pt-BR key is a build error), untranslated posts show a fallback notice rather than silently switching language.
