@@ -8,21 +8,31 @@
      · it is a DOCUMENT, not a dashboard. One column that flows top to
        bottom. No grid of bordered cards — that is exactly what made the
        previous pass read as a generic admin panel.
-     · one base colour, #DBDBDB on #000. Everything else is an accent used
-       three or four times on the whole page.
+     · bone on a red-black ink, and one signature: blood. Only --blood
+       carries text in its triad; --blood-deep and --blood-dark are fills
+       and grounds. Green and amber stay margin marks — a handful of uses
+       each, with fixed meanings.
      · borders are hairlines or nothing — the dashed rule was the
-       reference's signature, not ours.
+       reference's signature, not ours. The article's 2px quote rail is
+       the one committed exception.
      · headings are the command whose output follows them.
      · hover is reverse video, everywhere.
-     · the page opens on a real piece of art — a die rendered at raster
-       resolution and reduced to 1 bit, because a character cell holds
-       five grey levels over 8x15 pixels and cannot carry an illustration.
-     · bone on ink, one oxide accent. Not the reference's grey and purple.
+     · no masthead art. Every image I tried read as clutter on a page
+       whose substance is text, and a 1-bit dither of anything complex is
+       just static. If art ever earns the spot it will be line work, not
+       tone.
+     · the chrome speaks Departure Mono; the prose is Iosevka on a 72ch
+       measure, because twenty minutes of reading in a pixel face is a
+       punishment.
      · warmth over polish: buttons, a changelog in the first person,
-       floating windows you can close.
+       floating windows you can drag and close, a theme you can flip —
+       none of it required. Scripting off, everything still works.
 
-   Contrast on #0b0b0d — bone 15.20:1, oxide 7.38:1, verdigris 8.90:1,
-   ochre 9.83:1, all AAA. --rule is 2.16:1 and never carries text.
+   Contrast on #0a0507 — bone 16.15:1, green 10.85:1, amber 10.35:1,
+   comment 7.08:1, all AAA; blood 6.23:1, AA and the floor. Printed flips
+   to #f0e9e6 and holds AA everywhere (worst: comment 5.30:1). --rule is
+   1.78:1 lit / 1.90:1 printed and never carries text; the code ground
+   keeps its own ledger beside --blood-dark.
    ══════════════════════════════════════════════════════════════════════ */
 
 @font-face {

@@ -1,33 +1,38 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-31T20:53:44Z",
+  "generatedAt": "2026-07-31T21:21:05Z",
   "title": "Design System: lacorte.city",
   "extensions": {
     "colorMeta": {
-      "bone": { "role": "neutral", "displayName": "Bone", "canonical": "#e6e2d8", "tonalRamp": ["oklch(0.15 0.008 95)", "oklch(0.26 0.008 95)", "oklch(0.38 0.008 95)", "oklch(0.49 0.008 95)", "oklch(0.61 0.008 95)", "oklch(0.72 0.008 95)", "oklch(0.84 0.008 95)", "oklch(0.95 0.008 95)"] },
-      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0b0b0d", "tonalRamp": ["oklch(0.13 0.005 290)", "oklch(0.24 0.005 290)", "oklch(0.36 0.005 290)", "oklch(0.48 0.005 290)", "oklch(0.60 0.005 290)", "oklch(0.72 0.005 290)", "oklch(0.84 0.005 290)", "oklch(0.95 0.005 290)"] },
-      "oxide": { "role": "primary", "displayName": "Oxide", "canonical": "#e8845c", "tonalRamp": ["oklch(0.15 0.13 42)", "oklch(0.26 0.13 42)", "oklch(0.38 0.13 42)", "oklch(0.49 0.13 42)", "oklch(0.61 0.13 42)", "oklch(0.71 0.13 42)", "oklch(0.84 0.09 42)", "oklch(0.95 0.04 42)"] },
-      "verdigris": { "role": "secondary", "displayName": "Verdigris", "canonical": "#5fbfa8", "tonalRamp": ["oklch(0.15 0.09 175)", "oklch(0.26 0.09 175)", "oklch(0.38 0.09 175)", "oklch(0.49 0.09 175)", "oklch(0.61 0.09 175)", "oklch(0.73 0.09 175)", "oklch(0.84 0.07 175)", "oklch(0.95 0.03 175)"] },
-      "ochre": { "role": "tertiary", "displayName": "Ochre", "canonical": "#e0b050", "tonalRamp": ["oklch(0.15 0.12 85)", "oklch(0.26 0.12 85)", "oklch(0.38 0.12 85)", "oklch(0.49 0.12 85)", "oklch(0.61 0.12 85)", "oklch(0.77 0.12 85)", "oklch(0.86 0.09 85)", "oklch(0.95 0.04 85)"] },
-      "comment": { "role": "neutral", "displayName": "Comment", "canonical": "#9a948a", "tonalRamp": ["oklch(0.15 0.012 95)", "oklch(0.26 0.012 95)", "oklch(0.38 0.012 95)", "oklch(0.49 0.012 95)", "oklch(0.66 0.012 95)", "oklch(0.72 0.012 95)", "oklch(0.84 0.012 95)", "oklch(0.95 0.012 95)"] },
-      "rule": { "role": "neutral", "displayName": "Rule", "canonical": "#4a4750", "tonalRamp": ["oklch(0.15 0.015 300)", "oklch(0.26 0.015 300)", "oklch(0.38 0.015 300)", "oklch(0.49 0.015 300)", "oklch(0.61 0.015 300)", "oklch(0.72 0.015 300)", "oklch(0.84 0.015 300)", "oklch(0.95 0.015 300)"] },
-      "win-bar": { "role": "neutral", "displayName": "Window Bar", "canonical": "#16151a", "tonalRamp": ["oklch(0.18 0.012 300)", "oklch(0.28 0.012 300)", "oklch(0.39 0.012 300)", "oklch(0.50 0.012 300)", "oklch(0.61 0.012 300)", "oklch(0.72 0.012 300)", "oklch(0.84 0.012 300)", "oklch(0.95 0.012 300)"] },
-      "win-edge": { "role": "neutral", "displayName": "Window Edge", "canonical": "#6a6470", "tonalRamp": ["oklch(0.15 0.015 300)", "oklch(0.26 0.015 300)", "oklch(0.38 0.015 300)", "oklch(0.50 0.015 300)", "oklch(0.61 0.015 300)", "oklch(0.72 0.015 300)", "oklch(0.84 0.015 300)", "oklch(0.95 0.015 300)"] },
-      "pure-white": { "role": "neutral", "displayName": "Pure White", "canonical": "#ffffff", "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.26 0 0)", "oklch(0.38 0 0)", "oklch(0.49 0 0)", "oklch(0.61 0 0)", "oklch(0.72 0 0)", "oklch(0.84 0 0)", "oklch(1 0 0)"] },
-      "paper-page": { "role": "neutral", "displayName": "Paper Page", "canonical": "#e6e2d8" },
-      "paper-ink": { "role": "neutral", "displayName": "Paper Ink", "canonical": "#141317" },
-      "oxide-printed": { "role": "primary", "displayName": "Oxide (Printed)", "canonical": "#9c3a17" },
-      "verdigris-printed": { "role": "secondary", "displayName": "Verdigris (Printed)", "canonical": "#0f6b58" },
-      "ochre-printed": { "role": "tertiary", "displayName": "Ochre (Printed)", "canonical": "#7a5300" },
-      "comment-printed": { "role": "neutral", "displayName": "Comment (Printed)", "canonical": "#55515c" },
-      "rule-printed": { "role": "neutral", "displayName": "Rule (Printed)", "canonical": "#a9a49a" }
+      "bone": { "role": "neutral", "displayName": "Warm Bone", "canonical": "#ece4e2", "tonalRamp": ["oklch(0.15 0.008 30)", "oklch(0.26 0.008 30)", "oklch(0.38 0.008 30)", "oklch(0.49 0.008 30)", "oklch(0.61 0.008 30)", "oklch(0.72 0.008 30)", "oklch(0.84 0.008 30)", "oklch(0.95 0.008 30)"] },
+      "ink": { "role": "neutral", "displayName": "Red-Black Ink", "canonical": "#0a0507", "tonalRamp": ["oklch(0.11 0.015 10)", "oklch(0.24 0.015 10)", "oklch(0.36 0.015 10)", "oklch(0.48 0.015 10)", "oklch(0.60 0.015 10)", "oklch(0.72 0.015 10)", "oklch(0.84 0.015 10)", "oklch(0.95 0.015 10)"] },
+      "blood": { "role": "primary", "displayName": "Blood", "canonical": "#ff4d5c", "tonalRamp": ["oklch(0.15 0.10 18)", "oklch(0.26 0.14 18)", "oklch(0.38 0.17 18)", "oklch(0.49 0.19 18)", "oklch(0.61 0.19 18)", "oklch(0.66 0.19 18)", "oklch(0.80 0.12 18)", "oklch(0.93 0.04 18)"] },
+      "blood-deep": { "role": "primary", "displayName": "Deep Blood", "canonical": "#a30f1e", "tonalRamp": ["oklch(0.15 0.10 20)", "oklch(0.26 0.14 20)", "oklch(0.38 0.16 20)", "oklch(0.45 0.17 20)", "oklch(0.58 0.17 20)", "oklch(0.70 0.13 20)", "oklch(0.82 0.08 20)", "oklch(0.94 0.03 20)"] },
+      "blood-dark": { "role": "primary", "displayName": "Dark Blood", "canonical": "#1f0509", "tonalRamp": ["oklch(0.16 0.05 15)", "oklch(0.26 0.07 15)", "oklch(0.38 0.09 15)", "oklch(0.49 0.11 15)", "oklch(0.61 0.12 15)", "oklch(0.72 0.10 15)", "oklch(0.84 0.06 15)", "oklch(0.95 0.02 15)"] },
+      "green": { "role": "secondary", "displayName": "Signal Green", "canonical": "#4fd67f", "tonalRamp": ["oklch(0.15 0.08 150)", "oklch(0.26 0.11 150)", "oklch(0.38 0.13 150)", "oklch(0.49 0.15 150)", "oklch(0.61 0.15 150)", "oklch(0.78 0.15 150)", "oklch(0.86 0.10 150)", "oklch(0.95 0.04 150)"] },
+      "amber": { "role": "tertiary", "displayName": "Signal Amber", "canonical": "#e8b04b", "tonalRamp": ["oklch(0.15 0.05 80)", "oklch(0.26 0.08 80)", "oklch(0.38 0.10 80)", "oklch(0.49 0.12 80)", "oklch(0.61 0.13 80)", "oklch(0.79 0.13 80)", "oklch(0.87 0.09 80)", "oklch(0.95 0.04 80)"] },
+      "comment": { "role": "neutral", "displayName": "Comment", "canonical": "#a39694", "tonalRamp": ["oklch(0.15 0.012 25)", "oklch(0.26 0.012 25)", "oklch(0.38 0.012 25)", "oklch(0.49 0.012 25)", "oklch(0.68 0.012 25)", "oklch(0.76 0.012 25)", "oklch(0.86 0.012 25)", "oklch(0.95 0.012 25)"] },
+      "rule": { "role": "neutral", "displayName": "Blood Rule", "canonical": "#5e2a2f", "tonalRamp": ["oklch(0.15 0.04 15)", "oklch(0.26 0.05 15)", "oklch(0.35 0.06 15)", "oklch(0.49 0.07 15)", "oklch(0.61 0.07 15)", "oklch(0.72 0.06 15)", "oklch(0.84 0.04 15)", "oklch(0.95 0.02 15)"] },
+      "win-line": { "role": "neutral", "displayName": "Window Line", "canonical": "#7a2b33", "tonalRamp": ["oklch(0.15 0.06 15)", "oklch(0.26 0.08 15)", "oklch(0.41 0.09 15)", "oklch(0.53 0.10 15)", "oklch(0.64 0.10 15)", "oklch(0.75 0.08 15)", "oklch(0.85 0.05 15)", "oklch(0.95 0.02 15)"] },
+      "win-bar": { "role": "neutral", "displayName": "Window Bar", "canonical": "#1a0a0e", "tonalRamp": ["oklch(0.15 0.03 10)", "oklch(0.26 0.04 10)", "oklch(0.38 0.05 10)", "oklch(0.49 0.06 10)", "oklch(0.61 0.06 10)", "oklch(0.72 0.05 10)", "oklch(0.84 0.03 10)", "oklch(0.95 0.015 10)"] },
+      "pure-white": { "role": "neutral", "displayName": "Pure White", "canonical": "#ffffff" },
+      "paper-page": { "role": "neutral", "displayName": "Paper Page", "canonical": "#f0e9e6" },
+      "paper-ink": { "role": "neutral", "displayName": "Paper Ink", "canonical": "#17100f" },
+      "blood-printed": { "role": "primary", "displayName": "Blood (Printed)", "canonical": "#a8071a" },
+      "blood-deep-printed": { "role": "primary", "displayName": "Deep Blood (Printed)", "canonical": "#d9394a" },
+      "blood-dark-printed": { "role": "primary", "displayName": "Dark Blood (Printed)", "canonical": "#f7e7e5" },
+      "green-printed": { "role": "secondary", "displayName": "Signal Green (Printed)", "canonical": "#0d6b38" },
+      "amber-printed": { "role": "tertiary", "displayName": "Signal Amber (Printed)", "canonical": "#7a5300" },
+      "comment-printed": { "role": "neutral", "displayName": "Comment (Printed)", "canonical": "#6b5c59" },
+      "rule-printed": { "role": "neutral", "displayName": "Blood Rule (Printed)", "canonical": "#c2a5a2" }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "The 19px masthead wordmark. Nowhere else — the loudest type on the site." },
-      "headline": { "displayName": "Headline", "purpose": "h1–h6 in prose: body-size bold. Hierarchy comes from inversion and indentation, never scale." },
-      "body": { "displayName": "Body", "purpose": "Everything. Departure Mono 15px/1.32 in a 984px column." },
-      "label": { "displayName": "Label", "purpose": "Asides, figcaptions, taskbar buttons, metadata — usually in comment color." },
-      "code": { "displayName": "Code", "purpose": "Blocks, inline code, ASCII figures. Iosevka at even pixel sizes only (the Even-Pixel Rule)." }
+      "display": { "displayName": "Display", "purpose": "The 19px masthead wordmark and the article's ##-marked h2. The ceiling — nothing on the site is larger." },
+      "headline": { "displayName": "Headline", "purpose": "Chrome headings: body-size bold. Hierarchy comes from inversion and indentation, never scale." },
+      "body": { "displayName": "Body", "purpose": "The chrome — home, listings, menus, windows. Departure Mono 15px/1.32 in a 984px column." },
+      "prose": { "displayName": "Prose", "purpose": "The article body: Iosevka 15px/1.65 at a 72ch measure — the one surface built for a twenty-minute read." },
+      "label": { "displayName": "Label", "purpose": "Asides, figcaptions, taskbar buttons, metadata — usually comment-colored. The code-bar strip runs 12px tracked uppercase." },
+      "code": { "displayName": "Code", "purpose": "Blocks and inline on the blood-dark ground, Iosevka at even pixel sizes only (the Even-Pixel Rule)." }
     },
     "shadows": [],
     "motion": [
@@ -36,7 +41,7 @@
     ],
     "breakpoints": [
       { "name": "mobile", "value": "700px" },
-      { "name": "gutter-dock", "value": "1740px" }
+      { "name": "windows-float", "value": "900px" }
     ]
   },
   "components": [
@@ -44,9 +49,9 @@
       "name": "Command Heading",
       "kind": "custom",
       "refersTo": "cmd-heading",
-      "description": "The signature section heading: a command the operator would actually run. Verdigris $, bone command, oxide argument, comment aside.",
+      "description": "The signature section heading: a command the operator would actually run. Green $, bone command, blood argument, comment aside.",
       "html": "<h2 class=\"ds-cmd\"><span class=\"ds-cmd-run\">systemctl status</span> <span class=\"ds-cmd-flag\">lab</span><span class=\"ds-cmd-aside\">3 up · 0 down</span></h2>",
-      "css": ".ds-cmd{display:flex;align-items:baseline;gap:8px;margin:0;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;font-weight:400;color:var(--base,#e6e2d8)}.ds-cmd::before{content:\"$\";color:var(--green,#5fbfa8)}.ds-cmd-flag{color:var(--accent,#e8845c)}.ds-cmd-aside{margin-left:auto;color:var(--comment,#9a948a);font-size:14px}"
+      "css": ".ds-cmd{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin:0;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;font-weight:400;color:var(--base,#ece4e2)}.ds-cmd::before{content:\"$\";color:var(--green,#4fd67f)}.ds-cmd-flag{color:var(--accent,#ff4d5c)}.ds-cmd-aside{margin-left:auto;color:var(--comment,#a39694);font-size:14px}"
     },
     {
       "name": "Output Block",
@@ -54,38 +59,45 @@
       "refersTo": "output-block",
       "description": "Output indented under its command the way it is in a terminal: 16px behind a 1px hairline. With the Command Heading, the entire page grammar.",
       "html": "<div class=\"ds-out\"><p>Output sits indented under its command, the way it does in a terminal.</p></div>",
-      "css": ".ds-out{padding-left:16px;border-left:1px solid var(--rule,#4a4750);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;line-height:1.32;color:var(--base,#e6e2d8)}.ds-out p{margin:0}"
+      "css": ".ds-out{padding-left:16px;border-left:1px solid var(--rule,#5e2a2f);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;line-height:1.32;color:var(--base,#ece4e2)}.ds-out p{margin:0}"
     },
     {
       "name": "Link",
       "kind": "custom",
       "refersTo": "link",
-      "description": "Underlined bone; hover and focus are full reverse video — instant, no transition.",
+      "description": "Underlined bone in the chrome; hover and focus are full reverse video — instant, no transition. (Article links run blood with a rule-colored underline and flood blood on hover.)",
       "html": "<a class=\"ds-link\" href=\"#\">kerberos-attacks</a>",
-      "css": ".ds-link{color:var(--base,#e6e2d8);text-decoration:underline;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px}.ds-link:hover,.ds-link:focus-visible{color:var(--bg,#0b0b0d);background:var(--base,#e6e2d8);outline:none}"
+      "css": ".ds-link{color:var(--base,#ece4e2);text-decoration:underline;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px}.ds-link:hover,.ds-link:focus-visible{color:var(--bg,#0a0507);background:var(--base,#ece4e2);outline:none}"
+    },
+    {
+      "name": "Theme Switch",
+      "kind": "button",
+      "description": "Two labelled states beside the language switcher — crt / paper — current one in reverse video. Exists only once scripting has proven itself (the pre-paint js class); no dead control without JavaScript.",
+      "html": "<span class=\"ds-mode\"><button class=\"ds-mode-btn\" type=\"button\" aria-pressed=\"true\">crt</button> / <button class=\"ds-mode-btn\" type=\"button\" aria-pressed=\"false\">paper</button></span>",
+      "css": ".ds-mode{color:var(--comment,#a39694);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;white-space:nowrap}.ds-mode-btn{padding:0;border:0;background:transparent;color:var(--comment,#a39694);font:inherit;cursor:pointer}.ds-mode-btn[aria-pressed=\"true\"],.ds-mode-btn:hover,.ds-mode-btn:focus-visible{color:var(--bg,#0a0507);background:var(--base,#ece4e2);outline:none}"
     },
     {
       "name": "Inverted Chip",
       "kind": "chip",
       "refersTo": "chip-inverted",
-      "description": "How a heading shouts without getting bigger: bone background, ink text, underlined, weight 400.",
+      "description": "How the chrome shouts without getting bigger: bone background, ink text, underlined, weight 400.",
       "html": "<span class=\"ds-chip\">filed under ~/writing</span>",
-      "css": ".ds-chip{display:inline-block;color:var(--bg,#0b0b0d);background:var(--base,#e6e2d8);text-decoration:underline;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;font-weight:400}"
+      "css": ".ds-chip{display:inline-block;color:var(--bg,#0a0507);background:var(--base,#ece4e2);text-decoration:underline;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;font-weight:400}"
     },
     {
       "name": "Menu",
       "kind": "nav",
-      "description": "Hairline above and below, bracketed labels pushed right; current page and hover render reverse video. Language switch trails in comment color.",
+      "description": "Hairline above and below, bracketed labels pushed right; current page and hover render reverse video. Language switch and theme switch trail in comment color.",
       "html": "<nav class=\"ds-menu\"><ul><li><a href=\"#\" aria-current=\"page\">[ ~/ ]</a></li><li><a href=\"#\">[ blog ]</a></li><li><a href=\"#\">[ projects ]</a></li><li class=\"ds-menu-lang\"><a href=\"#\" aria-current=\"true\">EN</a> / <a href=\"#\">PT</a></li></ul></nav>",
-      "css": ".ds-menu{border-top:1px solid var(--rule,#4a4750);border-bottom:1px solid var(--rule,#4a4750);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px}.ds-menu ul{margin:12px 0;padding:0;list-style:none;text-align:right}.ds-menu li{display:inline;margin-left:10px}.ds-menu a{color:var(--base,#e6e2d8);text-decoration:none}.ds-menu a[aria-current=\"page\"],.ds-menu a:hover{color:var(--bg,#0b0b0d);background:var(--base,#e6e2d8)}.ds-menu-lang{margin-left:18px;color:var(--comment,#9a948a)}.ds-menu-lang a{color:var(--comment,#9a948a)}.ds-menu-lang a[aria-current=\"true\"]{color:var(--bg,#0b0b0d);background:var(--base,#e6e2d8)}"
+      "css": ".ds-menu{border-top:1px solid var(--rule,#5e2a2f);border-bottom:1px solid var(--rule,#5e2a2f);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px}.ds-menu ul{margin:12px 0;padding:0;list-style:none;text-align:right}.ds-menu li{display:inline;margin-left:10px}.ds-menu a{color:var(--base,#ece4e2);text-decoration:none}.ds-menu a[aria-current=\"page\"],.ds-menu a:hover{color:var(--bg,#0a0507);background:var(--base,#ece4e2)}.ds-menu-lang{margin-left:18px;color:var(--comment,#a39694)}.ds-menu-lang a{color:var(--comment,#a39694)}.ds-menu-lang a[aria-current=\"true\"]{color:var(--bg,#0a0507);background:var(--base,#ece4e2)}"
     },
     {
       "name": "Floating Window",
       "kind": "card",
       "refersTo": "window-bar",
-      "description": "The only card the system tolerates: hand-labeled title bar, monospace pre body with dotted leaders, closable. Static fallback: sits open in the flow.",
-      "html": "<aside class=\"ds-window\"><div class=\"ds-window-bar\"><span>status</span><button class=\"ds-window-x\" type=\"button\" aria-label=\"Close window\">x</button></div><pre class=\"ds-window-body\"><span class=\"ds-prompt\">$</span> ./status\nhost....... lacorte.city\nstatus..... <span class=\"ds-ok\">online</span>\nbuild...... 10e7a19</pre></aside>",
-      "css": ".ds-window{width:min(340px,100%);border:1px solid var(--win-line,#4a4750);background:var(--bg,#0b0b0d);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace}.ds-window-bar{display:flex;min-height:26px;align-items:center;justify-content:space-between;gap:12px;padding:4px 8px;border-bottom:1px solid var(--win-edge,#6a6470);background:var(--win-bar,#16151a);color:var(--win-title,#e6e2d8);font-size:15px;line-height:1}.ds-window-x{width:18px;height:18px;padding:0;border:1px solid var(--win-line,#4a4750);background:transparent;color:var(--base,#e6e2d8);font:inherit;font-size:11px;line-height:1;cursor:pointer}.ds-window-x:hover{color:var(--bg,#0b0b0d);background:var(--base,#e6e2d8)}.ds-window-body{margin:0;padding:10px 12px;overflow-x:auto;white-space:pre;font-family:Iosevka,ui-monospace,monospace;font-size:14px;line-height:1.45;color:var(--base,#e6e2d8)}.ds-prompt,.ds-ok{color:var(--green,#5fbfa8)}"
+      "description": "The only card the system tolerates: blood-titled bar on the one tinted ground, monospace pre body with dotted leaders, closable and draggable. Static fallback: sits open in the flow.",
+      "html": "<aside class=\"ds-window\"><div class=\"ds-window-bar\"><span>status</span><button class=\"ds-window-x\" type=\"button\" aria-label=\"Close window\">x</button></div><pre class=\"ds-window-body\"><span class=\"ds-prompt\">$</span> ./status\nhost....... lacorte.city\nstatus..... <span class=\"ds-ok\">online</span>\nbuild...... f74e8f7</pre></aside>",
+      "css": ".ds-window{width:min(340px,100%);border:1px solid var(--win-line,#7a2b33);background:var(--bg,#0a0507);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace}.ds-window-bar{display:flex;min-height:26px;align-items:center;justify-content:space-between;gap:12px;padding:4px 8px;border-bottom:1px solid var(--win-edge,#a30f1e);background:var(--win-bar,#1a0a0e);color:var(--win-title,#ff4d5c);font-size:15px;line-height:1}.ds-window-x{width:18px;height:18px;padding:0;border:1px solid var(--win-line,#7a2b33);background:transparent;color:var(--base,#ece4e2);font:inherit;font-size:11px;line-height:1;cursor:pointer}.ds-window-x:hover{color:var(--bg,#0a0507);background:var(--base,#ece4e2)}.ds-window-body{margin:0;padding:10px 12px;overflow-x:auto;white-space:pre;font-family:Iosevka,ui-monospace,monospace;font-size:14px;line-height:1.5;color:var(--base,#ece4e2)}.ds-prompt,.ds-ok{color:var(--green,#4fd67f)}"
     },
     {
       "name": "Taskbar Button",
@@ -93,57 +105,57 @@
       "refersTo": "taskbar-button",
       "description": "Square, hairline-bordered, transparent at rest; pressed and hover are reverse video.",
       "html": "<button class=\"ds-taskbar-btn\" type=\"button\" aria-pressed=\"true\">status</button>",
-      "css": ".ds-taskbar-btn{padding:2px 10px;border:1px solid var(--win-line,#4a4750);background:transparent;color:var(--base,#e6e2d8);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:13px;cursor:pointer}.ds-taskbar-btn[aria-pressed=\"true\"],.ds-taskbar-btn:hover,.ds-taskbar-btn:focus-visible{color:var(--bg,#0b0b0d);background:var(--base,#e6e2d8);outline:none}"
+      "css": ".ds-taskbar-btn{padding:2px 10px;border:1px solid var(--win-line,#7a2b33);background:transparent;color:var(--base,#ece4e2);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:13px;cursor:pointer}.ds-taskbar-btn[aria-pressed=\"true\"],.ds-taskbar-btn:hover,.ds-taskbar-btn:focus-visible{color:var(--bg,#0a0507);background:var(--base,#ece4e2);outline:none}"
     },
     {
       "name": "Callout",
       "kind": "custom",
-      "description": "Article aside framed by a hairline and labeled with real text (! note / ! warning / ! danger — label recolors comment / ochre / oxide).",
+      "description": "Article aside indented behind a 1px hairline and labeled with real text (! note / ! warning / ! danger — label in comment / amber / blood).",
       "html": "<aside class=\"ds-callout\"><p class=\"ds-callout-label\">warning</p><p>The fallback is the English original until the translation lands.</p></aside>",
-      "css": ".ds-callout{padding-left:12px;border-left:1px solid var(--rule,#4a4750);font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;line-height:1.32;color:var(--base,#e6e2d8)}.ds-callout-label{margin:0;color:var(--amber,#e0b050)}.ds-callout-label::before{content:\"! \"}.ds-callout p{margin:0}"
+      "css": ".ds-callout{padding-left:12px;border-left:1px solid var(--rule,#5e2a2f);font-family:Iosevka,ui-monospace,monospace;font-size:15px;line-height:1.65;color:var(--base,#ece4e2)}.ds-callout-label{margin:0;color:var(--amber,#e8b04b)}.ds-callout-label::before{content:\"! \"}.ds-callout p{margin:0}"
     },
     {
       "name": "Row Listing",
       "kind": "custom",
-      "description": "[date] title [new] length — dates and lengths in comment, [new] in oxide for anything under 90 days.",
+      "description": "[date] title [new] length — dates and lengths in comment, [new] in blood for anything under 90 days.",
       "html": "<ul class=\"ds-rows\"><li><span class=\"ds-when\">24/12/2024</span><a class=\"ds-row-link\" href=\"#\">static analysis of RansomHub's ESXi locker</a><span class=\"ds-new\">[new]</span><span class=\"ds-len\">14 min</span></li><li><span class=\"ds-when\">01/06/2024</span><a class=\"ds-row-link\" href=\"#\">a home server out of salvaged parts</a><span class=\"ds-len\">11 min</span></li></ul>",
-      "css": ".ds-rows{margin:0;padding:0;list-style:none;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;color:var(--base,#e6e2d8)}.ds-rows li{display:flex;flex-wrap:wrap;gap:0 9px;align-items:baseline;padding:1px 0}.ds-when,.ds-len{flex:none;color:var(--comment,#9a948a)}.ds-new{color:var(--red,#e8845c)}.ds-row-link{color:var(--base,#e6e2d8);text-decoration:underline}.ds-row-link:hover,.ds-row-link:focus-visible{color:var(--bg,#0b0b0d);background:var(--base,#e6e2d8);outline:none}"
+      "css": ".ds-rows{margin:0;padding:0;list-style:none;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;color:var(--base,#ece4e2)}.ds-rows li{display:flex;flex-wrap:wrap;gap:0 9px;align-items:baseline;padding:1px 0}.ds-when,.ds-len{flex:none;color:var(--comment,#a39694)}.ds-new{color:var(--red,#ff4d5c)}.ds-row-link{color:var(--base,#ece4e2);text-decoration:underline}.ds-row-link:hover,.ds-row-link:focus-visible{color:var(--bg,#0a0507);background:var(--base,#ece4e2);outline:none}"
     }
   ],
   "narrative": {
     "northStar": "The Operator's Notebook",
-    "overview": "One person's working terminal, kept the way a systems engineer keeps a lab notebook. Every section on every page is the output of a command the operator would actually run, and the page is the session transcript: one column, top to bottom, set in type. It is a DOCUMENT, not a dashboard; nothing appears that would not survive being printed.\n\nThe system is one engraving in two states: lit (bone phosphor on ink — the default, and the design) and printed (paper mode — the same marks pressed into paper). Controls are hand-labeled instruments — every window, button, and chip real, load-bearing, and named by its operator. Warmth comes from the visible hand, never from ornament. Lineage: the 1-bit information machine (NETLINK, INTDEV, U.S. Graphics' instrument panels), engraved line work on ink, desktop chrome as a place, and the inhabited personal web.",
+    "overview": "One person's working terminal, kept the way a systems engineer keeps a lab notebook. Every section on every page is the output of a command the operator would actually run, and the page is the session transcript: one column, top to bottom, set in type. It is a DOCUMENT, not a dashboard; nothing appears that would not survive being printed.\n\nThe system is one engraving in two states: lit (bone on red-black ink — the default, and the design) and printed (paper mode — the same marks pressed into paper). One signature cuts the page: blood. Blood is the voice, not a rare accent; green and amber stay margin marks. Controls are hand-labeled instruments — every window, button, and chip real, load-bearing, and named by its operator. Warmth comes from the visible hand, never from ornament. Lineage: the 1-bit information machine (NETLINK, INTDEV, U.S. Graphics' instrument panels), engraved line work on ink, desktop chrome as a place, and the inhabited personal web.",
     "keyCharacteristics": [
       "Command → indented output: 16px indent behind a 1px hairline, the whole grammar of the site.",
       "Reverse video (bone ⇄ ink swap) is the only interaction material: hover, focus, selection, current page, pressed state.",
-      "Headings are body-size. The loudest type on the entire site is a 19px masthead.",
-      "Two inks and three accents with fixed meanings; flat as paper; corners always square.",
+      "Headings are body-size. The loudest type on the entire site is 19px — the masthead and the article h2.",
+      "Two inks and one signature — blood — with green and amber as fixed-meaning margin marks; flat as paper; corners always square.",
       "Fully working with scripting off; JavaScript only enhances.",
       "Bilingual (en / pt-BR) as equals — every string through the typed dictionary.",
-      "One 984px column, breakpoints at 700px (windows join the flow) and 1740px (windows dock beside the column)."
+      "One 984px column, breakpoints at 700px (menu aligns left, asides drop lines) and 900px (windows lift to fixed)."
     ],
     "rules": [
-      { "name": "The One-Hand Rule", "body": "Each accent appears a handful of times per page, always with its fixed meaning — oxide marks, verdigris OK, ochre warn. An accent used more than ~4 times on a page is decoration; cut it.", "section": "colors" },
-      { "name": "The Silent Hairline Rule", "body": "--rule is 2.16:1 and draws lines only. It never, under any circumstance, carries text.", "section": "colors" },
-      { "name": "The AAA Ledger Rule", "body": "The contrast table in the global.css header (bone 15.20:1, oxide 7.38:1, verdigris 8.90:1, ochre 9.83:1) is normative. A palette change updates the ledger or does not ship.", "section": "colors" },
-      { "name": "The 19px Ceiling", "body": "The largest type on the site is the masthead. If a new surface seems to need bigger type, it needs a better command instead.", "section": "typography" },
+      { "name": "The Blood Ledger Rule", "body": "Among the blood triad only --blood carries text (6.23:1); --blood-deep and --blood-dark are fills, rails, and grounds — never text. The contrast notes beside the tokens in global.css are normative: a palette change updates them or does not ship.", "section": "colors" },
+      { "name": "The One-Hand Rule", "body": "Green and amber appear a handful of times per page, always with their fixed meaning — green OK, amber warn. Blood is exempt: it is the signature, not an accent.", "section": "colors" },
+      { "name": "The Silent Hairline Rule", "body": "--rule draws lines only. It never, under any circumstance, carries text.", "section": "colors" },
+      { "name": "The 19px Ceiling", "body": "The largest type on the site is the masthead (and the article h2 that matches it). If a new surface seems to need bigger type, it needs a better command instead.", "section": "typography" },
       { "name": "The Even-Pixel Rule", "body": "Mono runs at even pixel sizes only: Iosevka advances 0.5em per cell, so odd sizes land glyphs on half-pixels and solid rules render dashed.", "section": "typography" },
       { "name": "The Printout Rule", "body": "Flat as paper: zero box-shadow, zero gradients, zero blur, corners always square. Depth is reverse video, 1px hairlines, and the window bar's single tint. Fixed z-ladder: taskbar 40, lifted windows from 50, skip link 100.", "section": "elevation" },
-      { "name": "The Scripting-Off Rule", "body": "Every scripted behavior ships its static fallback: windows sit open in the flow, copy buttons vanish, the theme stays lit. If a proposed component cannot state its no-JS fallback, it is not in the system.", "section": "components" }
+      { "name": "The Scripting-Off Rule", "body": "Every scripted behavior ships its static fallback: windows sit open in the flow, copy buttons vanish, the theme switch does not exist. If a proposed component cannot state its no-JS fallback, it is not in the system.", "section": "components" }
     ],
     "dos": [
       "Do head every new section with a command the operator would actually run, and indent its output 16px behind a 1px hairline.",
       "Do use reverse video — full bone ⇄ ink swap — for every hover, focus, selection, pressed, and current state. It is instant: a cut, not a fade.",
-      "Do keep borders hairline (1px {colors.rule}) or absent. \"Borders are hairlines or nothing.\"",
-      "Do keep each accent to its fixed meaning (oxide marks, verdigris OK, ochre warn) and to a handful of uses per page.",
-      "Do keep mono at even pixel sizes (the Even-Pixel Rule) and the AAA ledger in global.css true.",
+      "Do keep borders hairline (1px {colors.rule}) or absent — \"borders are hairlines or nothing\". The article's 2px blood-deep quote rail is the one committed exception; do not add a second.",
+      "Do keep green and amber to their fixed meanings (OK, warn) and a handful of uses per page. Blood is the signature and exempt from counting — but among its triad only --blood ever carries text.",
+      "Do keep mono at even pixel sizes (the Even-Pixel Rule) and the contrast notes beside the tokens in global.css true.",
       "Do ship the static fallback with every scripted enhancement, and every UI string through the i18n dictionary in both languages.",
       "Do draw art, when a surface earns it, as line work — ASCII logotypes, box-drawn panels, engraving-style borders — never tone."
     ],
     "donts": [
       "Don't build dashboard chrome — \"grids of bordered cards, admin-panel texture, stat tiles\" (PRODUCT.md). One column. Document, not dashboard.",
       "Don't use marketing-site scale — \"display headings, hero sections, CTA blocks\". Nothing on the site exceeds 19px.",
-      "Don't resurrect the references' chrome: no dashed-rule signature (--dashed is dead — retire its three remaining citations toward hairline-or-nothing), no grey-and-purple palette, no cloned layouts.",
+      "Don't resurrect the references' chrome: no dashed-rule signature (--dashed and the citations that outlived it were retired 2026-07-31), no grey-and-purple palette, no cloned layouts.",
       "Don't pose tone as art: no 1-bit dithers of photographs or complex images. Line work (ASCII figures) or nothing.",
       "Don't add LinkedIn smell — skill bars, newsletter popups, engagement hooks, \"passionate about\" copy.",
       "Don't introduce a third typeface, a border-radius, a box-shadow, a gradient, or an arbitrary z-index outside the fixed ladder.",
