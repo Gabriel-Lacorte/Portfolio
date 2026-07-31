@@ -15,9 +15,12 @@ type Props = {
     /** Drop the disclosure wrapper — for when a panel already titles it,
      *  which otherwise renders "contents" twice, one inside the other. */
     bare?: boolean;
+    /** The headings' own language, when it is not the page's. Goes on the
+     *  list rather than the wrapper so `label` stays in the page's. */
+    lang?: string;
 };
 
-const { headings, label = "contents", bare = false } = Astro.props;
+const { headings, label = "contents", bare = false, lang } = Astro.props;
 
 /* Only h2/h3 make the outline — deeper levels turn it into noise.
  *
@@ -49,7 +52,7 @@ const toc = buildToc(headings);
     toc.length > 0 &&
         (bare ? (
             <nav class="toc-bare" aria-label={label}>
-                <ul>
+                <ul lang={lang}>
                     {toc.map((heading) => (
                         <TableOfContentsHeading heading={heading} />
                     ))}
@@ -59,7 +62,7 @@ const toc = buildToc(headings);
             <details class="toc" open>
                 <summary>{label}</summary>
                 <nav aria-label={label}>
-                    <ul>
+                    <ul lang={lang}>
                         {toc.map((heading) => (
                             <TableOfContentsHeading heading={heading} />
                         ))}
