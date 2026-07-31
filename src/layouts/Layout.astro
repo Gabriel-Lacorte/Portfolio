@@ -17,6 +17,12 @@ type Props = {
     suffix?: boolean;
     /** Home shows the floating windows and the taskbar. */
     windows?: boolean;
+    /** Forwarded to <Head> — locales whose route serves borrowed text. */
+    untranslated?: Locale[];
+    /** Forwarded to <Head> — keeps the page out of the index. */
+    noindex?: boolean;
+    /** Forwarded to <Head> — points the canonical at another route. */
+    canonicalPath?: string;
 };
 
 const {
@@ -25,6 +31,9 @@ const {
     description,
     suffix = true,
     windows = false,
+    untranslated = [],
+    noindex = false,
+    canonicalPath,
 } = Astro.props;
 
 const t = useTranslations(locale);
@@ -43,6 +52,9 @@ const isCurrent = (href: string) =>
             locale={locale}
             title={suffix ? `${title} | ${SITE.TITLE}` : title}
             description={description}
+            untranslated={untranslated}
+            noindex={noindex}
+            canonicalPath={canonicalPath}
         />
     </head>
     <body class:list={[windows && "has-windows"]}>

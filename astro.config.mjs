@@ -25,10 +25,14 @@ export default defineConfig({
        and all. The prefixes order the source tree; they have no business
        in a URL. Anything already shared against the old paths still
        resolves. */
+    /* Old paths from the Neocities site. Targets carry the trailing
+       slash the build actually produces — without it the reader lands on
+       a second redirect to reach the same page, and the stub's canonical
+       disagrees with the real one. */
     redirects: {
-        "/blog/00-kerberos-attacks": "/blog/kerberos-attacks",
-        "/blog/01-home-server-guide": "/blog/home-server-guide",
-        "/blog/02-ransomhub-ransomware": "/blog/ransomhub-esxi",
+        "/blog/00-kerberos-attacks": "/blog/kerberos-attacks/",
+        "/blog/01-home-server-guide": "/blog/home-server-guide/",
+        "/blog/02-ransomhub-ransomware": "/blog/ransomhub-esxi/",
     },
 
     markdown: {

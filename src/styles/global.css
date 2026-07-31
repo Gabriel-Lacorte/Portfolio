@@ -298,10 +298,16 @@ header.site {
     white-space: nowrap;
 }
 
+/* :focus-visible has to be named here, not left to the global rule: that
+   one sits earlier in the file at the same specificity, so `.menu a`
+   below it wins the colour and a focused link paints bone on bone —
+   invisible, with the outline already suppressed. */
 .menu a[aria-current="page"],
-.menu a:hover {
+.menu a:hover,
+.menu a:focus-visible {
     color: var(--bg);
     background: var(--base);
+    outline: none;
 }
 
 .menu .lang {
@@ -313,9 +319,11 @@ header.site {
     color: var(--comment);
 }
 
-.menu .lang a[aria-current="true"] {
+.menu .lang a[aria-current="true"],
+.menu .lang a:focus-visible {
     color: var(--bg);
     background: var(--base);
+    outline: none;
 }
 
 /* The theme switch mirrors the language switcher: two labelled states,

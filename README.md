@@ -173,12 +173,13 @@ metrics and misalign every diagram.
 
 ---
 
-## Checking links
+## Checks
 
 ```sh
 npm run build
 node scripts/check-links.mjs             # internal only, offline
 node scripts/check-links.mjs --external  # also hits the network
+python3 scripts/check-hreflang.py        # the two languages agree
 ```
 
 Exits non-zero on the first broken link, so it drops into CI as-is.
@@ -190,6 +191,24 @@ It exists because a link rotted in public: the home-server post pointed
 at `debian-12.5.0-amd64-netinst.iso` inside `current/`, and `current`
 had become Debian 13. **Do not pin a filename inside a directory that
 moves** — link the project's download page instead.
+
+`check-hreflang.py` is the same idea for the language pairs. Each page
+names its sibling in the other language, and search engines discard the
+whole set unless every link is reciprocal and every URL is *exactly* the
+target's canonical. Astro builds directory routes, so a canonical is
+`/blog/x/` while `localised()` returns `/blog/x` — the first version
+pointed every tag one redirect away from the page it meant. The markup
+looked perfect. Only the graph showed it.
+
+Two rules fall out of that, both enforced by the script:
+
+- **A page that serves borrowed text is not the canonical.** An
+  untranslated post still answers at its Portuguese URL, with the English
+  body and a notice. That URL points its canonical at the English
+  original and drops its own `hreflang="pt-BR"` claim, so the two do not
+  compete for the same words.
+- **Anything unindexable stays out of the graph.** The 404 and the
+  redirect stubs carry `noindex` and no alternates.
 
 ---
 
