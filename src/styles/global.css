@@ -756,6 +756,30 @@ a:focus-visible {
     padding: 0;
 }
 
+/* Five of the code blocks on the Kerberos post scroll — the pasted hashes
+   are 80+ columns. Without a visible bar a cut-off command reads as a
+   broken page rather than a scrollable one. */
+.article pre::-webkit-scrollbar,
+.fig-art::-webkit-scrollbar {
+    height: 6px;
+}
+
+.article pre::-webkit-scrollbar-track,
+.fig-art::-webkit-scrollbar-track {
+    background: var(--strip);
+}
+
+.article pre::-webkit-scrollbar-thumb,
+.fig-art::-webkit-scrollbar-thumb {
+    background: var(--rule);
+}
+
+.article pre,
+.fig-art {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) var(--strip);
+}
+
 .code-wrap {
     position: relative;
 }

@@ -10,9 +10,14 @@ export interface Heading {
 
 type Props = {
     headings: Omit<Heading, "subheadings">[];
+    /** Localised label for the summary. Ignored when `bare`. */
+    label?: string;
+    /** Drop the disclosure wrapper — for when a panel already titles it,
+     *  which otherwise renders "contents" twice, one inside the other. */
+    bare?: boolean;
 };
 
-const { headings } = Astro.props;
+const { headings, label = "contents", bare = false } = Astro.props;
 
 /* Only h2/h3 make the outline — deeper levels turn it into noise.
  *
@@ -41,18 +46,27 @@ const toc = buildToc(headings);
 ---
 
 {
-    toc.length > 0 && (
-        <details class="toc" open>
-            <summary>contents</summary>
-            <nav aria-label="Table of contents">
+    toc.length > 0 &&
+        (bare ? (
+            <nav class="toc-bare" aria-label={label}>
                 <ul>
                     {toc.map((heading) => (
                         <TableOfContentsHeading heading={heading} />
                     ))}
                 </ul>
             </nav>
-        </details>
-    )
+        ) : (
+            <details class="toc" open>
+                <summary>{label}</summary>
+                <nav aria-label={label}>
+                    <ul>
+                        {toc.map((heading) => (
+                            <TableOfContentsHeading heading={heading} />
+                        ))}
+                    </ul>
+                </nav>
+            </details>
+        ))
 }
 
 <style>
@@ -103,5 +117,19 @@ const toc = buildToc(headings);
 
     nav > ul {
         padding: 0.5rem 2ch;
+    }
+
+    /* Inside a panel the list supplies its own rhythm; the padding belongs
+       to the panel body. */
+    .toc-bare > ul {
+        padding: 0;
+        columns: 2;
+        column-gap: 4ch;
+    }
+
+    @media (max-width: 680px) {
+        .toc-bare > ul {
+            columns: 1;
+        }
     }
 </style>

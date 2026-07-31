@@ -22,6 +22,8 @@ const iso = post.data.date.toISOString().slice(0, 10);
    original. Saying so is the honest alternative to either hiding the post
    or blocking publication on a translation. */
 const borrowed = isFallback(post, locale);
+
+const hasToc = headings.filter((h) => h.depth <= 3).length > 1;
 ---
 
 <Layout
@@ -62,22 +64,20 @@ const borrowed = isFallback(post, locale);
         }
 
         {
-            headings.length > 0 && (
+            hasToc && (
                 <Panel
                     title={t("panel.contents")}
-                    note={`${headings.length} ${t("unit.sections")}`}
+                    note={`${headings.filter((h) => h.depth <= 3).length} ${t("unit.sections")}`}
                 >
-                    <TableOfContents headings={headings} />
+                    <TableOfContents headings={headings} bare />
                 </Panel>
             )
         }
 
-        <div class="panel">
-            <div class="panel-body">
-                <article class="article">
-                    <Content />
-                </article>
-            </div>
+        <div class="panel body">
+            <article class="article">
+                <Content />
+            </article>
         </div>
 
         <a class="back" href={localised("/blog", locale)}>
@@ -95,6 +95,19 @@ const borrowed = isFallback(post, locale);
     :global(.spec.meta) {
         max-width: 52ch;
         margin-top: var(--step);
+    }
+
+    .body {
+        padding: calc(var(--step) * 0.55) var(--pad);
+    }
+
+    /* The measure is ~75 characters and the panel affords ~94, so there is
+       always slack. Centred, it reads as margin; left-aligned it read as a
+       column of dead space on the right. A sidebar was the other option
+       and does not fit: the chassis caps at 108ch, which leaves under 20ch
+       once the article has its measure. */
+    .body :global(.article) {
+        margin-inline: auto;
     }
 
     .fallback {
