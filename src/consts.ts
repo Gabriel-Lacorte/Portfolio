@@ -1,11 +1,11 @@
 import type {
-    Capability,
     ChangelogEntry,
     Metadata,
     NavItem,
     Project,
     Site,
     Socials,
+    StackGroup,
     UsesGroup,
 } from "@types";
 
@@ -46,20 +46,30 @@ export const PROJECTS_META: Metadata = {
     DESCRIPTION: "Things I have built.",
 };
 
-/* The capability sheet. Replaces the old SKILLS list, which read
-   "Frontend Development (React, NextJS, Astro)" and undersold everything
-   underneath it. Statuses are deliberately honest — a sheet where every
-   row says FLUENT carries no information at all. */
-export const CAPABILITIES: Capability[] = [
-    { NAME: "go · services", STATUS: "FLUENT" },
-    { NAME: "python · tooling", STATUS: "FLUENT" },
-    { NAME: "c · systems", STATUS: "FLUENT" },
-    { NAME: "linux · syscalls · elf", STATUS: "ACTIVE" },
-    { NAME: "docker · networking", STATUS: "ACTIVE" },
-    { NAME: "active directory", STATUS: "FIELD" },
-    { NAME: "reverse engineering", STATUS: "FIELD" },
-    { NAME: "kvm · vmx · ept", STATUS: "STUDY" },
-    { NAME: "compilers · codegen", STATUS: "STUDY" },
+/* What he works with. Deliberately a flat list — a self-assessed
+   proficiency scale is a claim nobody can check and it read as posturing.
+   Grouped only so the column stays scannable. */
+export const STACK_GROUPS: StackGroup[] = [
+    {
+        GROUP: "languages",
+        ITEMS: ["C", "C++", "Go", "Python", "JavaScript", "SQL", "Bash"],
+    },
+    {
+        GROUP: "systems",
+        ITEMS: ["Linux", "syscalls", "ELF", "KVM / VMX", "paging", "ESXi"],
+    },
+    {
+        GROUP: "backend",
+        ITEMS: ["Flask", "FastAPI", "Gin", "Node.js", "Express", "PostgreSQL", "Prisma"],
+    },
+    {
+        GROUP: "infrastructure",
+        ITEMS: ["Docker", "nginx", "Cloudflare", "CI/CD", "git", "self-hosting"],
+    },
+    {
+        GROUP: "security",
+        ITEMS: ["Active Directory", "Kerberos", "reverse engineering", "malware analysis", "Yara"],
+    },
 ];
 
 /* TODO(gabriel): review — carried over from lacorte.neocities.org and the
@@ -150,30 +160,6 @@ export const NOW = {
         "Writing a small compiler back end to understand register allocation properly.",
         "Rebuilding this site.",
     ],
-};
-
-/* Home-page figure. Column-aligned by generator; if you edit it, keep the
-   sub-labels clear of the arrows. */
-export const PIPELINE = `front end source ──►  lex   ──► parse ──►  AST
-            .c       tokens      tree     typed
-
-back end   IR ──►  opt   ──► regalloc ──►  emit  ──► ELF
-          SSA     passes      vregs       object`;
-
-/** Caption for the pipeline figure, per locale. */
-export const PIPELINE_CAPTION: Record<"en" | "pt-br", string> = {
-    en: "The half of the stack I am teaching myself properly: everything between source text and an ELF binary.",
-    "pt-br":
-        "A metade da pilha que estou aprendendo direito: tudo que existe entre o texto-fonte e um binário ELF.",
-};
-
-export const PIPELINE_ALT_EN =
-    "Diagram of a compiler pipeline. The front end runs source (.c) through lex to tokens, parse to a tree, and on to a typed AST. The back end takes IR in SSA form through optimisation passes, then register allocation over virtual registers, then emits an object file and finally an ELF binary.";
-
-export const PIPELINE_ALT: Record<"en" | "pt-br", string> = {
-    en: PIPELINE_ALT_EN,
-    "pt-br":
-        "Diagrama de um pipeline de compilador. O front end leva o fonte (.c) por lex até tokens, parse até uma árvore, e daí a uma AST tipada. O back end pega a IR em forma SSA, passa pelos passes de otimização, depois pela alocação de registradores sobre registradores virtuais, e por fim emite um objeto e um binário ELF.",
 };
 
 export const SOCIALS: Socials = [

@@ -50,22 +50,32 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 :root {
-    --bg: #000000;
-    --panel: #000000;
-    --strip: #101010;
-    --ink: #ececec;
+    --bg: #06040a;
+    --panel: #06040a;
+    --strip: #140b1f;
+    --ink: #e8e4ee;
     --bright: #ffffff;
-    --dim: #a0a0a0;
-    --dot: #545454;
-    --rule: #8a8a8a;
-    --invert-bg: #ececec;
-    --invert-fg: #000000;
+    --dim: #a99fb8;
+    --dot: #5c5169;
+    --rule: #9084a3;
+    --invert-bg: #e8e4ee;
+    --invert-fg: #06040a;
 
-    --ramp-1: #ffffff;
-    --ramp-2: #d0d0d0;
-    --ramp-3: #9a9a9a;
-    --ramp-4: #6a6a6a;
-    --ramp-5: #3d3d3d;
+    /* Art gradient — the wordmark's face runs g1→g5 top to bottom, with
+       the extrude behind it in --x. Decorative only; no text uses these. */
+    --g1: #ffd9f5;
+    --g2: #f59ae8;
+    --g3: #d45ce0;
+    --g4: #9b35c9;
+    --g5: #5f1a8c;
+    --x: #2f1050;
+
+    /* Semantic. All AAA on the background — colour here is a signal, and a
+       signal nobody can read is not one. */
+    --ok: #5ceb70;
+    --warn: #ffb63d;
+    --alert: #ff6b70;
+    --info: #5fe0ee;
 
     --font-mono: "Iosevka", ui-monospace, "Cascadia Mono", Consolas,
         "DejaVu Sans Mono", monospace;
@@ -79,24 +89,30 @@
     color-scheme: dark;
 }
 
-/* Paper mode: the same instrument printed rather than lit. */
+/* Paper mode: the same flyer printed rather than lit. */
 html.light {
-    --bg: #e9e7e2;
-    --panel: #e9e7e2;
-    --strip: #dedbd4;
-    --ink: #14130f;
+    --bg: #ece8e4;
+    --panel: #ece8e4;
+    --strip: #ded7d8;
+    --ink: #17121c;
     --bright: #000000;
-    --dim: #4c4941;
-    --dot: #a49f94;
-    --rule: #4c4941;
-    --invert-bg: #14130f;
-    --invert-fg: #e9e7e2;
+    --dim: #4e4553;
+    --dot: #a89fae;
+    --rule: #4e4553;
+    --invert-bg: #17121c;
+    --invert-fg: #ece8e4;
 
-    --ramp-1: #000000;
-    --ramp-2: #2a2a2a;
-    --ramp-3: #5c5c5c;
-    --ramp-4: #918c84;
-    --ramp-5: #c3bdb1;
+    --g1: #3d1152;
+    --g2: #6b1b8f;
+    --g3: #8e2bb8;
+    --g4: #b45cd6;
+    --g5: #d9a8ea;
+    --x: #cbb6d6;
+
+    --ok: #157a25;
+    --warn: #8a5200;
+    --alert: #a8121a;
+    --info: #0e6070;
 
     color-scheme: light;
 }
@@ -510,6 +526,14 @@ a:focus-visible {
 
 .spec .v[data-tone="dim"] {
     color: var(--dim);
+}
+
+.spec .v[data-tone="ok"] {
+    color: var(--ok);
+}
+
+.spec .v[data-tone="warn"] {
+    color: var(--warn);
 }
 
 /* ══════════════════════════════════════════════════════════════════════

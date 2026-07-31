@@ -47,9 +47,18 @@ function gitShortHash(): string {
 }
 
 export async function getStats(): Promise<SiteStats> {
-    const posts = (await getCollection("blog")).filter(
-        (post) => !post.data.draft,
-    );
+    const all = (await getCollection("blog")).filter((post) => !post.data.draft);
+
+    /* One post is one piece of writing, not one file. Counting the
+       collection directly reported 3 posts and their 2 translations as 5,
+       and its word count twice over. */
+    const byKey = new Map<string, (typeof all)[number]>();
+    for (const post of all) {
+        if (!byKey.has(post.data.translationKey)) {
+            byKey.set(post.data.translationKey, post);
+        }
+    }
+    const posts = [...byKey.values()];
 
     const words = posts.reduce((sum, p) => sum + countWords(p.body), 0);
 
@@ -85,7 +94,7 @@ export function getSelfTest(stats: SiteStats) {
         { k: "third-party", v: "none", s: "PASS" },
         { k: "trackers · cookies", v: "none", s: "PASS" },
         { k: "type", v: "self-hosted · ofl", s: "PASS" },
-        { k: "contrast", v: "aaa on #000", s: "PASS" },
+        { k: "contrast", v: "aaa, both themes", s: "PASS" },
         { k: "locales", v: "en · pt-br", s: "PASS" },
     ];
 }

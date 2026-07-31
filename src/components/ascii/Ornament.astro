@@ -1,0 +1,31 @@
+---
+/**
+ * A scene-flyer rail: half-block wings above and below a core that eases
+ * from " " at the ends to "█" at the centre. Generated rather than drawn,
+ * so the easing is even and the three rows are the same width.
+ *
+ * Pure texture, so hidden from assistive tech. Clips rather than wraps —
+ * a wrapped ornament reads as damage.
+ */
+type Props = {
+    class?: string;
+};
+
+const { class: className } = Astro.props;
+---
+
+<pre class:list={["ascii ornament", className]} aria-hidden="true">     ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄     
+   ░░░▒▒▒▓▓██████████████████████████████████████████████████████████▓▓▒▒▒░░░   
+     ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀     </pre>
+
+<style>
+    .ornament {
+        width: 100%;
+        font-size: min(1.9cqw, 13px);
+        line-height: 0.82;
+        color: var(--g4);
+        overflow: hidden;
+        user-select: none;
+        text-align: center;
+    }
+</style>

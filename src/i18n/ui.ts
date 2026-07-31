@@ -38,7 +38,7 @@ const en = {
     "nav.now": "now",
 
     "panel.operator": "operator",
-    "panel.capability": "capability",
+    "panel.stack": "stack",
     "panel.transmissions": "transmissions",
     "panel.builds": "builds",
     "panel.signal": "signal",
@@ -46,7 +46,6 @@ const en = {
     "panel.contents": "contents",
     "panel.fault": "fault",
     "panel.recover": "recover",
-    "panel.buildingToward": "what I'm building toward",
     "panel.selfTest": "self-test",
     "panel.signalBand": "signal",
 
@@ -66,7 +65,7 @@ const en = {
 
     "value.yes": "yes",
     "value.active": "active",
-    "value.selfAssessed": "self-assessed",
+    "value.whatIUse": "what I work with",
     "value.systemsCompilers": "systems · compilers",
 
     "unit.posts": "posts",
@@ -137,7 +136,7 @@ const ptBR: Record<UIKey, string> = {
     "nav.now": "agora",
 
     "panel.operator": "operador",
-    "panel.capability": "capacidade",
+    "panel.stack": "stack",
     "panel.transmissions": "transmissões",
     "panel.builds": "construções",
     "panel.signal": "sinal",
@@ -145,7 +144,6 @@ const ptBR: Record<UIKey, string> = {
     "panel.contents": "índice",
     "panel.fault": "falha",
     "panel.recover": "recuperar",
-    "panel.buildingToward": "o que estou construindo",
     "panel.selfTest": "autoteste",
     "panel.signalBand": "sinal",
 
@@ -165,7 +163,7 @@ const ptBR: Record<UIKey, string> = {
 
     "value.yes": "sim",
     "value.active": "ativo",
-    "value.selfAssessed": "autoavaliado",
+    "value.whatIUse": "com o que trabalho",
     "value.systemsCompilers": "sistemas · compiladores",
 
     "unit.posts": "posts",

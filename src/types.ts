@@ -20,12 +20,9 @@ export type NavItem = {
     HREF: string;
 };
 
-/** A row on the capability sheet: what it is, and how far along it is. */
-export type Capability = {
-    NAME: string;
-    /** FLUENT = ship it daily · FIELD = used in anger · ACTIVE = in hand
-     *  · STUDY = deliberately learning. Kept honest on purpose. */
-    STATUS: "FLUENT" | "FIELD" | "ACTIVE" | "STUDY";
+export type StackGroup = {
+    GROUP: string;
+    ITEMS: string[];
 };
 
 export type Project = {

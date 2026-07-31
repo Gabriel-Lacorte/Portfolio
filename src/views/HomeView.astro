@@ -1,24 +1,19 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Dither from "@components/ascii/Dither.astro";
-import Figure from "@components/ascii/Figure.astro";
+import Ornament from "@components/ascii/Ornament.astro";
 import Panel from "@components/ascii/Panel.astro";
-import Meter from "@components/ascii/Meter.astro";
 import Spec from "@components/ascii/Spec.astro";
 import Waterfall from "@components/ascii/Waterfall.astro";
-import Wordmark from "@components/ascii/Wordmark.astro";
 import { postsFor } from "@lib/posts";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 import {
-    CAPABILITIES,
     CHANGELOG,
     NOW,
-    PIPELINE,
-    PIPELINE_ALT,
-    PIPELINE_CAPTION,
     PROJECTS,
     SITE,
     SOCIALS,
+    STACK_GROUPS,
 } from "@consts";
 import { getSelfTest, getStats, readingTime } from "@lib/stats";
 
@@ -32,9 +27,6 @@ const stats = await getStats();
 const selftest = getSelfTest(stats);
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
-
-/* Filled cells per status, so the bar and the word always agree. */
-const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
 ---
 
 <Layout
@@ -46,93 +38,23 @@ const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
     <div class="stack-gap">
         <section class="masthead panel">
             <div class="panel-body">
-                <p class="overline" aria-hidden="true">
-                    {t("site.overline")}
-                </p>
-                <Wordmark />
-                <h1 class="sr-only">{SITE.TITLE} — {t("site.role")}</h1>
-                <p class="crossbar" aria-hidden="true">{t("site.tagline")}</p>
+                <Ornament />
+                <div class="ident">
+                    <h1>
+                        <span class="mark">{SITE.HANDLE}</span>
+                        <span class="who">{SITE.TITLE} — {t("site.role")}</span>
+                    </h1>
+                    <p class="statement">{t("site.statement")}</p>
+                </div>
             </div>
             <Dither />
         </section>
-
-        <div class="grid-2">
-            <Panel title={t("panel.selfTest")} note={stats.built}>
-                <ul class="spec selftest">
-                    {
-                        selftest.map(({ k, v, s }) => (
-                            <li>
-                                <span class="k">{k}</span>
-                                <span class="lead" aria-hidden="true" />
-                                <span class="val">{v}</span>
-                                <span class="ok" aria-hidden="true">▲▲▲</span>
-                                <span class="v">{s}</span>
-                            </li>
-                        ))
-                    }
-                </ul>
-            </Panel>
-
-            <Panel title={t("panel.signalBand")} note="rf-1">
-                <p class="statement">{t("site.statement")}</p>
-                <div class="band">
-                    <Waterfall />
-                </div>
-            </Panel>
-        </div>
-
-        <div class="grid-2">
-            <Panel title={t("panel.operator")} note={t("value.active")}>
-                <Spec
-                    rows={[
-                        { k: t("field.name"), v: SITE.TITLE },
-                        { k: t("field.role"), v: t("site.role") },
-                        { k: t("field.based"), v: SITE.LOCATION },
-                        { k: t("field.writingAbout"), v: t("value.systemsCompilers") },
-                        { k: t("field.logged"), v: `${posts.length} ${t("unit.posts")}` },
-                        { k: t("field.reachable"), v: t("value.yes") },
-                        ...SOCIALS.map(({ NAME, HANDLE, HREF }) => ({
-                            k: NAME,
-                            v: HANDLE,
-                            href: HREF,
-                            external: true,
-                        })),
-                        {
-                            k: t("field.mail"),
-                            v: SITE.EMAIL,
-                            href: `mailto:${SITE.EMAIL}`,
-                        },
-                    ]}
-                />
-            </Panel>
-
-            <Panel title={t("panel.capability")} note={t("value.selfAssessed")}>
-                <ul class="spec">
-                    {
-                        CAPABILITIES.map(({ NAME, STATUS }) => (
-                            <li>
-                                <span class="k">{NAME}</span>
-                                <span class="lead" aria-hidden="true" />
-                                <Meter level={LEVEL[STATUS]} />
-                                <span
-                                    class="v"
-                                    data-tone={
-                                        STATUS === "STUDY" ? "dim" : undefined
-                                    }
-                                >
-                                    {STATUS}
-                                </span>
-                            </li>
-                        ))
-                    }
-                </ul>
-            </Panel>
-        </div>
 
         <Panel
             title={t("panel.transmissions")}
             note={`${posts.length} ${t("unit.logged")}`}
             bodyClass="flush"
+            class="lead"
         >
             <ol class="log">
                 {
@@ -215,14 +137,56 @@ const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
             </div>
         </div>
 
-        <Panel title={t("panel.buildingToward")} note="fig. a">
-            <Figure
-                alt={PIPELINE_ALT[locale]}
-                caption={PIPELINE_CAPTION[locale]}
-                bare
-            >
-                {PIPELINE}
-            </Figure>
+        <div class="grid-2">
+            <Panel title={t("panel.operator")} note={t("value.active")}>
+                <Spec
+                    rows={[
+                        { k: t("field.name"), v: SITE.TITLE },
+                        { k: t("field.role"), v: t("site.role") },
+                        { k: t("field.based"), v: SITE.LOCATION },
+                        { k: t("field.writingAbout"), v: t("value.systemsCompilers") },
+                        { k: t("field.logged"), v: `${posts.length} ${t("unit.posts")}` },
+                        ...SOCIALS.map(({ NAME, HANDLE, HREF }) => ({
+                            k: NAME,
+                            v: HANDLE,
+                            href: HREF,
+                            external: true,
+                        })),
+                        { k: t("field.mail"), v: SITE.EMAIL, href: `mailto:${SITE.EMAIL}` },
+                    ]}
+                />
+            </Panel>
+
+            <Panel title={t("panel.stack")} note={t("value.whatIUse")}>
+                <ul class="stack-groups">
+                    {
+                        STACK_GROUPS.map(({ GROUP, ITEMS }) => (
+                            <li>
+                                <h3>{GROUP}</h3>
+                                <p>{ITEMS.join(" · ")}</p>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </Panel>
+        </div>
+
+        {/* Last, not first: it is a curiosity about how the site is built,
+            not a headline. Every line is a fact from this build. */}
+        <Panel title={t("panel.selfTest")} note={stats.built}>
+            <ul class="spec selftest">
+                {
+                    selftest.map(({ k, v, s }) => (
+                        <li>
+                            <span class="k">{k}</span>
+                            <span class="lead" aria-hidden="true" />
+                            <span class="val">{v}</span>
+                            <span class="tri" aria-hidden="true">▲▲▲</span>
+                            <span class="v" data-tone="ok">{s}</span>
+                        </li>
+                    ))
+                }
+            </ul>
         </Panel>
     </div>
 </Layout>
@@ -233,8 +197,62 @@ const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
         container-type: inline-size;
     }
 
-    .overline {
-        margin-bottom: 0.6rem;
+    .ident {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.4rem 3ch;
+        margin-top: 1rem;
+    }
+
+    h1 {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0 2ch;
+        font-weight: 400;
+    }
+
+    /* The identity is a header element, not the page. The writing below is
+       meant to be the loudest thing here. */
+    .mark {
+        font-family: var(--font-display);
+        font-size: clamp(15px, 1.9vw, 22px);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--g2);
+    }
+
+    .who {
+        font-size: 0.93em;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--dim);
+    }
+
+    :global(.panel.lead > .panel-head) {
+        font-size: 13.5px;
+        padding-block: 0.3rem;
+    }
+
+    .stack-groups > li + li {
+        margin-top: 0.65rem;
+        padding-top: 0.65rem;
+        border-top: 1px solid var(--rule);
+    }
+
+    .stack-groups h3 {
+        font-family: var(--font-display);
+        font-size: 11.5px;
+        font-weight: 400;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--g2);
+    }
+
+    .stack-groups p {
+        margin-top: 0.1rem;
+        color: var(--ink);
     }
 
     .crossbar {
@@ -250,9 +268,9 @@ const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
         letter-spacing: 0.03em;
     }
 
-    :global(.spec.selftest .ok) {
+    :global(.spec.selftest .tri) {
         flex: none;
-        color: var(--dim);
+        color: var(--ok);
         letter-spacing: -0.05em;
         user-select: none;
     }
@@ -272,7 +290,9 @@ const LEVEL = { FLUENT: 5, FIELD: 4, ACTIVE: 3, STUDY: 2 } as const;
     }
 
     .statement {
+        flex: 1 1 40ch;
         max-width: var(--measure);
+        margin: 0;
         color: var(--ink);
     }
 
