@@ -49,7 +49,7 @@
       "name": "Masthead Wordmark",
       "kind": "custom",
       "description": "The one drawing the site allows itself: \"lacorte.city\" hand-drawn as 8px pixel bitmaps rendered in half blocks at line-height 1 (square pixels), domain dot in blood. Home only; subpages keep the two-line type ident.",
-      "html": "<div class=\"ds-masthead\" role=\"img\" aria-label=\"lacorte.city\"><pre>██   ▄▄▄▄   ▄▄▄▄  ▄▄▄▄  ▄▄▄▄▄  ██   ▄▄▄▄      ▄▄▄▄ ██   ██  ▄▄  ▄▄\n██   ▄▄▄██ ██    ██  ██ ██ ▀▀ ▀██▀ ██▄▄██    ██        ▀██▀ ██  ██\n██  ██  ██ ██    ██  ██ ██     ██  ██     <span class=\"ds-masthead-dot\">▄▄</span> ██    ██   ██   ▀▀▀██\n▀▀▀  ▀▀▀▀▀  ▀▀▀▀  ▀▀▀▀  ▀▀     ▀▀▀  ▀▀▀▀  <span class=\"ds-masthead-dot\">▀▀</span>  ▀▀▀▀ ▀▀▀  ▀▀▀  ▄▄▄█▀</pre></div>",
+      "html": "<div class=\"ds-masthead\" role=\"img\" aria-label=\"lacorte.city\"><pre>██   ▄▄▄▄   ▄▄▄▄  ▄▄▄▄  ▄▄▄▄▄  ▄▄   ▄▄▄▄      ▄▄▄▄ ██   ▄▄  ▄▄  ▄▄\n██   ▄▄▄██ ██    ██  ██ ██ ▀▀ ▀██▀ ██▄▄██    ██        ▀██▀ ██  ██\n██  ██  ██ ██    ██  ██ ██     ██  ██     <span class=\"ds-masthead-dot\">▄▄</span> ██    ██   ██   ▀▀▀██\n▀▀▀  ▀▀▀▀▀  ▀▀▀▀  ▀▀▀▀  ▀▀     ▀▀▀  ▀▀▀▀  <span class=\"ds-masthead-dot\">▀▀</span>  ▀▀▀▀ ▀▀▀  ▀▀▀  ▄▄▄█▀</pre></div>",
       "css": ".ds-masthead pre{margin:0;font-family:Iosevka,ui-monospace,monospace;font-size:10px;line-height:1;white-space:pre;color:var(--base,#ece4e2)}.ds-masthead-dot{color:var(--accent,#ff4d5c)}"
     },
     {

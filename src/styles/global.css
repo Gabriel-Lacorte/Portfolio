@@ -701,12 +701,16 @@ footer.site {
     max-width: 72ch;
 }
 
-.article > * + * {
-    margin-top: 17px;
+/* Both selectors are (0,1,0), so the sibling rule wins by order. Written
+   as `.article p { margin: 0 }` instead, it was (0,1,1), outranked the
+   spacing rule, and every paragraph after the first ran straight into the
+   one above it. */
+.article > * {
+    margin: 0;
 }
 
-.article p {
-    margin: 0;
+.article > * + * {
+    margin-top: 17px;
 }
 
 .article h2,
