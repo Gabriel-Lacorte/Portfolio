@@ -1,8 +1,5 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Panel from "@components/ascii/Panel.astro";
-import Spec from "@components/ascii/Spec.astro";
-import Dither from "@components/ascii/Dither.astro";
 import { NAV_KEYS } from "@consts";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 
@@ -12,37 +9,23 @@ const t = useTranslations(locale);
 ---
 
 <Layout locale={locale} title={t("err.title")} description={t("err.description")} suffix={false}>
-  <div class="stack-gap">
-    <Panel title={t("panel.fault")} note="err 404" as="h1">
-      <Dither pattern="check" />
-      <p class="msg">
-        <code>{Astro.url.pathname}</code> {t("err.body")}
-      </p>
-      <Dither pattern="check" />
-    </Panel>
+  <h1 class="sr-only">{t("err.title")}</h1>
 
-    <Panel title={t("panel.recover")} note={`${NAV_KEYS.length} ${t("unit.routes")}`}>
-      <Spec
-        rows={NAV_KEYS.map(({ KEY, HREF }) => ({
-          k: t(KEY),
-          v: localised(HREF, locale),
-          href: localised(HREF, locale),
-        }))}
-      />
-    </Panel>
-  </div>
+  <p><span class="titulo">404</span></p>
+
+  <p>
+    <span class="red">{Astro.url.pathname}</span> {t("err.body")}
+  </p>
+
+  <ul>
+    {
+      NAV_KEYS.map(({ KEY, HREF }) => (
+        <li>
+          <a href={localised(HREF, locale)}>{t(KEY)}</a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p><br /></p>
 </Layout>
-
-<style>
-  .msg {
-    max-width: var(--measure);
-    margin-block: var(--step);
-  }
-
-  code {
-    padding: 0.05em 0.5ch;
-    border: 1px solid var(--rule);
-    color: var(--bright);
-    overflow-wrap: anywhere;
-  }
-</style>

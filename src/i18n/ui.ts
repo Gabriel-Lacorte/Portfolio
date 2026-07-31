@@ -31,6 +31,20 @@ const en = {
     "site.statement":
         "I work below the abstraction line — hypervisors, compilers, and operating systems. This is where I write down what I find when I take them apart.",
 
+    "home.about": "about me",
+    "home.changelog": "changelog",
+    "home.latest": "latest posts",
+    "home.projects": "projects",
+    "home.stack": "what i use",
+    "home.now": "right now",
+    "home.intro1":
+        "Hey, welcome. I'm Gabriel — I work below the abstraction line: hypervisors, compilers, operating systems, and the protocols that hold them together.",
+    "home.intro2":
+        "This is where I write down what I find when I take those things apart. No tracking, no javascript, no newsletter. Just the notes.",
+    "win.status": "Blog status",
+    "win.close": "Close window",
+    "win.windows": "Windows",
+
     "nav.home": "~/",
     "nav.blog": "blog",
     "nav.projects": "projects",
@@ -62,6 +76,7 @@ const en = {
     "field.tags": "tags",
     "field.stack": "stack",
     "field.source": "source",
+    "field.writeup": "writeup",
 
     "value.yes": "yes",
     "value.active": "active",
@@ -129,6 +144,20 @@ const ptBR: Record<UIKey, string> = {
     "site.statement":
         "Trabalho abaixo da linha de abstração — hipervisores, compiladores e sistemas operacionais. É aqui que anoto o que encontro quando desmonto essas coisas.",
 
+    "home.about": "sobre mim",
+    "home.changelog": "changelog",
+    "home.latest": "últimos posts",
+    "home.projects": "projetos",
+    "home.stack": "o que eu uso",
+    "home.now": "agora",
+    "home.intro1":
+        "Olá, seja bem-vindo. Sou o Gabriel — trabalho abaixo da linha de abstração: hipervisores, compiladores, sistemas operacionais e os protocolos que seguram tudo isso.",
+    "home.intro2":
+        "É aqui que eu anoto o que encontro quando desmonto essas coisas. Sem rastreio, sem javascript, sem newsletter. Só as anotações.",
+    "win.status": "Status do blog",
+    "win.close": "Fechar janela",
+    "win.windows": "Janelas",
+
     "nav.home": "~/",
     "nav.blog": "blog",
     "nav.projects": "projetos",
@@ -160,6 +189,7 @@ const ptBR: Record<UIKey, string> = {
     "field.tags": "tags",
     "field.stack": "stack",
     "field.source": "fonte",
+    "field.writeup": "artigo",
 
     "value.yes": "sim",
     "value.active": "ativo",

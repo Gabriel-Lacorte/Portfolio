@@ -71,21 +71,15 @@ const toc = buildToc(headings);
 
 <style>
     .toc {
-        border: 1px solid var(--line);
-        background: var(--bg-raised);
-        font-size: 0.93em;
+        margin-bottom: 15px;
+        border: var(--dashed);
+        padding: 6px 10px;
     }
 
     summary {
-        padding: 0.35rem 2ch;
-        border-bottom: 1px solid transparent;
-        font-family: var(--font-display);
-        font-size: 12px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--dim);
         cursor: pointer;
         list-style: none;
+        color: var(--comment);
     }
 
     summary::-webkit-details-marker {
@@ -93,20 +87,16 @@ const toc = buildToc(headings);
     }
 
     summary::before {
-        content: "▸ ";
-        color: var(--accent);
-    }
-
-    .toc[open] summary {
-        border-bottom-color: var(--line);
+        content: "[+] ";
     }
 
     .toc[open] summary::before {
-        content: "▾ ";
+        content: "[-] ";
     }
 
     summary:hover {
-        color: var(--bright);
+        color: var(--bg);
+        background: var(--base);
     }
 
     nav :global(ul) {
@@ -116,18 +106,15 @@ const toc = buildToc(headings);
     }
 
     nav > ul {
-        padding: 0.5rem 2ch;
+        margin-top: 6px;
     }
 
-    /* Inside a panel the list supplies its own rhythm; the padding belongs
-       to the panel body. */
     .toc-bare > ul {
-        padding: 0;
         columns: 2;
-        column-gap: 4ch;
+        column-gap: 24px;
     }
 
-    @media (max-width: 680px) {
+    @media (max-width: 700px) {
         .toc-bare > ul {
             columns: 1;
         }

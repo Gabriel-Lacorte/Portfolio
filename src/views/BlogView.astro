@@ -1,7 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Panel from "@components/ascii/Panel.astro";
-import { postsFor, type Post } from "@lib/posts";
+import { postsFor } from "@lib/posts";
 import { compact, countWords, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 
@@ -10,174 +9,49 @@ const { locale } = Astro.props;
 const t = useTranslations(locale);
 
 const posts = await postsFor(locale);
-
 const totalWords = posts.reduce((sum, p) => sum + countWords(p.body), 0);
 
-const byYear = posts.reduce<Record<string, Post[]>>(
-    (acc, post) => {
-        const year = post.data.date.getFullYear().toString();
-        (acc[year] ??= []).push(post);
-        return acc;
-    },
-    {},
-);
+const years = [
+  ...new Set(posts.map((p) => p.data.date.getUTCFullYear())),
+].sort((a, b) => b - a);
 
-const years = Object.keys(byYear).sort((a, b) => Number(b) - Number(a));
-
-const md = (d: Date) => d.toISOString().slice(5, 10);
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+const br = (d: Date) =>
+  d.toLocaleDateString("en-CA", { timeZone: "UTC" }).split("-").reverse().join("/");
 ---
 
-<Layout
-    locale={locale}
-    title={t("meta.blogTitle")}
-    description={t("meta.blogDescription")}
->
-    <div class="stack-gap">
-        <Panel
-            title="~/blog"
-            note={`${posts.length} ${t("unit.posts")} · ${compact(totalWords)} ${t("unit.words")}`}
-            as="h1"
-        >
-            <p class="lede">{t("meta.blogDescription")}</p>
-        </Panel>
+<Layout locale={locale} title={t("meta.blogTitle")} description={t("meta.blogDescription")}>
+  <h1 class="sr-only">{t("meta.blogTitle")}</h1>
 
-        {
-            years.map((year) => (
-                <Panel
-                    title={year}
-                    note={`${byYear[year].length} ${t("unit.logged")}`}
-                    bodyClass="flush"
-                >
-                    <ol class="listing">
-                        {byYear[year].map((post) => (
-                            <li>
-                                <a href={localised(`/blog/${post.data.translationKey}`, locale)}>
-                                    <time
-                                        class="stamp"
-                                        datetime={iso(post.data.date)}
-                                    >
-                                        {md(post.data.date)}
-                                    </time>
-                                    <span class="name">{post.data.title}</span>
-                                    <span class="lead" aria-hidden="true" />
-                                    <span class="len">
-                                        {readingTime(post.body)} {t("unit.min")}
-                                    </span>
-                                </a>
-                                <p class="sub">{post.data.description}</p>
-                                {post.data.tags.length > 0 && (
-                                    <p class="tags">
-                                        {post.data.tags.map((tag) => (
-                                            <span class="tag">{tag}</span>
-                                        ))}
-                                    </p>
-                                )}
-                            </li>
-                        ))}
-                    </ol>
-                </Panel>
-            ))
-        }
-    </div>
+  <p><span class="titulo">{t("meta.blogTitle")}</span></p>
+
+  <p>
+    {t("meta.blogDescription")}
+    <br />
+    <span class="comment">
+      {posts.length} {t("unit.posts")} · {compact(totalWords)} {t("unit.words")}
+    </span>
+  </p>
+
+  {
+    years.map((year) => (
+      <>
+        <p><span class="titulo">{year}</span></p>
+        <ul class="rows">
+          {posts
+            .filter((p) => p.data.date.getUTCFullYear() === year)
+            .map((post) => (
+              <li>
+                <span class="when">[{br(post.data.date)}]</span>
+                <a href={localised(`/blog/${post.data.translationKey}`, locale)}>
+                  {post.data.title}
+                </a>
+                <span class="len">{readingTime(post.body)} min</span>
+              </li>
+            ))}
+        </ul>
+      </>
+    ))
+  }
+
+  <p><br /></p>
 </Layout>
-
-<style>
-    .lede {
-        max-width: var(--measure);
-    }
-
-    :global(.panel-body.flush) {
-        padding-inline: 0;
-        padding-block: 0;
-    }
-
-    .listing > li {
-        padding: 0.6rem var(--pad);
-    }
-
-    .listing > li + li {
-        border-top: 1px solid var(--rule);
-    }
-
-    .listing a {
-        display: flex;
-        align-items: baseline;
-        gap: 1ch;
-    }
-
-    .stamp {
-        flex: none;
-        width: 5ch;
-        color: var(--dim);
-        font-variant-numeric: tabular-nums;
-    }
-
-    .name {
-        flex: none;
-        color: var(--bright);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-    .lead {
-        flex: 1;
-        min-width: 2ch;
-        height: 1px;
-        align-self: center;
-        background-image: radial-gradient(
-            circle at center,
-            var(--dot) 0.5px,
-            transparent 0.6px
-        );
-        background-size: 1ch 2px;
-        background-repeat: repeat-x;
-    }
-
-    .len {
-        flex: none;
-        color: var(--dim);
-        font-variant-numeric: tabular-nums;
-    }
-
-    .listing a:hover .stamp,
-    .listing a:hover .len,
-    .listing a:hover .name {
-        color: inherit;
-    }
-
-    .listing a:hover .lead {
-        opacity: 0;
-    }
-
-    .sub {
-        max-width: var(--measure);
-        margin-top: 0.1rem;
-        padding-left: 6ch;
-        color: var(--dim);
-        font-size: 0.93em;
-    }
-
-    .tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.3rem 1ch;
-        margin-top: 0.35rem;
-        padding-left: 6ch;
-    }
-
-    @media (max-width: 680px) {
-        .listing a {
-            flex-wrap: wrap;
-        }
-
-        .lead {
-            display: none;
-        }
-
-        .sub,
-        .tags {
-            padding-left: 0;
-        }
-    }
-</style>

@@ -1,21 +1,9 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Dither from "@components/ascii/Dither.astro";
-import Ornament from "@components/ascii/Ornament.astro";
-import Panel from "@components/ascii/Panel.astro";
-import Spec from "@components/ascii/Spec.astro";
-import Waterfall from "@components/ascii/Waterfall.astro";
 import { postsFor } from "@lib/posts";
+import { compact, getStats, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
-import {
-    CHANGELOG,
-    NOW,
-    PROJECTS,
-    SITE,
-    SOCIALS,
-    STACK_GROUPS,
-} from "@consts";
-import { getSelfTest, getStats, readingTime } from "@lib/stats";
+import { CHANGELOG, NOW, PROJECTS, SITE, STACK_GROUPS } from "@consts";
 
 type Props = { locale: Locale };
 const { locale } = Astro.props;
@@ -24,9 +12,19 @@ const L = (path: string) => localised(path, locale);
 
 const posts = await postsFor(locale);
 const stats = await getStats();
-const selftest = getSelfTest(stats);
 
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+const br = (d: Date) =>
+    d
+        .toLocaleDateString("en-CA", { timeZone: "UTC" })
+        .split("-")
+        .reverse()
+        .join("/");
+
+/* Anything filed in the last 90 days carries the [new] marker. Measured
+   against the build date so it is decided once, at build time. */
+const NEW_FOR_DAYS = 90;
+const isNew = (d: Date) =>
+    (Date.parse(stats.built) - d.valueOf()) / 86_400_000 < NEW_FOR_DAYS;
 ---
 
 <Layout
@@ -34,439 +32,137 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
     title={SITE.TITLE}
     description={t("meta.homeDescription")}
     suffix={false}
+    windows
 >
-    <div class="stack-gap">
-        <section class="masthead panel">
-            <div class="panel-body">
-                <Ornament />
-                <div class="ident">
-                    <h1>
-                        <span class="mark">{SITE.HANDLE}</span>
-                        <span class="who">{SITE.TITLE} — {t("site.role")}</span>
-                    </h1>
-                    <p class="statement">{t("site.statement")}</p>
-                </div>
-            </div>
-            <Dither />
-        </section>
+    <h1 class="sr-only">{SITE.TITLE} — {t("site.role")}</h1>
 
-        <Panel
-            title={t("panel.transmissions")}
-            note={`${posts.length} ${t("unit.logged")}`}
-            bodyClass="flush"
-            class="lead"
-        >
-            <ol class="log">
-                {
-                    posts.map((post) => (
-                        <li>
-                            <a href={L(`/blog/${post.data.translationKey}`)}>
-                                <time
-                                    class="stamp"
-                                    datetime={iso(post.data.date)}
-                                >
-                                    {iso(post.data.date)}
-                                </time>
-                                <span class="name">{post.data.title}</span>
-                                <span class="lead" aria-hidden="true" />
-                                <span class="len">
-                                    {readingTime(post.body)} {t("unit.min")}
-                                </span>
-                            </a>
-                            <p class="sub">
-                                {post.data.description}
-                                {post.data.tags.length > 0 && (
-                                    <span class="tags">
-                                        {post.data.tags.map((tag) => (
-                                            <span class="tag">{tag}</span>
-                                        ))}
-                                    </span>
-                                )}
-                            </p>
-                        </li>
-                    ))
-                }
-            </ol>
-        </Panel>
+    <p><span class="titulo">{t("home.about")}</span></p>
 
-        <div class="grid-2">
-            <Panel title={t("panel.builds")} note={`${PROJECTS.length} ${t("unit.listed")}`}>
-                <ul class="builds">
-                    {
-                        PROJECTS.map((project) => (
-                            <li>
-                                <a href={project.HREF.startsWith("/") ? L(project.HREF) : project.HREF}>{project.NAME}</a>
-                                <p class="sub">{project.SUMMARY}</p>
-                                <p class="kit">{project.STACK.join(" · ")}</p>
-                            </li>
-                        ))
-                    }
-                </ul>
-                <a class="more" href={L("/projects")}>{t("action.allBuilds")} ▸</a>
-            </Panel>
+    <p>
+        {t("home.intro1")}
+        <br />
+        {t("home.intro2")}
+    </p>
 
-            {/* Two shorter panels stacked, so the column closes level with
-                the taller one beside it instead of trailing dead space. */}
-            <div class="stack-gap">
-                <Panel title={t("panel.signal")} note={NOW.UPDATED}>
-                    <ul class="signal">
-                        {
-                            NOW.LINES.map((line, i) => (
-                                <li>
-                                    <span class="idx" aria-hidden="true">
-                                        {String(i + 1).padStart(2, "0")}
-                                    </span>
-                                    <span>{line}</span>
-                                </li>
-                            ))
+    <p><span class="titulo">{t("home.changelog")}</span></p>
+
+    {
+        CHANGELOG.slice(0, 2).map(({ DATE, TEXT }) => (
+            <p>
+                <b>{br(new Date(DATE))}</b> {TEXT}
+            </p>
+        ))
+    }
+
+    <p><span class="titulo">{t("home.latest")}</span></p>
+
+    <ul class="rows">
+        {
+            posts.map((post) => (
+                <li>
+                    <span class="when">[{br(post.data.date)}]</span>
+                    <a href={L(`/blog/${post.data.translationKey}`)}>
+                        {post.data.title}
+                    </a>
+                    {isNew(post.data.date) && <span class="new">[new]</span>}
+                    <span class="len">{readingTime(post.body)} min</span>
+                </li>
+            ))
+        }
+    </ul>
+
+    <p><span class="titulo">{t("home.projects")}</span></p>
+
+    <ul>
+        {
+            PROJECTS.map((project) => (
+                <li>
+                    <a
+                        href={
+                            project.HREF.startsWith("http")
+                                ? project.HREF
+                                : L(project.HREF)
                         }
-                    </ul>
-                    <a class="more" href={L("/now")}>{t("action.fullSignal")} ▸</a>
-                </Panel>
+                    >
+                        {project.NAME}
+                    </a>{" "}
+                    <span class="comment">{project.SUMMARY}</span>
+                </li>
+            ))
+        }
+    </ul>
 
-                <Panel title={t("panel.log")} note={`${CHANGELOG.length} ${t("unit.entries")}`}>
-                    <Spec
-                        rows={CHANGELOG.map(({ DATE, TEXT }) => ({
-                            k: DATE,
-                            v: TEXT,
-                            dim: true,
-                        }))}
-                        class="logspec"
-                    />
-                </Panel>
+    <p><span class="titulo">{t("home.stack")}</span></p>
+
+    <ul>
+        {
+            STACK_GROUPS.map(({ GROUP, ITEMS }) => (
+                <li>
+                    <b>{GROUP}</b> {ITEMS.join(", ")}
+                </li>
+            ))
+        }
+    </ul>
+
+    <p>
+        <span class="titulo">{t("home.now")}</span>{" "}
+        <span class="comment">— {NOW.UPDATED}</span>
+    </p>
+
+    <ul>
+        {NOW.LINES.map((line) => <li>{line}</li>)}
+    </ul>
+
+    <p><br /></p>
+
+    <Fragment slot="windows">
+        <aside id="win-status" class="window" aria-label={t("win.status")}>
+            <div class="window__bar">
+                <span>status</span>
+                <span class="window__controls">
+                    <button
+                        type="button"
+                        data-window-close="win-status"
+                        aria-label={t("win.close")}>x</button
+                    >
+                </span>
             </div>
-        </div>
+            <pre class="window__body"><span class="prompt">$</span> ./status
 
-        <div class="grid-2">
-            <Panel title={t("panel.operator")} note={t("value.active")}>
-                <Spec
-                    rows={[
-                        { k: t("field.name"), v: SITE.TITLE },
-                        { k: t("field.role"), v: t("site.role") },
-                        { k: t("field.based"), v: SITE.LOCATION },
-                        { k: t("field.writingAbout"), v: t("value.systemsCompilers") },
-                        { k: t("field.logged"), v: `${posts.length} ${t("unit.posts")}` },
-                        ...SOCIALS.map(({ NAME, HANDLE, HREF }) => ({
-                            k: NAME,
-                            v: HANDLE,
-                            href: HREF,
-                            external: true,
-                        })),
-                        { k: t("field.mail"), v: SITE.EMAIL, href: `mailto:${SITE.EMAIL}` },
-                    ]}
-                />
-            </Panel>
+host....... <a href="https://lacorte.city">lacorte.city</a>
+status..... <span class="green">online</span>
+posts...... {stats.posts}
+words...... {compact(stats.words)}
+build...... {stats.commit}
+updated.... {stats.built}</pre>
+        </aside>
+    </Fragment>
 
-            <Panel title={t("panel.stack")} note={t("value.whatIUse")}>
-                <ul class="stack-groups">
-                    {
-                        STACK_GROUPS.map(({ GROUP, ITEMS }) => (
-                            <li>
-                                <h3>{GROUP}</h3>
-                                <p>{ITEMS.join(" · ")}</p>
-                            </li>
-                        ))
-                    }
-                </ul>
-            </Panel>
-        </div>
-
-        {/* Last, not first: it is a curiosity about how the site is built,
-            not a headline. Every line is a fact from this build. */}
-        <Panel title={t("panel.selfTest")} note={stats.built}>
-            <ul class="spec selftest">
-                {
-                    selftest.map(({ k, v, s }) => (
-                        <li>
-                            <span class="k">{k}</span>
-                            <span class="lead" aria-hidden="true" />
-                            <span class="val">{v}</span>
-                            <span class="tri" aria-hidden="true">▲▲▲</span>
-                            <span class="v" data-tone="ok">{s}</span>
-                        </li>
-                    ))
-                }
-            </ul>
-        </Panel>
-    </div>
+    <Fragment slot="taskbar">
+        <nav class="taskbar no-print" aria-label={t("win.windows")}>
+            <button
+                type="button"
+                data-window-task="win-status"
+                aria-controls="win-status"
+                aria-pressed="true">status</button
+            >
+        </nav>
+    </Fragment>
 </Layout>
 
 <style>
-    .masthead {
-        overflow: hidden;
-        container-type: inline-size;
-    }
-
-    .ident {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        gap: 0.4rem 3ch;
-        margin-top: 1rem;
-    }
-
-    h1 {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        gap: 0 2ch;
-        font-weight: 400;
-    }
-
-    /* The identity is a header element, not the page. The writing below is
-       meant to be the loudest thing here. */
-    .mark {
-        font-family: var(--font-display);
-        font-size: clamp(15px, 1.9vw, 22px);
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: var(--g2);
-    }
-
-    .who {
-        font-size: 0.93em;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: var(--dim);
-    }
-
-    :global(.panel.lead > .panel-head) {
-        font-size: 13.5px;
-        padding-block: 0.3rem;
-    }
-
-    .stack-groups > li + li {
-        margin-top: 0.65rem;
-        padding-top: 0.65rem;
-        border-top: 1px solid var(--rule);
-    }
-
-    .stack-groups h3 {
-        font-family: var(--font-display);
-        font-size: 11.5px;
-        font-weight: 400;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--g2);
-    }
-
-    .stack-groups p {
-        margin-top: 0.1rem;
-        color: var(--ink);
-    }
-
-    .crossbar {
-        margin-top: 0.4rem;
-    }
-
-    /* Self-test rows carry a value AND a status, so the leader sits
-       between the label and the value and the status pins to the end. */
-    :global(.spec.selftest .val) {
-        flex: none;
-        color: var(--dim);
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-    }
-
-    :global(.spec.selftest .tri) {
-        flex: none;
-        color: var(--ok);
-        letter-spacing: -0.05em;
-        user-select: none;
-    }
-
-    /* Fills the panel rather than floating mid-column. */
-    .band {
-        width: 100%;
-        margin-top: var(--step);
-        padding-top: 0.6rem;
-        border-top: 1px solid var(--rule);
-        container-type: inline-size;
-        overflow: hidden;
-    }
-
-    .crossbar {
-        margin-top: 0.9rem;
-    }
-
-    .statement {
-        flex: 1 1 40ch;
-        max-width: var(--measure);
-        margin: 0;
-        color: var(--ink);
-    }
-
-    /* ── Transmissions: a directory listing ───────────────────────── */
-    :global(.panel-body.flush) {
-        padding-inline: 0;
-        padding-block: 0;
-    }
-
-    .log > li {
-        padding: 0.5rem var(--pad);
-    }
-
-    .log > li + li {
-        border-top: 1px solid var(--rule);
-    }
-
-    .log a {
-        display: flex;
-        align-items: baseline;
-        gap: 1ch;
-    }
-
-    .log .stamp {
-        flex: none;
-        color: var(--dim);
-        font-variant-numeric: tabular-nums;
-    }
-
-    .log .name {
-        flex: none;
-        color: var(--bright);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-    .log .lead {
-        flex: 1;
-        min-width: 2ch;
-        height: 1px;
-        align-self: center;
-        background-image: radial-gradient(
-            circle at center,
-            var(--dot) 0.5px,
-            transparent 0.6px
-        );
-        background-size: 1ch 2px;
-        background-repeat: repeat-x;
-    }
-
-    .log a:hover .lead {
-        opacity: 0;
-    }
-
-    .log .len {
-        flex: none;
-        color: var(--dim);
-        font-variant-numeric: tabular-nums;
-    }
-
-    .log a:hover .stamp,
-    .log a:hover .len,
-    .log a:hover .name {
-        color: inherit;
-    }
-
-    .sub {
-        margin-top: 0.1rem;
-        color: var(--dim);
-        font-size: 0.93em;
-    }
-
-    .log .sub {
-        padding-left: 12ch;
-    }
-
-    .tags {
-        display: inline-flex;
-        flex-wrap: wrap;
-        gap: 0.3rem 1ch;
-        margin-left: 1ch;
-        vertical-align: middle;
-    }
-
-    /* ── Builds ───────────────────────────────────────────────────── */
-    .builds > li + li {
-        margin-top: 0.7rem;
-        padding-top: 0.7rem;
-        border-top: 1px solid var(--rule);
-    }
-
-    .builds a {
-        color: var(--bright);
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-    }
-
-    .builds a::before {
-        content: "▸ ";
-        color: var(--dim);
-    }
-
-    .kit {
-        margin-top: 0.15rem;
-        color: var(--dot);
-        font-size: 0.88em;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-    /* ── Signal ───────────────────────────────────────────────────── */
-    .signal > li {
-        display: flex;
-        gap: 1.5ch;
-        color: var(--dim);
-    }
-
-    .signal > li + li {
-        margin-top: 0.4rem;
-    }
-
-    .signal .idx {
-        flex: none;
-        color: var(--dot);
-        font-variant-numeric: tabular-nums;
-    }
-
-    .more {
-        display: inline-block;
-        margin-top: 0.9rem;
-        color: var(--dim);
-        font-size: 0.9em;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-    }
-
-    /* The log reads as prose and now sits in a narrow column, so its rows
-       stack: date above, entry below, leader dropped. */
-    :global(.logspec > li) {
-        display: block;
-    }
-
-    :global(.logspec > li + li) {
-        margin-top: 0.35rem;
-    }
-
-    :global(.logspec .lead) {
-        display: none;
-    }
-
-    :global(.logspec .k) {
-        font-variant-numeric: tabular-nums;
-        color: var(--dot);
-    }
-
-    :global(.logspec .v) {
-        display: block;
-        text-align: left;
-        text-transform: none;
-        letter-spacing: 0;
-        color: var(--dim);
-    }
-
-    @media (max-width: 680px) {
-        .log a {
-            flex-wrap: wrap;
-        }
-
-        .log .lead {
-            display: none;
-        }
-
-        .log .sub {
-            padding-left: 0;
+    /* Parked beside the column, the way the reference floats its own.
+       The breakpoint is arithmetic, not a guess: the column is 984px and
+       centred, so the gutter beside it is (100vw - 984) / 2. Fitting a
+       340px window plus gaps needs that gutter to reach 372px, which is
+       100vw >= 1728. At my earlier 1320 the window simply sat on top of
+       the prose. Below the breakpoint it joins the flow. */
+    @media (min-width: 1740px) {
+        .window {
+            position: fixed;
+            top: 210px;
+            right: max(16px, calc((100vw - 984px) / 2 - 356px));
+            margin: 0;
         }
     }
 </style>

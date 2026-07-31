@@ -23,27 +23,26 @@ const { heading } = Astro.props;
 
 <style>
     li {
-        padding-block: 0.1rem;
+        padding: 1px 0;
     }
 
     a {
-        color: var(--dim);
+        color: var(--comment);
         text-decoration: none;
     }
 
     a::before {
-        content: "· ";
-        color: var(--faint);
+        content: "- ";
     }
 
     a:hover {
         color: var(--bg);
-        background: var(--accent);
+        background: var(--base);
     }
 
     .nested {
         margin: 0;
-        padding-left: 2ch;
+        padding-left: 18px;
         list-style: none;
     }
 </style>

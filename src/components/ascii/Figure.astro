@@ -38,16 +38,12 @@ const { alt, caption, label, bare = false } = Astro.props;
 
 <style>
     .fig {
-        margin: var(--step) 0;
-    }
-
-    .fig.bare {
-        margin: 0;
+        margin: 15px 0;
     }
 
     .fig-art {
-        padding: 0.8rem var(--pad);
-        border: 1px solid var(--rule);
+        padding: 10px 12px;
+        border: var(--dashed);
         overflow-x: auto;
         overscroll-behavior-x: contain;
     }
@@ -59,33 +55,29 @@ const { alt, caption, label, bare = false } = Astro.props;
 
     .fig-art pre {
         margin: 0;
-        color: var(--ink);
-        /* Even sizes only. Iosevka advances 0.5em per cell, so an odd
-           font-size puts every character on a half pixel and the box
-           rules render with a gap between glyphs — a solid ─── run comes
-           out dashed. 14px gives a 7px advance; 10px gives 5px.
-           Line-height is tight enough that vertical rules join, loose
-           enough that label text stays readable. */
+        font-family: var(--code);
+        color: var(--base);
+        /* Even size only: Iosevka advances 0.5em per cell, so an odd
+           font-size lands every glyph on a half pixel and a solid ───
+           run renders dashed. 14px gives a 7px advance. */
         font-size: 14px;
         line-height: 1.2;
     }
 
     figcaption {
-        margin-top: 0.6rem;
-        color: var(--dim);
-        font-size: 0.88em;
-    }
-
-    @media (max-width: 900px) {
-        .fig-art pre {
-            font-size: 10px;
-        }
+        margin-top: 6px;
+        color: var(--comment);
+        font-size: 14px;
     }
 
     .fig-label {
-        margin-right: 1ch;
-        color: var(--bright);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
+        margin-right: 8px;
+        color: var(--purple);
+    }
+
+    @media (max-width: 700px) {
+        .fig-art pre {
+            font-size: 10px;
+        }
     }
 </style>

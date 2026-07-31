@@ -67,66 +67,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 <script is:inline>
     (() => {
         const root = document.documentElement;
-        root.classList.toggle("light", localStorage.getItem("theme") === "light");
-        // Gates the reveal animation, so content is never hidden without JS.
-        root.classList.add("js");
+        root.classList.toggle(
+            "light",
+            localStorage.getItem("theme") === "light",
+        );
     })();
 </script>
 
 <script>
-    type Theme = "dark" | "light";
-
-    function current(): Theme {
-        return document.documentElement.classList.contains("light")
-            ? "light"
-            : "dark";
-    }
-
-    function apply(theme: Theme) {
-        document.documentElement.classList.toggle("light", theme === "light");
-        localStorage.setItem("theme", theme);
-        paintToggle();
-    }
-
-    function paintToggle() {
-        const theme = current();
-        const button = document.getElementById("theme-toggle");
-        if (!button) return;
-        button.textContent = theme === "light" ? "☀" : "☾";
-        button.setAttribute(
-            "aria-label",
-            `Switch to ${theme === "light" ? "dark" : "light"} theme`,
-        );
-    }
-
-    /* Reveal on scroll. The template this replaced staggered every element
-       with setTimeout(index * 100), so the last item on a long page landed
-       seconds after the first. */
-    function reveal() {
-        const items = document.querySelectorAll<HTMLElement>(".reveal");
-
-        if (!("IntersectionObserver" in window)) {
-            items.forEach((el) => el.classList.add("shown"));
-            return;
-        }
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
-                    entry.target.classList.add("shown");
-                    observer.unobserve(entry.target);
-                });
-            },
-            { rootMargin: "0px 0px -10% 0px" },
-        );
-
-        items.forEach((el) => observer.observe(el));
-    }
-
-    /* Copy buttons live on a wrapper, not inside <pre>: appending the button
-       to the code block itself meant its label was part of the copied text
-       and had to be stripped back out again. */
+    /* Copy buttons live on a wrapper, not inside <pre>: appending the
+       button to the code block itself meant its label became part of the
+       copied text and had to be stripped back out. */
     function copyButtons() {
         document
             .querySelectorAll<HTMLPreElement>(".article pre")
@@ -158,16 +109,40 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
             });
     }
 
-    function init() {
-        paintToggle();
-        reveal();
-        copyButtons();
+    /* Closable windows and the taskbar that reopens them. Entirely an
+       enhancement: with scripting off the window is simply always open,
+       which is the correct fallback for a panel of static text. */
+    function windows() {
+        const setOpen = (id: string, open: boolean) => {
+            const win = document.getElementById(id);
+            const task = document.querySelector<HTMLButtonElement>(
+                `[data-window-task="${id}"]`,
+            );
+            if (win) win.hidden = !open;
+            task?.setAttribute("aria-pressed", String(open));
+        };
 
         document
-            .getElementById("theme-toggle")
-            ?.addEventListener("click", () =>
-                apply(current() === "light" ? "dark" : "light"),
+            .querySelectorAll<HTMLButtonElement>("[data-window-close]")
+            .forEach((b) =>
+                b.addEventListener("click", () =>
+                    setOpen(b.dataset.windowClose!, false),
+                ),
             );
+
+        document
+            .querySelectorAll<HTMLButtonElement>("[data-window-task]")
+            .forEach((b) =>
+                b.addEventListener("click", () => {
+                    const id = b.dataset.windowTask!;
+                    setOpen(id, b.getAttribute("aria-pressed") !== "true");
+                }),
+            );
+    }
+
+    function init() {
+        copyButtons();
+        windows();
     }
 
     document.addEventListener("astro:page-load", init);

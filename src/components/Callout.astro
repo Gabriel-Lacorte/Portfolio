@@ -28,25 +28,26 @@ const DEFAULT_LABEL: Record<string, string> = {
 
 <style>
     .callout {
-        position: relative;
-        margin-block: var(--step);
-        padding: calc(var(--step) * 0.6) 2ch;
-        border: 1px solid var(--line);
-        border-left-width: 2px;
-        background: var(--bg-raised);
+        margin: 15px 0;
+        padding-left: 12px;
+        border-left: var(--dashed);
     }
 
     .callout-label {
-        margin: 0 0 0.3rem;
-        font-family: var(--font-display);
-        font-size: 12px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--dim);
+        margin: 0;
+        color: var(--comment);
     }
 
     .callout-label::before {
-        content: "─ ";
+        content: "! ";
+    }
+
+    .warning .callout-label {
+        color: var(--amber);
+    }
+
+    .error .callout-label {
+        color: var(--red);
     }
 
     .callout-body :global(> :first-child) {
@@ -55,29 +56,5 @@ const DEFAULT_LABEL: Record<string, string> = {
 
     .callout-body :global(> :last-child) {
         margin-bottom: 0;
-    }
-
-    .note {
-        border-left-color: var(--dim);
-    }
-
-    .info {
-        border-left-color: var(--base);
-    }
-
-    .warning {
-        border-left-color: #d99a3c;
-    }
-
-    .warning .callout-label {
-        color: #d99a3c;
-    }
-
-    .error {
-        border-left-color: var(--accent);
-    }
-
-    .error .callout-label {
-        color: var(--accent);
     }
 </style>

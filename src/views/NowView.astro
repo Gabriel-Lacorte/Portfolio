@@ -1,6 +1,5 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Panel from "@components/ascii/Panel.astro";
 import { NOW } from "@consts";
 import { useTranslations, type Locale } from "@i18n/utils";
 
@@ -10,44 +9,18 @@ const t = useTranslations(locale);
 ---
 
 <Layout locale={locale} title={t("meta.nowTitle")} description={t("meta.nowDescription")}>
-  <div class="stack-gap">
-    <Panel title="~/now" note={NOW.UPDATED} as="h1">
-      <p class="lede">{t("meta.nowLede")}</p>
-    </Panel>
+  <h1 class="sr-only">{t("meta.nowTitle")}</h1>
 
-    <Panel title={t("panel.signal")} note={`${NOW.LINES.length} ${t("value.active")}`}>
-      <ul class="signal">
-        {
-          NOW.LINES.map((line, i) => (
-            <li>
-              <span class="idx" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-              <span>{line}</span>
-            </li>
-          ))
-        }
-      </ul>
-    </Panel>
-  </div>
+  <p>
+    <span class="titulo">{t("meta.nowTitle")}</span>{" "}
+    <span class="comment">— {NOW.UPDATED}</span>
+  </p>
+
+  <p>{t("meta.nowLede")}</p>
+
+  <ul>
+    {NOW.LINES.map((line) => <li>{line}</li>)}
+  </ul>
+
+  <p><br /></p>
 </Layout>
-
-<style>
-  .lede {
-    max-width: var(--measure);
-  }
-
-  .signal > li {
-    display: flex;
-    gap: 1.5ch;
-    max-width: var(--measure);
-  }
-
-  .signal > li + li {
-    margin-top: 0.5rem;
-  }
-
-  .idx {
-    flex: none;
-    color: var(--dot);
-    font-variant-numeric: tabular-nums;
-  }
-</style>

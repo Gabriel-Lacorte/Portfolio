@@ -1,60 +1,44 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Panel from "@components/ascii/Panel.astro";
-import Spec from "@components/ascii/Spec.astro";
 import { PROJECTS } from "@consts";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 
 type Props = { locale: Locale };
 const { locale } = Astro.props;
 const t = useTranslations(locale);
-
 const external = (href: string) => href.startsWith("http");
 ---
 
 <Layout
-    locale={locale}
-    title={t("meta.projectsTitle")}
-    description={t("meta.projectsDescription")}
-  >
-  <div class="stack-gap">
-    <Panel title="~/projects" note={`${PROJECTS.length} ${t("unit.listed")}`} as="h1">
-      <p class="lede">{t("meta.projectsDescription")}</p>
-    </Panel>
+  locale={locale}
+  title={t("meta.projectsTitle")}
+  description={t("meta.projectsDescription")}
+>
+  <h1 class="sr-only">{t("meta.projectsTitle")}</h1>
 
-    {
-      PROJECTS.map((project) => (
-        <Panel title={project.NAME} note={project.YEAR}>
-          <p class="summary">{project.SUMMARY}</p>
-          <Spec
-            class="kit"
-            rows={[
-              { k: t("field.stack"), v: project.STACK.join(" · ") },
-              {
-                k: t("field.source"),
-                v: external(project.HREF) ? "github" : "writeup",
-                href: external(project.HREF) ? project.HREF : localised(project.HREF, locale),
-                external: external(project.HREF),
-              },
-            ]}
-          />
-        </Panel>
-      ))
-    }
-  </div>
+  <p><span class="titulo">{t("meta.projectsTitle")}</span></p>
+  <p>{t("meta.projectsDescription")}</p>
+
+  {
+    PROJECTS.map((project) => (
+      <>
+        <p>
+          <b>{project.NAME}</b>{" "}
+          <a
+            href={external(project.HREF) ? project.HREF : localised(project.HREF, locale)}
+            target={external(project.HREF) ? "_blank" : undefined}
+            rel={external(project.HREF) ? "noopener noreferrer" : undefined}
+          >
+            ({external(project.HREF) ? t("field.source") : t("field.writeup")})
+          </a>
+          <br />
+          {project.SUMMARY}
+          <br />
+          <span class="comment">{project.STACK.join(", ")}</span>
+        </p>
+      </>
+    ))
+  }
+
+  <p><br /></p>
 </Layout>
-
-<style>
-  .lede,
-  .summary {
-    max-width: var(--measure);
-  }
-
-  .summary {
-    color: var(--dim);
-  }
-
-  :global(.spec.kit) {
-    margin-top: var(--step);
-  }
-</style>
