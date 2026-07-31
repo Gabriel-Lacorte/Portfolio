@@ -229,7 +229,7 @@ body.has-windows {
 /* ── header ────────────────────────────────────────────────────────── */
 
 header.site {
-    margin: 28px 0 10px;
+    margin: 26px 0 10px;
 }
 
 
@@ -277,32 +277,29 @@ header.site {
     background: var(--base);
 }
 
-/* ── the plate ─────────────────────────────────────────────────────────
-   The die is a 1-bit dithered raster, not character art: a character cell
-   holds five grey levels over 8x15 pixels, which is nowhere near enough
-   for a detailed illustration — the first attempt read as noise. This is
-   how the reference flyers get their engraved look too. */
+/* ── identity ──────────────────────────────────────────────────────────
+   No graphic. Every large decorative image I put here read as clutter on
+   a page whose whole substance is text, and a 1-bit dither of anything
+   complex is just static — the engravings in the references work because
+   they are line work, not tone. So the masthead is two lines of type and
+   the page gets on with it. */
 
-.plate {
-    margin: 0 0 6px;
-    text-align: center;
+.ident {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 14px;
+    margin: 0 0 10px;
 }
 
-.plate img {
-    display: block;
-    width: 100%;
-    max-width: 560px;
-    height: auto;
-    margin-inline: auto;
-    image-rendering: pixelated;
+.ident .mark {
+    color: var(--base);
+    font-size: 19px;
+    letter-spacing: 0.06em;
 }
 
-.plate figcaption {
-    margin-top: 6px;
+.ident .who {
     color: var(--comment);
-    font-size: 13px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
 }
 
 /* ── the command line that heads each section ──────────────────────────

@@ -50,16 +50,10 @@ const isCurrent = (href: string) =>
 
         <div class="container">
             <header class="site">
-                <figure class="plate">
-                    <img
-                        src="/art/die.png"
-                        width="660"
-                        height="440"
-                        alt=""
-                        aria-hidden="true"
-                    />
-                    <figcaption>{SITE.HANDLE}</figcaption>
-                </figure>
+                <p class="ident">
+                    <span class="mark">{SITE.HANDLE}</span>
+                    <span class="who">{t("site.tagline")}</span>
+                </p>
 
                 <nav class="menu" aria-label="Main">
                     <ul>
