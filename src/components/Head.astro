@@ -2,17 +2,69 @@
 import "../styles/global.css";
 import { ViewTransitions } from "astro:transitions";
 import { SITE } from "@consts";
-import { HTML_LANG } from "@i18n/ui";
-import { localised, type Locale } from "@i18n/utils";
+import { DEFAULT_LOCALE, HTML_LANG, LOCALES } from "@i18n/ui";
+import { localised, unlocalised, type Locale } from "@i18n/utils";
 
 type Props = {
     locale: Locale;
     title: string;
     description: string;
+    /**
+     * Locales whose route exists but serves another language's text.
+     * A post with no Portuguese translation still answers at its
+     * Portuguese URL — with the English body and a notice — and that
+     * URL must not advertise itself as the Portuguese version.
+     */
+    untranslated?: Locale[];
+    /** Pages that should never be indexed. The 404 is the only one. */
+    noindex?: boolean;
+    /**
+     * Overrides the canonical with another route's path. A page serving
+     * borrowed text is a duplicate of the page it borrowed from and says
+     * so, rather than competing with it for the same words.
+     */
+    canonicalPath?: string;
 };
 
-const { locale, title, description } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+const {
+    locale,
+    title,
+    description,
+    untranslated = [],
+    noindex = false,
+    canonicalPath,
+} = Astro.props;
+const canonical = new URL(
+    canonicalPath ?? Astro.url.pathname,
+    Astro.site ?? Astro.url,
+).href;
+
+/* Every route exists in every locale, so each page names its siblings.
+   Without this the two languages are two unrelated documents competing
+   with each other: nothing tells a search engine that /blog/x and
+   /pt-br/blog/x are one article, so the wrong one gets served to half
+   the readers. Reciprocal by construction — the pair is derived from
+   the path rather than hand-listed, so it cannot drift.
+
+   x-default points at the unprefixed English route: the answer to
+   "this reader matches no listed language", not a fourth translation.
+
+   An alternate has to be byte-identical to the target page's canonical
+   or the pair is not reciprocal and the whole set is ignored. Astro
+   builds directory routes, so every canonical ends in a slash while
+   `localised()` returns none — the first version pointed every tag at a
+   URL one redirect away from the real one, which is the same as having
+   written nothing. Hence `withSlash`, and hence the check in
+   scripts/check-hreflang.py. */
+const here = unlocalised(Astro.url.pathname);
+const base = Astro.site ?? Astro.url;
+const withSlash = (path: string) => (path.endsWith("/") ? path : `${path}/`);
+const urlFor = (code: Locale) =>
+    new URL(withSlash(localised(here, code)), base).href;
+
+const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
+    (code) => ({ hreflang: HTML_LANG[code], href: urlFor(code) }),
+);
 ---
 
 <meta charset="utf-8" />
@@ -25,6 +77,18 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+{
+    !noindex &&
+    alternates.map(({ hreflang, href }) => (
+        <link rel="alternate" hreflang={hreflang} href={href} />
+    ))
+}
+{
+    !noindex && (
+        <link rel="alternate" hreflang="x-default" href={urlFor(DEFAULT_LOCALE)} />
+    )
+}
 <link
     rel="alternate"
     type="application/rss+xml"
@@ -33,6 +97,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 />
 
 <meta property="og:type" content="website" />
+{
+    LOCALES.filter((code) => code !== locale && !untranslated.includes(code)).map(
+        (code) => (
+            <meta
+                property="og:locale:alternate"
+                content={HTML_LANG[code].replace("-", "_")}
+            />
+        ),
+    )
+}
 <meta property="og:site_name" content={SITE.TITLE} />
 <meta property="og:locale" content={HTML_LANG[locale].replace("-", "_")} />
 <meta property="og:title" content={title} />

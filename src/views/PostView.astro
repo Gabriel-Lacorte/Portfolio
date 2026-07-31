@@ -2,7 +2,7 @@
 import Layout from "@layouts/Layout.astro";
 import Cmd from "@components/Cmd.astro";
 import TableOfContents from "@components/TableOfContents.astro";
-import { isFallback, localeOf, type Post } from "@lib/posts";
+import { borrowingLocales, isFallback, localeOf, type Post } from "@lib/posts";
 import { compact, countWords, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 
@@ -18,6 +18,20 @@ const br = iso.split("-").reverse().join("/");
    original. Saying so is the honest alternative to hiding the post or
    blocking publication on a translation. */
 const borrowed = isFallback(post, locale);
+
+/* Which locales answer at this post's URL with someone else's language.
+   A borrowed page must not tell a search engine it is the Portuguese
+   article — it is the English one with a notice on top. Derived from
+   the post rather than from this route, so both routes agree. */
+const untranslated = await borrowingLocales(post);
+
+/* When this route is serving the original rather than a translation of
+   it, the original is the canonical. Two URLs carrying the same English
+   words otherwise compete with each other for it, and the one that wins
+   is a coin toss. */
+const canonicalPath = borrowed
+    ? `${localised(`/blog/${post.data.translationKey}`, localeOf(post))}/`
+    : undefined;
 const hasToc = headings.filter((h) => h.depth <= 3).length > 1;
 
 /* The file the reader is notionally reading — the post's own source. */
@@ -28,6 +42,8 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
     locale={locale}
     title={post.data.title}
     description={post.data.description}
+    untranslated={untranslated}
+    canonicalPath={canonicalPath}
 >
     <Cmd
         run="cat"

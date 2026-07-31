@@ -9,7 +9,13 @@ const { locale } = Astro.props;
 const t = useTranslations(locale);
 ---
 
-<Layout locale={locale} title={t("err.title")} description={t("err.description")} suffix={false}>
+<Layout
+  locale={locale}
+  title={t("err.title")}
+  description={t("err.description")}
+  suffix={false}
+  noindex
+>
   <h1 class="sr-only">{t("err.title")}</h1>
 
   {/* The page is the command that failed. It is the one place where the
