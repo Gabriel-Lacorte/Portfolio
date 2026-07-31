@@ -4,6 +4,7 @@ import Cmd from "@components/Cmd.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import { borrowingLocales, isFallback, localeOf, type Post } from "@lib/posts";
 import { compact, countWords, readingTime } from "@lib/stats";
+import { HTML_LANG } from "@i18n/ui";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
 
 type Props = { locale: Locale; post: Post };
@@ -34,6 +35,13 @@ const canonicalPath = borrowed
     : undefined;
 const hasToc = headings.filter((h) => h.depth <= 3).length > 1;
 
+/* A borrowed page is English text inside a page that says lang="pt-BR".
+   Left unmarked, a screen reader pronounces English words with
+   Portuguese phonetics and the result is not words at all. Marking the
+   parts that are actually the post — title, description, contents,
+   body — lets it switch voice and leaves the chrome alone. */
+const bodyLang = borrowed ? HTML_LANG[localeOf(post)] : undefined;
+
 /* The file the reader is notionally reading — the post's own source. */
 const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
 ---
@@ -55,9 +63,9 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
 
     <div class="out">
         <p>
-            <b>{post.data.title}</b>
+            <b lang={bodyLang}>{post.data.title}</b>
             <br />
-            {post.data.description}
+            <span lang={bodyLang}>{post.data.description}</span>
             <br />
             <span class="comment">
                 {compact(countWords(post.body))} {t("unit.words")}
@@ -74,11 +82,12 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
                 <TableOfContents
                     headings={headings}
                     label={t("panel.contents")}
+                    lang={bodyLang}
                 />
             )
         }
 
-        <article class="article">
+        <article class="article" lang={bodyLang}>
             <Content />
         </article>
     </div>
