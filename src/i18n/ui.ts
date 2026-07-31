@@ -135,6 +135,10 @@ const en = {
     "fallback.notice":
         "This post has not been translated yet — showing the English original.",
     "lang.switch": "Change language",
+
+    "theme.label": "Theme",
+    "theme.dark": "crt",
+    "theme.light": "paper",
 } as const;
 
 export type UIKey = keyof typeof en;
@@ -250,6 +254,10 @@ const ptBR: Record<UIKey, string> = {
     "fallback.notice":
         "Este post ainda não foi traduzido — exibindo o original em inglês.",
     "lang.switch": "Mudar idioma",
+
+    "theme.label": "Tema",
+    "theme.dark": "crt",
+    "theme.light": "papel",
 };
 
 export const UI: Record<Locale, Record<UIKey, string>> = {

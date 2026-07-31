@@ -293,6 +293,36 @@ header.site {
     background: var(--base);
 }
 
+/* The theme switch mirrors the language switcher: two labelled states,
+   the current one in reverse video. It exists only once scripting has
+   proven itself — the `js` class lands before first paint. */
+.menu .mode {
+    display: none;
+    margin-left: 18px;
+    color: var(--comment);
+}
+
+html.js .menu .mode {
+    display: inline;
+}
+
+.menu .mode button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--comment);
+    cursor: pointer;
+}
+
+html:not(.light) .menu .mode button[data-theme-set="dark"],
+html.light .menu .mode button[data-theme-set="light"],
+.menu .mode button:hover,
+.menu .mode button:focus-visible {
+    color: var(--bg);
+    background: var(--base);
+    outline: none;
+}
+
 /* ── identity ──────────────────────────────────────────────────────────
    No graphic. Every large decorative image I put here read as clutter on
    a page whose whole substance is text, and a 1-bit dither of anything
@@ -326,8 +356,9 @@ header.site {
 
 .cmd {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    gap: 8px;
+    gap: 2px 8px;
     margin: 26px 0 10px;
     font-weight: normal;
     font-size: 15px;
@@ -353,10 +384,20 @@ header.site {
     align-self: center;
 }
 
+/* margin-left:auto pins it to the right edge, which on a phone pushed the
+   heading past the viewport by exactly its own width. It drops to its own
+   line there instead. */
 .cmd .aside {
     margin-left: auto;
     color: var(--comment);
     font-size: 14px;
+}
+
+@media (max-width: 700px) {
+    .cmd .aside {
+        margin-left: 0;
+        flex-basis: 100%;
+    }
 }
 
 /* Output sits indented under its command, the way it does in a terminal. */

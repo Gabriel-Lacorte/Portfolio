@@ -19,7 +19,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="generator" content={Astro.generator} />
 <meta name="color-scheme" content="dark light" />
-<meta name="theme-color" content="#000000" />
+<meta name="theme-color" content="#0b0b0d" />
 
 <title>{title}</title>
 <meta name="title" content={title} />
@@ -67,6 +67,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 <script is:inline>
     (() => {
         const root = document.documentElement;
+        /* Scripting has proven itself, so controls that need it (the theme
+           switch) may exist. Lands before first paint: no dead control
+           without JS, no shift with it. */
+        root.classList.add("js");
         root.classList.toggle(
             "light",
             localStorage.getItem("theme") === "light",
@@ -258,9 +262,46 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
         });
     }
 
+    /* The theme switch: two labelled states beside the language switcher,
+       current one in reverse video. The visual state comes straight from
+       the `light` class on <html>, so this only keeps the pressed
+       semantics and the browser chrome colour in step, and persists the
+       choice under the key the pre-paint script reads. */
+    function theme() {
+        const root = document.documentElement;
+        const meta = document.querySelector<HTMLMetaElement>(
+            'meta[name="theme-color"]',
+        );
+        const buttons =
+            document.querySelectorAll<HTMLButtonElement>("[data-theme-set]");
+
+        const sync = () => {
+            const light = root.classList.contains("light");
+            buttons.forEach((b) =>
+                b.setAttribute(
+                    "aria-pressed",
+                    String((b.dataset.themeSet === "light") === light),
+                ),
+            );
+            meta?.setAttribute("content", light ? "#e6e2d8" : "#0b0b0d");
+        };
+
+        buttons.forEach((b) =>
+            b.addEventListener("click", () => {
+                const light = b.dataset.themeSet === "light";
+                root.classList.toggle("light", light);
+                localStorage.setItem("theme", light ? "light" : "dark");
+                sync();
+            }),
+        );
+
+        sync();
+    }
+
     function init() {
         codeBlocks();
         windows();
+        theme();
     }
 
     document.addEventListener("astro:page-load", init);

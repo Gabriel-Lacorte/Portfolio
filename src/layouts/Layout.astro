@@ -91,6 +91,19 @@ const isCurrent = (href: string) =>
                                 ))
                             }
                         </li>
+                        <li
+                            class="mode no-print"
+                            role="group"
+                            aria-label={t("theme.label")}
+                        >
+                            <button type="button" data-theme-set="dark">
+                                {t("theme.dark")}
+                            </button>
+                            {" / "}
+                            <button type="button" data-theme-set="light">
+                                {t("theme.light")}
+                            </button>
+                        </li>
                     </ul>
                 </nav>
             </header>
