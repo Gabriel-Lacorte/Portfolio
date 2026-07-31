@@ -41,9 +41,8 @@ const external = (href: string) => href.startsWith("http");
               href={external(project.HREF) ? project.HREF : localised(project.HREF, locale)}
               target={external(project.HREF) ? "_blank" : undefined}
               rel={external(project.HREF) ? "noopener noreferrer" : undefined}
+              >{external(project.HREF) ? t("field.source") : t("field.writeup")} -&gt;</a
             >
-              {external(project.HREF) ? t("field.source") : t("field.writeup")} -&gt;
-            </a>
           </p>
         </div>
       </>
