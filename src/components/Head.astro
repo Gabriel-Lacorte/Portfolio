@@ -3,7 +3,7 @@ import "../styles/global.css";
 import { ViewTransitions } from "astro:transitions";
 import { SITE } from "@consts";
 import { HTML_LANG } from "@i18n/ui";
-import type { Locale } from "@i18n/utils";
+import { localised, type Locale } from "@i18n/utils";
 
 type Props = {
     locale: Locale;
@@ -25,6 +25,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+<link
+    rel="alternate"
+    type="application/rss+xml"
+    title={SITE.HANDLE}
+    href={localised("/feed.xml", locale)}
+/>
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={SITE.TITLE} />
@@ -175,7 +181,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
     function savePosition(id: string, pos: Pos) {
         const all = readPositions();
         all[id] = pos;
-        localStorage.setItem(POS_KEY, JSON.stringify(all));
+        /* Storage can be denied (private mode, quota); a drag that cannot
+           be remembered should still finish. */
+        try {
+            localStorage.setItem(POS_KEY, JSON.stringify(all));
+        } catch {
+            /* forget it, literally */
+        }
     }
 
     function windows() {
@@ -189,6 +201,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
             );
             if (win) win.hidden = !open;
             task?.setAttribute("aria-pressed", String(open));
+            /* An in-flow window can sit below the fold; reopening it with
+               no visible change reads as a dead button. */
+            if (open && win && win.style.position !== "fixed")
+                win.scrollIntoView({ block: "nearest" });
         };
 
         document
@@ -348,7 +364,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
             b.addEventListener("click", () => {
                 const light = b.dataset.themeSet === "light";
                 root.classList.toggle("light", light);
-                localStorage.setItem("theme", light ? "light" : "dark");
+                try {
+                    localStorage.setItem("theme", light ? "light" : "dark");
+                } catch {
+                    /* the flip still happens; it just will not persist */
+                }
                 sync();
             }),
         );

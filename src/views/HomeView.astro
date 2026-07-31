@@ -23,6 +23,10 @@ const L = (path: string) => localised(path, locale);
 const posts = await postsFor(locale);
 const stats = await getStats();
 
+/* Scaffold rows ("—") stay in consts as a to-do, but they do not ship:
+   two "add yours" placeholders cost more credibility than a short list. */
+const reading = READING.filter((r) => r.TITLE !== "—");
+
 const br = (d: Date) =>
     d
         .toLocaleDateString("en-CA", { timeZone: "UTC" })
@@ -109,11 +113,19 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <Cmd run="ls" arg="~/projects" icon="star" />
+    <Cmd
+        run="ls"
+        arg="~/projects"
+        icon="star"
+        aside={`${PROJECTS.length} ${t("unit.listed")}`}
+    />
     <div class="out">
         <ul>
+            {/* The head of the list only — the count above says how many
+                there are and [ projects ] has the rest. Printing all of
+                them here turned the front page into the projects page. */}
             {
-                PROJECTS.map((project) => (
+                PROJECTS.slice(0, 4).map((project) => (
                     <li>
                         <a
                             href={
@@ -134,9 +146,9 @@ const isNew = (d: Date) =>
     <div class="out">
         <ul>
             {
-                READING.map(({ TITLE, NOTE, STATE }) => (
+                reading.map(({ TITLE, NOTE, STATE }) => (
                     <li>
-                        <span class:list={[STATE === "now" && "purple"]}>
+                        <span class:list={[STATE === "now" && "blood"]}>
                             {TITLE}
                         </span>{" "}
                         <span class="comment">— {NOTE}</span>
@@ -153,7 +165,7 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <Cmd run="git log" arg="--oneline" icon="warn" />
+    <Cmd run="git log" arg="--oneline" icon="term" />
     <div class="out">
         <ul class="rows">
             {
@@ -167,7 +179,6 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <p><br /></p>
 
     <Fragment slot="windows">
         <aside id="win-status" class="window" aria-label={t("win.status")}>
@@ -181,14 +192,16 @@ const isNew = (d: Date) =>
                     >
                 </span>
             </div>
+            {/* A window has to earn its glass: only telemetry the page
+                does not already show. Post and word counts live in the
+                ls aside; here is the build itself. */}
             <pre class="window__body"><span class="prompt">$</span> ./status
 
-host....... <a href="https://lacorte.city">lacorte.city</a>
+host....... lacorte.city
 status..... <span class="green">online</span>
-posts...... {stats.posts}
-words...... {compact(stats.words)}
 build...... {stats.commit}
-updated.... {stats.built}</pre>
+updated.... {stats.built}
+engine..... {Astro.generator.toLowerCase()}</pre>
         </aside>
 
         <aside id="win-lab" class="window" aria-label={t("win.lab")}>
@@ -202,12 +215,15 @@ updated.... {stats.built}</pre>
                     >
                 </span>
             </div>
+            {/* The systemctl section two scrolls up already lists the
+                boxes; the window shows the network posture instead. */}
             <pre
-                class="window__body"><span class="prompt">$</span> systemctl status lab
-{LAB.map((b) => `${b.NAME.padEnd(12, ".")} ${b.STATE}`).join("\n")}
+                class="window__body"><span class="prompt">$</span> cat ~/lab/ingress
 
 ingress..... cloudflare tunnel
-open ports.. <span class="green">none</span></pre>
+open ports.. <span class="green">none</span>
+exposure.... zero trust
+writeup..... <a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
         </aside>
     </Fragment>
 
