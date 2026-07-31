@@ -117,7 +117,10 @@ def build_icons() -> None:
 
 BUTTONS = {
     "lacorte": ([("lacorte", BONE, 12), (".city", BLOOD, 11)], BLOOD),
-    "nojs": ([("no", GREEN, 11), ("javascript", BONE, 10)], GREEN),
+    # "no javascript" was a lie: the site ships ~18KB of it for the theme
+    # switch, the draggable windows and the copy buttons. What is true is
+    # that none of it is required — scripting off, every page still works.
+    "nojs": ([("works without", GREEN, 9), ("javascript", BONE, 10)], GREEN),
     "astro": ([("built with", DIM, 9), ("A S T R O", BONE, 10)], DIM),
 }
 

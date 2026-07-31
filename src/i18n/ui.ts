@@ -40,7 +40,7 @@ const en = {
     "home.intro1":
         "Hey, welcome. I'm Gabriel — I work below the abstraction line: hypervisors, compilers, operating systems, and the protocols that hold them together.",
     "home.intro2":
-        "This is where I write down what I find when I take those things apart. No tracking, no javascript, no newsletter. Just the notes.",
+        "This is where I write down what I find when I take those things apart. No tracking, no newsletter, nothing that needs javascript to read. Just the notes.",
     "win.status": "Blog status",
     "win.lab": "Homelab status",
     "win.close": "Close window",
@@ -160,7 +160,7 @@ const ptBR: Record<UIKey, string> = {
     "home.intro1":
         "Olá, seja bem-vindo. Sou o Gabriel — trabalho abaixo da linha de abstração: hipervisores, compiladores, sistemas operacionais e os protocolos que seguram tudo isso.",
     "home.intro2":
-        "É aqui que eu anoto o que encontro quando desmonto essas coisas. Sem rastreio, sem javascript, sem newsletter. Só as anotações.",
+        "É aqui que eu anoto o que encontro quando desmonto essas coisas. Sem rastreio, sem newsletter, nada que precise de javascript para ler. Só as anotações.",
     "win.status": "Status do blog",
     "win.lab": "Status do homelab",
     "win.close": "Fechar janela",
