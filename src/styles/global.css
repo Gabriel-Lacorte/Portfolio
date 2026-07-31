@@ -607,28 +607,88 @@ footer.site {
     image-rendering: pixelated;
 }
 
-/* ── article ───────────────────────────────────────────────────────── */
+/* ── article ───────────────────────────────────────────────────────────
+   The one place the site stops being a terminal and becomes something to
+   read for twenty minutes. Measured before changing anything: 97
+   characters per line, 1.32 line-height, headings the same 15px as body,
+   set in a pixel display face. All four are wrong for long-form.
 
+   Departure Mono stays everywhere else — it is what gives the chrome its
+   character — but the prose is Iosevka, which is drawn to be read at
+   length. */
+
+/* The article itself is full width; the measure is applied to the prose
+   inside it. Capping the container instead meant a diagram or a pasted
+   hash was squeezed to reading width too, which is the one thing that
+   genuinely needs the whole column. */
 .article {
-    max-width: 100%;
+    font-family: var(--code);
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.article > p,
+.article > ul,
+.article > ol,
+.article > blockquote,
+.article > h2,
+.article > h3,
+.article > h4 {
+    max-width: 72ch;
 }
 
 .article > * + * {
-    margin-top: 15px;
+    margin-top: 17px;
+}
+
+.article p {
+    margin: 0;
 }
 
 .article h2,
 .article h3,
 .article h4 {
-    margin-top: 26px;
+    margin-top: 34px;
+    margin-bottom: -4px;
+    font-family: var(--mono);
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--base);
 }
 
-.article h2 > span,
-.article h3 > span {
-    display: inline-block;
+.article h2 {
+    font-size: 19px;
+    padding-bottom: 5px;
+    border-bottom: var(--hair);
+}
+
+.article h2::before {
+    content: "## ";
+    color: var(--blood);
+}
+
+.article h3 {
+    font-size: 16px;
+}
+
+.article h3::before {
+    content: "### ";
+    color: var(--blood);
+}
+
+.article h4 {
+    font-size: 15px;
+    color: var(--comment);
+}
+
+.article a {
+    color: var(--blood);
+    text-decoration-color: var(--rule);
+}
+
+.article a:hover {
     color: var(--bg);
-    background: var(--base);
-    text-decoration: underline;
+    background: var(--blood);
 }
 
 .article ul,
@@ -636,31 +696,49 @@ footer.site {
     padding-left: 0;
 }
 
+.article ul {
+    list-style: none;
+}
+
+.article ul > li {
+    padding-left: 22px;
+    text-indent: -22px;
+}
+
+.article ul > li::before {
+    content: "— ";
+    color: var(--blood);
+}
+
 .article ol {
     list-style: none;
     counter-reset: item;
 }
 
+.article ol > li {
+    padding-left: 26px;
+    text-indent: -26px;
+}
+
 .article ol > li::before {
     counter-increment: item;
-    content: counter(item) ".";
-    margin-right: 9px;
-    color: var(--comment);
+    content: counter(item) ". ";
+    color: var(--blood);
 }
 
 .article li + li {
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .article blockquote {
     margin: 0;
-    padding-left: 12px;
-    border-left: var(--hair);
+    padding-left: 14px;
+    border-left: 2px solid var(--blood-deep);
     color: var(--comment);
 }
 
 .article hr {
-    margin: 22px 0;
+    margin: 30px 0;
     border: 0;
     border-top: var(--hair);
 }
@@ -677,15 +755,18 @@ footer.site {
 
 .article th,
 .article td {
-    padding: 2px 8px;
+    padding: 3px 9px;
     border: var(--hair);
     text-align: left;
 }
 
 .article th {
-    color: var(--accent);
-    font-weight: normal;
+    background: var(--blood-dark);
+    color: var(--blood);
+    font-weight: 400;
 }
+
+
 
 /* ── code ──────────────────────────────────────────────────────────── */
 

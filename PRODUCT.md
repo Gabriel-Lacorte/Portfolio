@@ -22,6 +22,16 @@ lacorte.city is Gabriel Lacorte's systems-engineering notebook — hypervisors, 
 
 First person, dry, allergic to posturing (no proficiency bars, no "passionate about" copy). The site presents as a terminal session — every section is the output of a command he would actually run — but a human is visibly behind the prompt: a changelog in the first person, floating windows you can close and drag, 88×31 buttons free to hotlink. Warmth over polish. Document, not dashboard.
 
+## References
+
+Filed 2026-07-31 from a 16-screenshot drop. Five lanes, each with the specific thing it carries — and what it does not license:
+
+- **The 1-bit information machine** — INTDEV's roster page, the fictional NETLINK (1983) profile screen, U.S. Graphics' CMX-7500 instrument panels: framed monospace panels, dotted-leader tables (`host.......`), box-drawing, `[••--]` meters. The closest lane to this site; the status/lab windows already speak it. Licenses: instrument-grade density inside windows and ASCII figures.
+- **Engraved ink** — woodcut frames and sun/moon engravings on black (the knight-and-dragon border; iRead). The manifesto's own sentence made visual: engravings work because they are line work, not tone. Licenses: any future masthead or section art is drawn line work — an ASCII logotype, an engraved border — never a dither of a photograph.
+- **Desktop chrome as a place** — KMFDM's Win95 collage, the Windows 3.1 poster, the desktop-collage CV, the XP-chrome profile page: title bars, taskbars, message boxes as a stage someone lives on. The floating windows' lineage; furniture stays monochrome, hairline, square.
+- **The personal web, inhabited** — miserabledolly, 3proutspace, 8bitpeoples, Dark Culture Magazine: guestbooks, update logs, 88×31 walls, webrings. Licenses: more warmth-over-polish features. Does NOT license: their multi-column link-hub layouts (this page stays one column) or collage chaos.
+- **The résumé as artifact** — the two designed CVs (typographic black-on-white; print-zine duotone): a curriculum treated as a printable object. If a /cv page ever exists, it is typeset in this register. Does NOT license: their skill meters and plus-scales — self-assessed proficiency stays banned.
+
 ## Anti-references
 
 Largely codified in the manifesto atop `src/styles/global.css`; kept here deliberately:
