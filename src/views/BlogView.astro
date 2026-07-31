@@ -12,68 +12,170 @@ const t = useTranslations(locale);
 const posts = await postsFor(locale);
 const totalWords = posts.reduce((sum, p) => sum + countWords(p.body), 0);
 const years = [...new Set(posts.map((p) => p.data.date.getUTCFullYear()))].sort(
-  (a, b) => b - a,
+    (a, b) => b - a,
 );
 
 const br = (d: Date) =>
-  d.toLocaleDateString("en-CA", { timeZone: "UTC" }).split("-").reverse().join("/");
+    d
+        .toLocaleDateString("en-CA", { timeZone: "UTC" })
+        .split("-")
+        .reverse()
+        .join("/");
 ---
 
-<Layout locale={locale} title={t("meta.blogTitle")} description={t("meta.blogDescription")}>
-  <h1 class="sr-only">{t("meta.blogTitle")}</h1>
+<Layout
+    locale={locale}
+    title={t("meta.blogTitle")}
+    description={t("meta.blogDescription")}
+>
+    <Cmd
+        run="ls -la"
+        arg="~/writing"
+        icon="note"
+        as="h1"
+        aside={`${posts.length} ${t("unit.posts")} · ${compact(totalWords)} ${t("unit.words")}`}
+    />
+    <div class="out">
+        <p>{t("meta.blogDescription")}</p>
+    </div>
 
-  <Cmd
-    run="ls -la"
-    arg="~/writing"
-    icon="note"
-    aside={`${posts.length} ${t("unit.posts")} · ${compact(totalWords)} ${t("unit.words")}`}
-  />
-  <div class="out">
-    <p>{t("meta.blogDescription")}</p>
-  </div>
+    {
+        years.map((year) => (
+            <>
+                <Cmd run="cd" arg={`~/writing/${year}`} icon="disk" />
+                <div class="out">
+                    {/* One entry per post. These used to be two separate
+                        lists — every title, then every description — which
+                        left the descriptions orphaned from the posts they
+                        belong to. */}
+                    <ol class="listing">
+                        {posts
+                            .filter(
+                                (p) => p.data.date.getUTCFullYear() === year,
+                            )
+                            .map((post) => (
+                                <li>
+                                    <a
+                                        class="head"
+                                        href={localised(
+                                            `/blog/${post.data.translationKey}`,
+                                            locale,
+                                        )}
+                                    >
+                                        <time
+                                            class="when"
+                                            datetime={post.data.date
+                                                .toISOString()
+                                                .slice(0, 10)}
+                                        >
+                                            {br(post.data.date)}
+                                        </time>
+                                        <span class="title">
+                                            {post.data.title}
+                                        </span>
+                                        <span class="len">
+                                            {readingTime(post.body)} min
+                                        </span>
+                                    </a>
+                                    <p class="desc">{post.data.description}</p>
+                                    {post.data.tags.length > 0 && (
+                                        <p class="tags">
+                                            {post.data.tags.map((tag) => (
+                                                <span class="tag">{tag}</span>
+                                            ))}
+                                        </p>
+                                    )}
+                                </li>
+                            ))}
+                    </ol>
+                </div>
+            </>
+        ))
+    }
 
-  {
-    years.map((year) => (
-      <>
-        <Cmd run="cd" arg={`~/writing/${year}`} icon="disk" />
-        <div class="out">
-          <ul class="rows">
-            {posts
-              .filter((p) => p.data.date.getUTCFullYear() === year)
-              .map((post) => (
-                <li>
-                  <span class="when">{br(post.data.date)}</span>
-                  <a href={localised(`/blog/${post.data.translationKey}`, locale)}>
-                    {post.data.title}
-                  </a>
-                  <span class="len">{readingTime(post.body)} min</span>
-                </li>
-              ))}
-          </ul>
-          <ul class="plain">
-            {posts
-              .filter((p) => p.data.date.getUTCFullYear() === year)
-              .map((post) => (
-                <li class="desc">
-                  <span class="comment">
-                    {post.data.description}
-                    {post.data.tags.length > 0 && <> · {post.data.tags.join(", ")}</>}
-                  </span>
-                </li>
-              ))}
-          </ul>
-        </div>
-      </>
-    ))
-  }
-
-  <p><br /></p>
+    <p><br /></p>
 </Layout>
 
 <style>
-  /* The descriptions belong to the rows above them, so they read as a
-     second column of the same listing rather than a separate list. */
-  .desc {
-    padding: 1px 0;
-  }
+    .listing {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .listing > li + li {
+        margin-top: 14px;
+    }
+
+    .listing > li::before {
+        content: none;
+    }
+
+    /* The date column is fixed so titles line up and the detail beneath
+       hangs off the same edge, the way a real listing reads. */
+    .head {
+        display: grid;
+        grid-template-columns: 11ch minmax(0, 1fr) auto;
+        gap: 0 12px;
+        align-items: baseline;
+        text-decoration: none;
+    }
+
+    .head .when,
+    .head .len {
+        color: var(--comment);
+    }
+
+    .head .title {
+        color: var(--base);
+        text-decoration: underline;
+    }
+
+    /* Only the title inverts on hover; lighting the whole grid row up
+       swallowed the date and the reading time with it. */
+    .head:hover {
+        background: none;
+        color: inherit;
+    }
+
+    .head:hover .title {
+        color: var(--bg);
+        background: var(--blood);
+        text-decoration: none;
+    }
+
+    .desc,
+    .tags {
+        margin: 2px 0 0;
+        padding-left: calc(11ch + 12px);
+        color: var(--comment);
+    }
+
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+    }
+
+    .tag {
+        padding: 0 5px;
+        border: var(--hair);
+        color: var(--blood);
+        font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+        .head {
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        .head .when {
+            grid-column: 1 / -1;
+        }
+
+        .desc,
+        .tags {
+            padding-left: 0;
+        }
+    }
 </style>
