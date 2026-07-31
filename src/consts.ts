@@ -54,43 +54,83 @@ export const PROJECTS_META: Metadata = {
 export const STACK_GROUPS: StackGroup[] = [
     {
         GROUP: "languages",
-        ITEMS: ["C", "C++", "Go", "Python", "JavaScript", "SQL", "Bash"],
+        ITEMS: ["C", "C++", "Rust", "x86 assembly", "Go", "Python", "Lua", "SQL", "Bash"],
     },
     {
         GROUP: "systems",
-        ITEMS: ["Linux", "syscalls", "ELF", "KVM / VMX", "paging", "ESXi"],
+        ITEMS: ["Linux", "Windows kernel", "syscalls", "ELF", "KVM / VMX", "paging", "ESXi"],
     },
     {
-        GROUP: "backend",
-        ITEMS: ["Flask", "FastAPI", "Gin", "Node.js", "Express", "PostgreSQL", "Prisma"],
-    },
-    {
-        GROUP: "infrastructure",
-        ITEMS: ["Docker", "nginx", "Cloudflare", "CI/CD", "git", "self-hosting"],
+        GROUP: "debugging",
+        ITEMS: ["WinDbg", "LiveKD", "CDB", "VMware", "PowerShell"],
     },
     {
         GROUP: "security",
-        ITEMS: ["Active Directory", "Kerberos", "reverse engineering", "malware analysis", "Yara"],
+        ITEMS: [
+            "driver exploitation",
+            "side channels",
+            "CVE research",
+            "reverse engineering",
+            "malware analysis",
+            "Active Directory",
+            "Kerberos",
+        ],
+    },
+    {
+        GROUP: "backend",
+        ITEMS: ["Flask", "FastAPI", "Gin", "Node.js", "PostgreSQL", "Docker", "nginx"],
     },
 ];
 
-/* TODO(gabriel): review — carried over from lacorte.neocities.org and the
-   home-server post. Add, drop, or rewrite as you like. */
+/* Newest and heaviest first: the home page shows the top of this list,
+   /projects shows all of it. Summaries and stacks are taken from the
+   repositories themselves, not from memory — check them against the
+   READMEs when you push something that changes what a project is.
+
+   TODO(gabriel): the two 2024 web projects that used to head this list
+   (notio, license-manager) are gone. They were the Neocities-era entries
+   and they read as a different engineer's portfolio next to the driver
+   work. Say the word and they come back at the bottom. */
 export const PROJECTS: Project[] = [
     {
-        NAME: "notio",
-        SUMMARY: "API for fast note sharing — create a note, hand over a link.",
-        STACK: ["Node.js", "Express", "PostgreSQL", "Prisma", "Docker"],
-        HREF: "https://github.com/Gabriel-Lacorte/Notio",
-        YEAR: "2024",
+        NAME: "prefetch-bleed",
+        SUMMARY:
+            "Breaks Windows KASLR through the prefetch side-channel — times PREFETCHNTA against kernel addresses to find where the image actually landed.",
+        STACK: ["C++", "x86 assembly", "CMake"],
+        HREF: "https://github.com/Gabriel-Lacorte/prefetch-bleed",
+        YEAR: "2026",
     },
     {
-        NAME: "license-manager",
+        NAME: "CVE-2025-7771",
         SUMMARY:
-            "Issues and validates software licence keys over a documented REST API.",
-        STACK: ["Python", "Flask", "SQLite", "REST", "Swagger"],
-        HREF: "https://github.com/Gabriel-Lacorte/LicenseManager",
-        YEAR: "2024",
+            "Arbitrary kernel function call through the ThrottleStop driver — a signed driver that hands its IOCTL interface to anything that asks.",
+        STACK: ["C++", "Windows kernel", "IOCTL"],
+        HREF: "https://github.com/Gabriel-Lacorte/CVE-2025-7771",
+        YEAR: "2025",
+    },
+    {
+        NAME: "scrypt",
+        SUMMARY:
+            "Protocol analysis framework: a Rust core for dissecting traffic, scripted in Lua so a new protocol is a script rather than a rebuild.",
+        STACK: ["Rust", "Lua", "Just"],
+        HREF: "https://github.com/Gabriel-Lacorte/scrypt",
+        YEAR: "2026",
+    },
+    {
+        NAME: "winvm-mcp",
+        SUMMARY:
+            "Puts a VMware Windows VM behind an MCP server, so a model can drive WinDbg, LiveKD and CDB and read a kernel back for itself.",
+        STACK: ["Python", "PowerShell", "WinDbg", "MCP"],
+        HREF: "https://github.com/Gabriel-Lacorte/winvm-mcp",
+        YEAR: "2026",
+    },
+    {
+        NAME: "CVE-2026-36670",
+        SUMMARY:
+            "Time-based blind SQL injection in the OpenSIPS Control Panel. First CVE.",
+        STACK: ["SQL injection", "OpenSIPS"],
+        HREF: "https://github.com/Gabriel-Lacorte/CVE-2026-36670",
+        YEAR: "2026",
     },
     {
         NAME: "homelab",
@@ -102,18 +142,26 @@ export const PROJECTS: Project[] = [
     },
 ];
 
-/* TODO(gabriel): scaffold — swap in your real setup. The em-dashes are
-   placeholders and render muted, so the gaps stay obvious. */
+/* A row set to "—" renders as "(unset)", which is a fine marker while
+   you are filling this in and a bad thing to publish. So rows I had no
+   evidence for are absent rather than blank — terminal and multiplexer
+   were two of them.
+
+   TODO(gabriel): check these. They were read off the machine, not told
+   to me: Debian 13 and the CPU/RAM/GPU from /proc and lspci, VS Code
+   from ~/.config/Code, bash from your login shell and a 135-line
+   .bashrc. There is also a ~/.config/fish, so the shell line is the one
+   most likely to be wrong. */
 export const USES: UsesGroup[] = [
     {
         GROUP: "workstation",
         ROWS: [
-            { k: "editor", v: "—" },
-            { k: "shell", v: "—" },
-            { k: "terminal", v: "—" },
-            { k: "multiplexer", v: "—" },
-            { k: "machine", v: "—" },
-            { k: "os", v: "—" },
+            { k: "os", v: "Debian 13 · trixie" },
+            { k: "editor", v: "VS Code" },
+            { k: "shell", v: "bash" },
+            { k: "cpu", v: "Intel i5-9400F · 6 cores" },
+            { k: "memory", v: "16GB" },
+            { k: "gpu", v: "GeForce GTX 1650" },
         ],
     },
     {
@@ -131,7 +179,7 @@ export const USES: UsesGroup[] = [
             { k: "framework", v: "Astro · static" },
             { k: "type", v: "Iosevka · Departure Mono" },
             { k: "licence", v: "SIL OFL 1.1" },
-            { k: "hosting", v: "—" },
+            { k: "hosting", v: "Vercel · static" },
         ],
     },
 ];
@@ -181,12 +229,12 @@ export const LAB: LabBox[] = [
     },
 ];
 
-/* TODO(gabriel): this is the one part I cannot invent for you — put the
-   books and papers you are actually on. */
+/* One real entry beats three, two of which said "add yours" on the live
+   site. Add rows as you actually pick things up.
+
+   TODO(gabriel): this is the one part I cannot invent for you. */
 export const READING: ReadingItem[] = [
     { TITLE: "Intel SDM, vol. 3", NOTE: "VMX chapters, slowly", STATE: "now" },
-    { TITLE: "—", NOTE: "add yours", STATE: "queued" },
-    { TITLE: "—", NOTE: "add yours", STATE: "queued" },
 ];
 
 /* TODO(gabriel): a /now page is only worth having if it is current.

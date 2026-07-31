@@ -222,8 +222,16 @@ button {
     margin-inline: auto;
 }
 
-body.has-windows {
+/* The padding exists for the fixed taskbar, and the taskbar exists only
+   once scripting has proven itself — same gate as the theme switch. */
+html.js body.has-windows {
     padding-bottom: 56px;
+}
+
+/* Every view used to end with a <p><br /></p> spacer; the margin belongs
+   to the page, not the content. */
+main {
+    padding-bottom: 26px;
 }
 
 .skip {
@@ -279,9 +287,15 @@ header.site {
     margin-left: 10px;
 }
 
+/* inline-block + padding lifts the tap target past 24px without touching
+   the type; nowrap keeps "[ uses ]" from snapping between bracket and
+   word on a phone. */
 .menu a {
+    display: inline-block;
+    padding: 3px 0;
     color: var(--base);
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .menu a[aria-current="page"],
@@ -321,7 +335,7 @@ html.js .menu .mode {
 }
 
 .menu .mode button {
-    padding: 0;
+    padding: 3px 0;
     border: 0;
     background: transparent;
     color: var(--comment);
@@ -429,6 +443,12 @@ html.light .menu .mode button[data-theme-set="light"],
     border-left: var(--hair);
 }
 
+/* A paragraph at full column width runs ~129 mono characters; nobody
+   reads that. Lists and rows keep the column — prose gets a measure. */
+.out p {
+    max-width: 80ch;
+}
+
 /* ── the inverted section chip ─────────────────────────────────────── */
 
 /* The chip carries the section break, so it needs the space a heading
@@ -461,15 +481,16 @@ p:has(> .titulo) {
     color: var(--amber);
 }
 
-.purple {
+.blood {
     color: var(--accent);
 }
 
+/* No underline: that affordance belongs to anchors alone. Emphasis is
+   the ink, not the line. */
 strong,
 b {
     color: var(--accent);
     font-weight: normal;
-    text-decoration: underline;
 }
 
 /* ── lists get a dash, the way the reference does ──────────────────── */
@@ -478,6 +499,15 @@ main ul:not(.plain) {
     list-style: none;
     padding-left: 0;
     margin-bottom: 15px;
+}
+
+/* Hanging indent, so a line that wraps sits under the text and not back
+   under the dash. The two values are the same distance in opposite
+   directions — the dash is 1ch and the gap after it is 9px — so the
+   marker hangs out into the padding and everything else lines up. */
+main ul:not(.plain):not(.rows) > li {
+    padding-left: calc(1ch + 9px);
+    text-indent: calc(-1ch - 9px);
 }
 
 main ul:not(.plain) > li::before {
@@ -492,17 +522,17 @@ ul.plain {
 
 /* ── boxes: name, role, state ──────────────────────────────────────── */
 
+/* This used to carry `.boxes > li::before { content: none }`, which never
+   once took effect: at (0,1,2) it loses to the dash rule above at (0,1,4),
+   so the lab list has always been dashed like every other list on the
+   page — and reads better for it. The rule is gone rather than
+   strengthened, and these items take the hanging indent with the rest. */
 .boxes > li {
     padding: 2px 0;
 }
 
-.boxes > li::before {
-    content: none;
-}
-
 .boxes .bname {
     color: var(--accent);
-    text-decoration: underline;
 }
 
 .boxes .state[data-s="up"] {
@@ -605,9 +635,11 @@ main ul.rows > li::before {
     cursor: pointer;
 }
 
-.window__controls button:hover {
+.window__controls button:hover,
+.window__controls button:focus-visible {
     color: var(--bg);
     background: var(--base);
+    outline: none;
 }
 
 .window__body {
@@ -626,11 +658,17 @@ main ul.rows > li::before {
     right: 0;
     bottom: 0;
     z-index: 40;
-    display: flex;
+    /* Two buttons that only script can serve have no business rendering
+       without it — the Scripting-Off Rule, same as the theme switch. */
+    display: none;
     gap: 6px;
     padding: 6px 10px;
     border-top: 1px solid var(--win-edge);
     background: var(--win-bar);
+}
+
+html.js .taskbar {
+    display: flex;
 }
 
 .taskbar button {
@@ -643,9 +681,11 @@ main ul.rows > li::before {
 }
 
 .taskbar button[aria-pressed="true"],
-.taskbar button:hover {
+.taskbar button:hover,
+.taskbar button:focus-visible {
     color: var(--bg);
     background: var(--base);
+    outline: none;
 }
 
 /* ── footer ────────────────────────────────────────────────────────── */
@@ -1013,6 +1053,7 @@ html.light {
     }
 
     .taskbar,
+    .window,
     .no-print {
         display: none !important;
     }

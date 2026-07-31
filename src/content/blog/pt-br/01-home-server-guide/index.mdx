@@ -10,7 +10,7 @@ import Figure from "@components/ascii/Figure.astro";
 
 Neste post vou cobrir os passos necessários para montar e configurar seu próprio home server, incluindo dicas de escolha de hardware, instalação do sistema operacional, configuração de aplicações e como expor o servidor para a internet.
 
-## Escolhendo as peças do servidor 🌟
+## Escolhendo as peças do servidor
 
 Montar um home server pode ser feito de várias formas, dependendo do que você tem à disposição. Dá para reaproveitar peças ou computadores antigos, ou investir em peças novas. No meu caso usei dois computadores velhos, combinando os dois em um só. Não é a solução ideal, mas funciona bem para o que preciso.
 
@@ -18,9 +18,9 @@ Se você quer algo mais profissional ou não tem hardware antigo para reaproveit
 
 Quanto ao armazenamento, a escolha depende do que você pretende fazer. Se planeja hospedar arquivos ou montar um NAS, um SSD é essencial. Já para hospedar sites e coisas do tipo, um HD de 500GB basta.
 
-## Instalando e configurando o sistema operacional 💻
+## Instalando e configurando o sistema operacional
 
-Neste guia vamos usar o Debian 12 netinstall como sistema operacional ([baixar ISO](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso)), por ser leve, seguro e estável. A escolha pode variar conforme sua preferência: para quem está começando em self-hosting, recomendo o Debian; fora isso, opções como Ubuntu Server ou Fedora também servem. Para um NAS, o TrueNAS é altamente recomendado.
+Neste guia vamos usar o Debian 12 netinstall como sistema operacional ([baixar ISO](https://www.debian.org/distrib/netinst)), por ser leve, seguro e estável. A escolha pode variar conforme sua preferência: para quem está começando em self-hosting, recomendo o Debian; fora isso, opções como Ubuntu Server ou Fedora também servem. Para um NAS, o TrueNAS é altamente recomendado.
 
 O sistema não precisa — e não deve — ter interface gráfica, já que só será acessado por SSH. Durante a instalação, marque a opção de instalar o servidor SSH. Terminada a instalação, você acessa o sistema assim:
 
@@ -143,7 +143,7 @@ Se tudo foi configurado corretamente, você está pronto para continuar.
 
 ---
 
-## Instalando e configurando as primeiras aplicações 🔨
+## Instalando e configurando as primeiras aplicações
 
 Neste post vamos usar Docker e Docker Compose para instalar e configurar as aplicações — o que é altamente recomendado. Se você não tem experiência com Docker, é uma boa hora para estudar um pouco. Vamos começar instalando o Docker:
 
@@ -154,16 +154,16 @@ sudo apt install docker.io docker-compose
 Gosto de organizar minhas aplicações em pastas dentro da home e usar essas pastas como volumes no Docker. Você pode organizar do jeito que preferir, mas vou mostrar como costumo fazer:
 
 ```plaintext
-📁 .
-├── 📁 app1
-│   ├── 📄 docker-compose.yml
-│   └── 📁 app1_data
-├── 📁 app2
-│   ├── 📄 docker-compose.yml
-│   └── 📁 app2_data
-└── 📁 app3
-    ├── 📄 docker-compose.yml
-    └── 📁 app3_data
+.
+├── app1/
+│   ├── docker-compose.yml
+│   └── app1_data/
+├── app2/
+│   ├── docker-compose.yml
+│   └── app2_data/
+└── app3/
+    ├── docker-compose.yml
+    └── app3_data/
 ```
 
 Outra dica é usar portas web na faixa 800x (8001, 8002, 8003 e assim por diante) para manter as coisas organizadas.
@@ -172,8 +172,8 @@ Agora vamos hospedar a primeira aplicação. Começando por um servidor web com 
 
 ```plaintext
 .
-└── 📁 www
-    └── 📄 docker-compose.yml
+└── www/
+    └── docker-compose.yml
 ```
 
 Dentro do docker-compose.yml você define o serviço do Apache2 assim:
@@ -222,11 +222,11 @@ Por exemplo, se você criou a estrutura de pastas assim:
 
 ```plaintext
 .
-└── 📁 www
-    ├── 📁 meu_site
-    │   └── 📄 index.html
-    ├── 📄 httpd.conf
-    └── 📄 docker-compose.yml
+└── www/
+    ├── meu_site/
+    │   └── index.html
+    ├── httpd.conf
+    └── docker-compose.yml
 ```
 
 Você deve trocar `<PASTA_DO_SEU_SITE>` por "meu_site".
@@ -257,7 +257,7 @@ Listen 8002
 
 ---
 
-## Expondo o servidor para a internet 🌐
+## Expondo o servidor para a internet
 
 Agora que você tem um servidor web no ar, seria interessante deixar seu site acessível para outras pessoas, ou até colocar um domínio nele. Muita gente tem dificuldade nessa parte, porque um home server geralmente não tem IP público fixo e também não tem proteção contra ataques DDoS. Para resolver isso vamos usar o Cloudflare Tunnel.
 
@@ -324,11 +324,11 @@ Você pode adicionar quantos túneis quiser, para quantos sites e portas precisa
 
 ---
 
-## Algumas aplicações para instalar 📦
+## Algumas aplicações para instalar
 
 Agora que você já aprendeu quase tudo, vamos instalar algumas aplicações úteis e legais no servidor. Aqui vão algumas sugestões do que dá para hospedar por conta própria.
 
-### Gerenciador de senhas: Vaultwarden 🔑
+### Gerenciador de senhas: Vaultwarden
 
 Um gerenciador de senhas é ferramenta essencial para manter suas senhas seguras. Hospedar o seu próprio, como o VaultWarden (uma versão modificada do BitWarden), é uma opção segura e confiável. Primeiro crie uma pasta chamada "vault" na sua home e adicione o docker-compose.yml a seguir:
 
@@ -354,7 +354,7 @@ sudo docker-compose up -d
 
 Você acessa seu gerenciador de senhas em [http://localhost:8002](http://localhost:8002). Para criar uma conta, é preciso acessar o site com SSL — o que dá para fazer via Cloudflared, que adiciona automaticamente, ou consultando a documentação do VaultWarden sobre como adicionar um certificado. Criada a conta, você já pode gerenciar suas senhas.
 
-### Motor de busca: SearxNG 🔍
+### Motor de busca: SearxNG
 
 Ter um motor de busca privado e seguro hospedado por você mesmo é uma excelente adição ao home server. Dá para usar o SearxNG. Crie uma pasta na home chamada "searxng" e adicione o docker-compose.yml a seguir:
 

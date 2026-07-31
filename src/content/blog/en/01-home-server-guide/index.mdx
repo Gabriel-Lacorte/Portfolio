@@ -10,7 +10,7 @@ import Figure from "@components/ascii/Figure.astro";
 
 Hello, in this post, I'm going to cover the steps needed to set up and configure your own home server, including tips on choosing hardware, installing the operating system, configuring applications, and exposing the server to the Internet.
 
-## Choosing the parts for your server 🌟
+## Choosing the parts for your server
 
 Setting up a home server can be done in various ways, depending on what you have at your disposal. You can choose to reuse old parts or old computers, or invest in new parts. In my case, I used two old computers, combining them into one. Although it's not the ideal solution, it works well for my purposes.
 
@@ -18,9 +18,9 @@ If you're looking for a more professional solution or don't have old hardware to
 
 As for storage, the choice depends on what you intend to do with the server. If you plan to host files or set up a NAS, an SSD is essential. However, for hosting websites, etc., a 500GB hard drive is sufficient.
 
-## Installing the operating system and configuring 💻
+## Installing the operating system and configuring
 
-In this guide, we will use Debian 12 netinstall as the operating system [Download ISO](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso), as it is lightweight, secure, and stable. However, the choice of operating system may vary according to your preferences. For self-hosting beginners, I recommend using Debian. Otherwise, other options such as Ubuntu Server or Fedora can be considered. For a NAS, TrueNAS is highly recommended.
+In this guide, we will use Debian 12 netinstall as the operating system [Download ISO](https://www.debian.org/distrib/netinst), as it is lightweight, secure, and stable. However, the choice of operating system may vary according to your preferences. For self-hosting beginners, I recommend using Debian. Otherwise, other options such as Ubuntu Server or Fedora can be considered. For a NAS, TrueNAS is highly recommended.
 
 The operating system does not need and should not have a graphical interface, as it will only be accessed via SSH. During installation, be sure to check the option to install an SSH server. Once the installation is complete, you can access the system as follows:
 
@@ -143,7 +143,7 @@ If everything is set up correctly, you're ready to continue configuring your ser
 
 ---
 
-## Installing and configuring the first applications 🔨
+## Installing and configuring the first applications
 
 In this post, we're going to use Docker and Docker Compose to install and configure our applications, which is highly recommended. If you don't have any experience with Docker, it's time to study up a bit. Let's start by installing Docker:
 
@@ -154,16 +154,16 @@ sudo apt install docker.io docker-compose
 I like to organize my applications in folders in my home and use these folders as volumes in Docker. You can organize them any way you like, but I'll show you how I usually do it:
 
 ```plaintext
-📁 .
-├── 📁 app1
-│   ├── 📄 docker-compose.yml
-│   └── 📁 app1_data
-├── 📁 app2
-│   ├── 📄 docker-compose.yml
-│   └── 📁 app2_data
-└── 📁 app3
-    ├── 📄 docker-compose.yml
-    └── 📁 app3_data
+.
+├── app1/
+│   ├── docker-compose.yml
+│   └── app1_data/
+├── app2/
+│   ├── docker-compose.yml
+│   └── app2_data/
+└── app3/
+    ├── docker-compose.yml
+    └── app3_data/
 ```
 
 Another tip is to use web ports in the 800x range (e.g. 8001, 8002, 8003, etc.) to keep things organized.
@@ -172,8 +172,8 @@ Now, let's host our first application. Let's start with a web server using Apach
 
 ```plaintext
 .
-└── 📁 www
-    └── 📄 docker-compose.yml
+└── www/
+    └── docker-compose.yml
 ```
 
 Within the docker-compose.yml file, you can define the Apache2 service as follows:
@@ -222,11 +222,11 @@ For example, if you created the folder structure as follows:
 
 ```plaintext
 .
-└── 📁 www
-    ├── 📁 my_website
-    │   └── 📄 index.html
-    ├── 📄 httpd.conf
-    └── 📄 docker-compose.yml
+└── www/
+    ├── my_website/
+    │   └── index.html
+    ├── httpd.conf
+    └── docker-compose.yml
 ```
 
 You should replace `<YOUR_WEBSITE_FOLDER>` with "my_website".
@@ -257,7 +257,7 @@ Listen 8002
 
 ---
 
-## Exposing the server to the internet 🌐
+## Exposing the server to the internet
 
 Now that you have a web server up and running, it would be interesting to be able to make your site available for other people to access or even add a domain to it. However, many people have difficulties with this process, as a home server generally doesn't have a static public IP and also has no protection against DDoS attacks. To solve this, we're going to use Cloudflare Tunnel, part of Cloudflare.
 
@@ -324,11 +324,11 @@ You can add as many tunnels as you like, for as many sites and ports as you need
 
 ---
 
-## Some applications to install 📦
+## Some applications to install
 
 Now that you've learned almost everything, let's install some useful and cool applications on your server. Here are some suggestions for applications that you can host on your own server.
 
-### Password manager: Vaultwarden 🔑
+### Password manager: Vaultwarden
 
 A password manager is an essential tool for keeping your passwords safe. Hosting your own password manager, such as VaultWarden (a modified version of BitWarden), is a safe and reliable option. First, create a folder called "vault" in your home and add the following docker-compose.yml:
 
@@ -354,7 +354,7 @@ sudo docker-compose up -d
 
 You can access your password manager at [http://localhost:8002](http://localhost:8002). To create an account, make sure you use the site with SSL, which can be done using Cloudflared to add it automatically, or consult the VaultWarden documentation on how to add an SSL certificate. Once you have created your account, you can easily manage your passwords.
 
-### Search Engine: SearxNG 🔍
+### Search Engine: SearxNG
 
 Having a secure, private search engine that you host yourself is an excellent addition to your home server. You can use SearxNG for this. Create a folder in your home called "searxng" and add the following docker-compose.yml:
 

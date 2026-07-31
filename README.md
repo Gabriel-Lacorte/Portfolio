@@ -173,11 +173,43 @@ metrics and misalign every diagram.
 
 ---
 
+## Checking links
+
+```sh
+npm run build
+node scripts/check-links.mjs             # internal only, offline
+node scripts/check-links.mjs --external  # also hits the network
+```
+
+Exits non-zero on the first broken link, so it drops into CI as-is.
+Internal links resolve against the files the build actually wrote, and
+the site's own canonical URLs count as internal — fetching those checks
+what is *deployed*, which on an unmerged branch is a different site.
+
+It exists because a link rotted in public: the home-server post pointed
+at `debian-12.5.0-amd64-netinst.iso` inside `current/`, and `current`
+had become Debian 13. **Do not pin a filename inside a directory that
+moves** — link the project's download page instead.
+
+---
+
 ## Still to fill in
 
-`src/consts.ts` has `TODO(gabriel)` on the parts only you can write:
-`USES` (editor, shell, terminal, machine), `READING`, and `PROJECTS`,
-which still lists what was on the old Neocities site.
+`src/consts.ts` has `TODO(gabriel)` on the parts that need your word:
+
+- **`USES`** — the workstation rows were read off the machine (Debian 13
+  and the CPU/RAM/GPU from `/proc` and `lspci`, VS Code from
+  `~/.config/Code`, bash from your login shell). Check them. There is
+  also a `~/.config/fish`, so the shell row is the likeliest to be wrong.
+- **`PROJECTS`** — now the GitHub repositories, newest first. The two
+  2024 web projects, notio and license-manager, were dropped rather than
+  kept at the bottom.
+- **`READING`** — one real entry. It used to carry two rows that said
+  "add yours" on the live site.
+
+A row set to `"—"` renders as `(unset)`, which is a useful marker while
+you fill something in and a bad thing to publish. Prefer leaving the row
+out.
 
 ---
 

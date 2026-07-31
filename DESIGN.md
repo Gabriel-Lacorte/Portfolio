@@ -119,7 +119,7 @@ This system explicitly rejects, in PRODUCT.md's words: **dashboard chrome** ("gr
 A two-ink page — bone on red-black ink — cut by one signature: blood. Blood is the voice, not a rare accent; green and amber stay margin marks with fixed meanings.
 
 ### Primary
-- **Blood** (#ff4d5c lit / #a8071a printed): the signature. Emphasis marks, command arguments, article links and the `##` heading marks, window titles, `[new]`. 6.23:1 on ink — the only member of the blood triad that may carry text. `--accent` and `--red` both alias it: identity, emphasis, and danger deliberately share one ink.
+- **Blood** (#ff4d5c lit / #a8071a printed): the signature. Emphasis marks, command arguments, article links and the `##` heading marks, window titles, `[new]`. 6.23:1 on ink — the only member of the blood triad that may carry text. `--accent` and `--red` both alias it: identity, emphasis, and danger deliberately share one ink. **Emphasis is the ink alone — never underlined**; see the Underline Rule.
 - **Blood deep** (#a30f1e lit / #d9394a printed): fills, the quote rail, the window edge. Never text.
 - **Blood dark** (#1f0509 lit / #f7e7e5 printed): the code-block and table-header ground — picked so all seven syntax colours pass against it, not just against the page. Never text.
 
@@ -143,6 +143,8 @@ A two-ink page — bone on red-black ink — cut by one signature: blood. Blood 
 **The One-Hand Rule.** Green and amber appear a handful of times per page, always with their fixed meaning — green OK, amber warn. Blood is exempt: it is the signature, not an accent.
 
 **The Silent Hairline Rule.** `--rule` draws lines only. It never, under any circumstance, carries text.
+
+**The Underline Rule.** Underline means "this navigates" and nothing else. Anchors carry it; `strong`/`b`, box names, and reading titles are blood without it. A reader who clicks an emphasis word once has been lied to.
 
 ## 3. Typography
 
@@ -188,8 +190,8 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - **Rule:** it stays the only drawing in the chrome. A second one demotes both.
 
 ### Navigation
-- **Style:** hairline above and below, links pushed right (left-aligned under 700px), each label bracketed: `[ ~/ ] [ blog ] [ projects ]`.
-- **States:** `aria-current="page"` and hover both render full reverse video. The language switch (`EN / PT`) sits after them in comment color.
+- **Style:** hairline above and below, links pushed right (left-aligned under 700px), each label bracketed: `[ ~/ ] [ blog ] [ projects ]`. Every control is `white-space: nowrap` with 3px block padding — a bracket must never orphan from its word, and the target clears 24px.
+- **States:** `aria-current="page"` and hover both render full reverse video. The language switch (`EN / PT`) and theme switch (`crt / paper`) sit after them in comment color.
 
 ### Buttons
 - **Shape:** square, 1px border in `{colors.rule}` (window controls, taskbar) or borderless strips (code-copy).
@@ -198,9 +200,10 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - **Code-copy:** lives in the code-bar strip that names the block's language (12px tracked uppercase on the window-bar ground); hairline-bordered, hover floods blood; its label is its state ("copy" → "copied"/"failed").
 
 ### Chips
-- **Inverted chip** (`.titulo`): bone background, ink text, underlined, weight 400 — how the chrome shouts without getting bigger. (The article no longer uses chips; its headings carry `## ` marks in blood instead.)
+- **Inverted chip** (`.titulo`): bone background, ink text, weight 400 — how the chrome shouts without getting bigger. Currently unused in markup (the article carries `## ` marks in blood instead); kept as a system primitive, not a live component.
 
 ### Cards / Containers
+- **A window must earn its glass.** It shows only what the page does not: `status` carries build, timestamp, and engine (the counts live in the `ls` aside); `lab` carries the network posture and a link to the writeup (the boxes are listed by the `systemctl` section). A window that repeats the section beside it is decoration wearing an instrument's label — the exact thing the manifesto bans.
 - **The floating window is the only card the system tolerates.** 1px frame in window-line (#7a2b33): title bar (26px min, `4px 8px`, ground #1a0a0e, blood title, hairline bottom in blood-deep), monospace `pre` body (`10px 12px`), close control. From 900px of viewport it lifts to fixed positioning up front — parked at the right edge, stacked, position remembered per id, draggable by the bar (pointer events, viewport-clamped, re-clamped on resize), reopenable from the taskbar. Below 900px, and always with scripting off, it simply sits open in the flow.
 - No other card, panel, or bordered grid exists. Do not add one.
 
@@ -224,7 +227,7 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - Classic web buttons, `image-rendering: pixelated`, centered under the footer. The site's own button is free to hotlink.
 
 ### Named Rule
-**The Scripting-Off Rule.** Every scripted behavior ships its static fallback: windows sit open in the flow, copy buttons vanish, the theme stays lit. If a proposed component cannot state its no-JS fallback, it is not in the system.
+**The Scripting-Off Rule.** Every scripted behavior ships its static fallback: windows sit open in the flow, copy buttons vanish, the theme switch and the taskbar do not render at all (both gated behind the `js` class that lands before first paint), and the body loses the padding that existed for the taskbar. A control only script can serve must not exist without it. If a proposed component cannot state its no-JS fallback, it is not in the system.
 
 ## 6. Do's and Don'ts
 
@@ -232,7 +235,8 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - **Do** head every new section with a command the operator would actually run, and indent its output 16px behind a 1px hairline.
 - **Do** use reverse video — full bone ⇄ ink swap — for every hover, focus, selection, pressed, and current state. It is instant: a cut, not a fade.
 - **Do** keep borders hairline (1px `{colors.rule}`) or absent — "borders are hairlines or nothing". The article's 2px blood-deep quote rail is the one committed exception; do not add a second.
-- **Do** keep green and amber to their fixed meanings (OK, warn) and a handful of uses per page. Blood is the signature and exempt from counting — but among its triad only `--blood` ever carries text.
+- **Do** reserve underline for anchors, and cap prose inside `.out` at 80ch — the column is for listings, not for 129-character sentences.
+- **Do** keep green and amber to their fixed meanings (OK, warn) and a handful of uses per page — including the command icons: `warn` (amber triangle) heads a warning section or nothing. Blood is the signature and exempt from counting — but among its triad only `--blood` ever carries text.
 - **Do** keep mono at even pixel sizes (the Even-Pixel Rule) and the contrast notes beside the tokens in `global.css` true.
 - **Do** ship the static fallback with every scripted enhancement, and every UI string through the i18n dictionary in both languages.
 - **Do** draw art, when a surface earns it, as line work — ASCII logotypes, box-drawn panels, engraving-style borders — never tone.
@@ -242,7 +246,8 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - **Don't** use marketing-site scale — "display headings, hero sections, CTA blocks". Nothing on the site exceeds 19px.
 - **Don't** resurrect the references' chrome: no dashed-rule signature (`--dashed` and the citations that outlived it were retired 2026-07-31), no grey-and-purple palette, no cloned layouts.
 - **Don't** pose tone as art: no 1-bit dithers of photographs or complex images. Line work (ASCII figures) or nothing.
-- **Don't** add LinkedIn smell — skill bars, newsletter popups, engagement hooks, "passionate about" copy.
+- **Don't** add LinkedIn smell — skill bars, newsletter popups, engagement hooks, "passionate about" copy. (The RSS feed is not a funnel: it is subscription on the reader's terms, and it ships per locale.)
+- **Don't** ship scaffold rows. A placeholder that reaches production ("— add yours") costs more credibility than a short list; filter them at render.
 - **Don't** introduce a third typeface, a border-radius, a box-shadow, a gradient, or an arbitrary z-index outside the fixed ladder.
 - **Don't** thicken the structural 1px left hairline into a colored side-stripe accent, and never let `--rule` carry text.
 - **Don't** animate what can cut. Reverse video snaps; the only tolerated motion is Astro's page crossfade, which `prefers-reduced-motion` already flattens.

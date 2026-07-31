@@ -14,7 +14,7 @@ The job to be done: read one post to the end, conclude "this person actually tak
 
 ## Product Purpose
 
-lacorte.city is Gabriel Lacorte's systems-engineering notebook — hypervisors, compilers, operating systems, and the protocols that hold them together — published as a bilingual (en / pt-BR) static Astro site. It exists so the work can speak for itself: writeups deep enough that a finished read IS the conversion. Success looks like a post read to the end, a bookmark, a return visit when the next one lands. There is deliberately no funnel: no newsletter, no tracking, no CTA.
+lacorte.city is Gabriel Lacorte's systems-engineering notebook — hypervisors, compilers, operating systems, and the protocols that hold them together — published as a bilingual (en / pt-BR) static Astro site. It exists so the work can speak for itself: writeups deep enough that a finished read IS the conversion. Success looks like a post read to the end, a bookmark, a return visit when the next one lands. There is deliberately no funnel: no newsletter, no tracking, no CTA. An RSS feed exists per locale as a courtesy — subscription on the reader's terms is not a funnel, it is how this audience says "keep going".
 
 ## Brand Personality
 
