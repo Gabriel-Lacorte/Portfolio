@@ -67,9 +67,8 @@ const isCurrent = (href: string) =>
                                         aria-current={
                                             isCurrent(HREF) ? "page" : undefined
                                         }
+                                        >[ {t(KEY)} ]</a
                                     >
-                                        [ {t(KEY)} ]
-                                    </a>
                                 </li>
                             ))
                         }
@@ -86,9 +85,8 @@ const isCurrent = (href: string) =>
                                                     ? "true"
                                                     : undefined
                                             }
+                                            >{LOCALE_LABEL[code]}</a
                                         >
-                                            {LOCALE_LABEL[code]}
-                                        </a>
                                     </>
                                 ))
                             }
@@ -131,9 +129,8 @@ const isCurrent = (href: string) =>
                                         href={HREF}
                                         target="_blank"
                                         rel="noopener noreferrer"
+                                        >{NAME}</a
                                     >
-                                        {NAME}
-                                    </a>
                                 </>
                             ))
                         }

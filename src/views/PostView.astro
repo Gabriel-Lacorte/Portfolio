@@ -70,9 +70,9 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
     <Cmd run="cd" arg="~/writing" icon="term" />
     <div class="out">
         <p>
-            <a href={localised("/blog", locale)}>
-                &lt;- {t("action.backToBlog")}
-            </a>
+            <a href={localised("/blog", locale)}
+                >&lt;- {t("action.backToBlog")}</a
+            >
         </p>
     </div>
 

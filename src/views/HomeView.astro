@@ -64,9 +64,9 @@ const isNew = (d: Date) =>
                 posts.map((post) => (
                     <li>
                         <span class="when">{br(post.data.date)}</span>
-                        <a href={L(`/blog/${post.data.translationKey}`)}>
-                            {post.data.title}
-                        </a>
+                        <a href={L(`/blog/${post.data.translationKey}`)}
+                            >{post.data.title}</a
+                        >
                         {isNew(post.data.date) && (
                             <span class="new">[new]</span>
                         )}
@@ -121,9 +121,8 @@ const isNew = (d: Date) =>
                                     ? project.HREF
                                     : L(project.HREF)
                             }
-                        >
-                            {project.NAME}
-                        </a>{" "}
+                            >{project.NAME}</a
+                        >{" "}
                         <span class="comment">{project.SUMMARY}</span>
                     </li>
                 ))
