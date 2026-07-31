@@ -60,9 +60,13 @@ const { alt, caption, label, bare = false } = Astro.props;
     .fig-art pre {
         margin: 0;
         color: var(--ink);
-        font-size: clamp(9.5px, 1.02vw, 13px);
-        /* Tight enough that vertical box characters join into unbroken
-           lifelines, loose enough that label text stays readable. */
+        /* Even sizes only. Iosevka advances 0.5em per cell, so an odd
+           font-size puts every character on a half pixel and the box
+           rules render with a gap between glyphs — a solid ─── run comes
+           out dashed. 14px gives a 7px advance; 10px gives 5px.
+           Line-height is tight enough that vertical rules join, loose
+           enough that label text stays readable. */
+        font-size: 14px;
         line-height: 1.2;
     }
 
@@ -70,6 +74,12 @@ const { alt, caption, label, bare = false } = Astro.props;
         margin-top: 0.6rem;
         color: var(--dim);
         font-size: 0.88em;
+    }
+
+    @media (max-width: 900px) {
+        .fig-art pre {
+            font-size: 10px;
+        }
     }
 
     .fig-label {

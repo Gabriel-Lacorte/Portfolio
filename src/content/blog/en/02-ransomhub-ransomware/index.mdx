@@ -6,6 +6,8 @@ tags: ["reverse-engineering", "malware", "esxi"]
 translationKey: "ransomhub-esxi"
 ---
 
+import Figure from "@components/ascii/Figure.astro";
+
 ## Abstract
 This report presents my detailed analysis of the main functions of the ransomware for ESXi from the RansomHub group.
 
@@ -29,6 +31,43 @@ The background execution process begins with the creation of a child process usi
 If the process creation is successful, the parent (original) process waits for the completion of the child process (where the ransomware will continue its main execution) using `waitpid()`. 
 
 In the child process, where the ransomware will execute, the `setsid()` function is used to create a new session. This decouples the process from any controlling terminal. If `setsid()` fails, the process is immediately terminated with `exit(1)`.
+
+<Figure
+  label="fig.1"
+  caption="Daemonisation: everything the locker does before it touches a single file."
+  alt="Flow diagram of the ransomware's daemonisation. The locker starts and checks whether -verbose was given; without it, it daemonises. It calls fork(); the parent goes to waitpid() and reaps the child, while the child calls setsid(), exiting with status 1 if that fails. The child then closes file descriptors 0, 1 and 2, reopens /dev/null and duplicates it over them, and only then enters the encrypt loop."
+>
+{`
+             ./locker
+                 │
+                 ▼
+    ┌─────────────────────────┐
+    │     -verbose given ?    │
+    └─────────────────────────┘
+                 │  no  →  daemonise
+                 ▼
+    ┌─────────────────────────┐
+    │          fork()         │
+    └─────────────────────────┘
+                 │  parent  →  waitpid(), reaps
+                 ▼  child
+    ┌─────────────────────────┐
+    │         setsid()        │  fail → exit(1)
+    └─────────────────────────┘
+                 ▼
+    ┌─────────────────────────┐
+    │       close(0,1,2)      │
+    └─────────────────────────┘
+                 ▼
+    ┌─────────────────────────┐
+    │open("/dev/null") + dup()│
+    └─────────────────────────┘
+                 ▼
+    ┌─────────────────────────┐
+    │       encrypt loop      │
+    └─────────────────────────┘
+`}
+</Figure>
 
 The default child process descriptors of `stdin`, `stdout`, `stderr` are also closed using `close()`. This prevents the daemon process from continuing to interact with the terminal. The closed descriptors are also redirected to `/dev/null` and duplicated with `dup()` to force any attempt to access the standard channels to be redirected to `/dev/null`.
 

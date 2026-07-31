@@ -6,6 +6,8 @@ tags: ["linux", "self-hosting", "docker"]
 translationKey: "home-server-guide"
 ---
 
+import Figure from "@components/ascii/Figure.astro";
+
 Hello, in this post, I'm going to cover the steps needed to set up and configure your own home server, including tips on choosing hardware, installing the operating system, configuring applications, and exposing the server to the Internet.
 
 ## Choosing the parts for your server 🌟
@@ -258,6 +260,37 @@ Listen 8002
 ## Exposing the server to the internet 🌐
 
 Now that you have a web server up and running, it would be interesting to be able to make your site available for other people to access or even add a domain to it. However, many people have difficulties with this process, as a home server generally doesn't have a static public IP and also has no protection against DDoS attacks. To solve this, we're going to use Cloudflare Tunnel, part of Cloudflare.
+
+<Figure
+  label="fig.1"
+  caption="The shape of it: the tunnel dials out, so the router never needs an inbound port open."
+  alt="Topology diagram. Traffic from the internet reaches the Cloudflare edge over TLS on port 443, where WAF, DDoS protection and Zero Trust are applied. The cloudflared daemon on the home server holds an outbound-only tunnel to that edge, so no inbound port is ever opened on the router. Behind it on the home server sit nginx on port 80 and the Docker services."
+>
+{`
+              internet
+                  │
+                  │  TLS 443
+                  ▼
+      ┌───────────────────────┐
+      │    cloudflare edge    │  WAF · DDoS · Zero Trust
+      └───────────────────────┘
+                  ╎  outbound tunnel only —
+                  ╎  no inbound port opened
+                  ▼
+      ┌───────────────────────┐
+      │      cloudflared      │
+      └───────────────────────┘
+      ════════ home server ════
+                  ▼
+      ┌───────────────────────┐
+      │       nginx  :80      │
+      └───────────────────────┘
+                  ▼
+      ┌───────────────────────┐
+      │    docker services    │
+      └───────────────────────┘
+`}
+</Figure>
 
 First, create a Cloudflare account, it's a simple and straightforward process. Then add your domain to your account following the instructions provided. After a few hours, your site will be visible on Cloudflare.
 

@@ -431,9 +431,20 @@ a:focus-visible {
     margin-top: 0;
 }
 
+/* Grid and flex items default to min-width:auto, so they refuse to shrink
+   below their content's min-content width. One 320-character nowrap dither
+   strip was enough to stretch a panel to 1950px inside a 686px column and
+   give the whole page a horizontal scrollbar. */
+.grid-2 > *,
+.stack-gap > * {
+    min-width: 0;
+}
+
 .grid-2 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(44ch, 1fr));
+    /* min() so the track can fall below 44ch on a narrow phone; a bare
+       minmax(44ch, 1fr) refuses to and overflows the viewport. */
+    grid-template-columns: repeat(auto-fit, minmax(min(44ch, 100%), 1fr));
     gap: var(--pad);
     /* Panels size to their content. Stretching them to a common height
        just pads the shorter one with dead space, and each panel already
@@ -843,8 +854,23 @@ html.js .reveal.shown {
         font-size: 13.5px;
     }
 
-    .titlebar .controls {
+    /* A spec row is label · leader · value on one line, which needs the
+       value to be unshrinkable. On a phone that is exactly what pushed a
+       long stack list past the viewport, so the row stacks instead and
+       the leader — the only expendable part — goes. */
+    .spec > li {
+        display: block;
+    }
+
+    .spec .lead {
         display: none;
+    }
+
+    .spec .v {
+        display: block;
+        padding-left: 2ch;
+        text-align: left;
+        overflow-wrap: anywhere;
     }
 }
 
