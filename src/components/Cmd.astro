@@ -29,6 +29,13 @@ const {
     as: Tag = "h2",
     id,
 } = Astro.props;
+
+/* `astro check` reports Props as unused here. It is a false positive:
+   Astro binds a component's prop types from this declaration through its
+   own compiler transform, not through a reference in the file. Writing
+   `Astro.props as Props` to silence the hint severs that binding — every
+   call site then sees IntrinsicAttributes and rejects every prop, which
+   was 20 errors across the views. Leave it. */
 ---
 
 <Tag class="cmd" id={id}>
