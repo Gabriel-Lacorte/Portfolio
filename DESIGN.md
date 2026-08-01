@@ -157,12 +157,14 @@ A two-ink page — bone on red-black ink — cut by one signature: blood. Blood 
 - **Display** (Departure 400, 19px): the masthead wordmark `lacorte.city` (+0.06em) — and, since the article rework, the `## `-marked h2 inside prose. Still the ceiling.
 - **Headline** (700, 15px, 1.32): headings in the chrome. Body-size bold — hierarchy comes from inversion and indentation, never from scale. Command headings stay weight 400; their structure is carried by color (green `$`, bone command, blood argument).
 - **Body** (Departure 400, 15px, 1.32): the chrome — home, listings, menus, windows. The column caps at 984px.
-- **Prose** (Iosevka 400, 15px, 1.65): the article body, measured at 72ch; h3 16px, h4 15px in comment; `##`/`###` markers in blood.
+- **Prose** (Iosevka 400, 15px): every paragraph of running sentences, not just the article — `.out p` carries the same family and a 72ch measure. The chrome speaks Departure; a paragraph is reading, not chrome. Article body runs 1.65 leading; h3 16px, h4 15px in comment; `##`/`###` markers in blood.
 - **Label** (400, 14px): asides, figcaptions, taskbar buttons, metadata — usually in comment color. The code-bar strip runs 12px tracked uppercase.
 - **Code** (Iosevka 400, 14px, 1.5): blocks and inline, on the blood-dark ground. Bold spans use Iosevka 600.
 
 ### Named Rules
 **The 19px Ceiling.** The largest type on the site is the masthead. If a new surface seems to need bigger type, it needs a better command instead.
+
+**The Weight-Without-Scale Rule.** A section earns prominence through order, room, and density — never size. The home's writing listing comes first after the greeting, keeps 34px below it, and carries a description per row; every heading on the page is still 15px. If a page cannot say which section is its job, the fix is the order, not the type scale.
 
 **The Even-Pixel Rule.** Mono runs at even pixel sizes only (14px, not 15px, for code and ASCII art): Iosevka advances 0.5em per cell, so odd sizes land glyphs on half-pixels and solid `───` rules render dashed. (ASCII figures drop to 10px on mobile.)
 
@@ -203,8 +205,8 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - **Inverted chip** (`.titulo`): bone background, ink text, weight 400 — how the chrome shouts without getting bigger. Currently unused in markup (the article carries `## ` marks in blood instead); kept as a system primitive, not a live component.
 
 ### Cards / Containers
-- **A window must earn its glass.** It shows only what the page does not: `status` carries build, timestamp, and engine (the counts live in the `ls` aside); `lab` carries the network posture and a link to the writeup (the boxes are listed by the `systemctl` section). A window that repeats the section beside it is decoration wearing an instrument's label — the exact thing the manifesto bans.
-- **The floating window is the only card the system tolerates.** 1px frame in window-line (#7a2b33): title bar (26px min, `4px 8px`, ground #1a0a0e, blood title, hairline bottom in blood-deep), monospace `pre` body (`10px 12px`), close control. From 900px of viewport it lifts to fixed positioning up front — parked at the right edge, stacked, position remembered per id, draggable by the bar (pointer events, viewport-clamped, re-clamped on resize), reopenable from the taskbar. Below 900px, and always with scripting off, it simply sits open in the flow.
+- **A window must earn its glass.** It shows only what the page does not: `status` carries build, timestamp, and engine (the counts live in the `ls` aside); `lab` draws the request path as line work — the topology no section states — since listing ingress and open ports again only repeated the `systemctl` row. A window that repeats the section beside it is decoration wearing an instrument's label, the exact thing the manifesto bans.
+- **The floating window is the only card the system tolerates.** 1px frame in window-line (#7a2b33): title bar (26px min, `4px 8px`, ground #1a0a0e, blood title, hairline bottom in blood-deep), monospace `pre` body (`10px 12px`), close control. 280px wide, which is what sets the float threshold: `984 + 2 × (280 + 24) = 1592px`, the width at which a gutter exists beside the column. Above it, windows lift to fixed and park in that gutter, draggable by the bar (pointer and arrow keys, viewport-clamped) with position remembered per id; below it they return to the document flow — **the check runs on every resize, not once at load**, so narrowing can never strand a panel over the prose. Open and closed both persist, and reopening a window whose remembered spot would cover the column re-parks it instead. With scripting off it simply sits open in the flow.
 - No other card, panel, or bordered grid exists. Do not add one.
 
 ### Callout (article aside)
@@ -218,7 +220,8 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - **Style:** a `<details open>` disclosure labeled `[+] contents` / `[-] contents` in comment color; summary hover reverses. Only h2/h3 make the outline.
 
 ### Row Listing
-- **Style:** `[dd/mm/yyyy] title [new] 12 min` — date and length in comment, title as a normal link, `[new]` in oxide for anything under 90 days. 1px row rhythm; descriptions may follow as a comment-colored second column of the same listing.
+- **Style:** `2024-12-24 title [new] 8 min` — date and length in comment, title as a normal link, `[new]` in blood for anything under 90 days. Fields are separated by `1ch`, never a pixel value: at a 9.55px cell a 9px gap read as one run-on string. On the home listing a comment-colored description wraps under its own row (`flex-basis: 100%`), which is what gives the writing section its weight.
+- **One date format.** ISO (`2024-12-24`) everywhere in the chrome — listings, asides, windows. The page used to print three.
 
 ### Inputs
 - None exist. The site has no forms; if one is ever needed it must be designed in this register from scratch (hairline field, reverse-video focus), not imported.

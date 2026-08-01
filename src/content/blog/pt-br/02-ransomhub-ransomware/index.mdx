@@ -42,17 +42,17 @@ No processo filho, onde o ransomware executa, a função `setsid()` é usada par
                  │
                  v
     ┌─────────────────────────┐
-    │     -verbose given ?    │
+    │   -verbose passado ?    │
     └─────────────────────────┘
-                 │  no  ->  daemonise
+                 │  não ->  daemoniza
                  v
     ┌─────────────────────────┐
     │          fork()         │
     └─────────────────────────┘
-                 │  parent  ->  waitpid(), reaps
-                 v  child
+                 │  pai  ->  waitpid(), recolhe
+                 v  filho
     ┌─────────────────────────┐
-    │         setsid()        │  fail -> exit(1)
+    │         setsid()        │  falha -> exit(1)
     └─────────────────────────┘
                  v
     ┌─────────────────────────┐
@@ -64,7 +64,7 @@ No processo filho, onde o ransomware executa, a função `setsid()` é usada par
     └─────────────────────────┘
                  v
     ┌─────────────────────────┐
-    │       encrypt loop      │
+    │    laço de cifragem     │
     └─────────────────────────┘
 `}
 </Figure>
