@@ -495,10 +495,15 @@ html.light .menu .mode button[data-theme-set="light"],
     border-left: var(--hair);
 }
 
-/* A paragraph at full column width runs ~129 mono characters; nobody
-   reads that. Lists and rows keep the column — prose gets a measure. */
+/* Running prose is Iosevka wherever it appears, the same rule the
+   article follows: the chrome speaks Departure, but a paragraph of
+   sentences is reading, not chrome. The measure comes with it — at full
+   column width a line runs past 100 characters, and nobody reads that.
+   (Lists and rows stay Departure and keep the column: they are output,
+   scanned rather than read.) */
 .out p {
-    max-width: 80ch;
+    max-width: 72ch;
+    font-family: var(--code);
 }
 
 /* ── the inverted section chip ─────────────────────────────────────── */
@@ -601,11 +606,14 @@ ul.plain {
 
 /* ── row lists: [date] title ───────────────────────────────────────── */
 
+/* The gap is a character wide, not 9px: at a 9.55px cell a 9px gap put
+   the date, the title and the length closer together than the spaces
+   inside them, and the three fields read as one run-on string. */
 .rows > li {
     padding: 1px 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 0 9px;
+    gap: 2px 1ch;
     align-items: baseline;
 }
 

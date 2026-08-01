@@ -241,6 +241,45 @@ Two rules fall out of that, both enforced by the script:
 
 ---
 
+## Headers
+
+`vercel.json` is generated, not written:
+
+```sh
+npm run build            # includes `gen-headers.mjs --check`
+npm run headers          # regenerate after changing the inline script
+```
+
+The CSP carries a SHA-256 of the one inline script — the pre-paint theme
+switch, which has to stay inline or the page flashes light before the
+stylesheet corrects it. Hashing it is what keeps `script-src` strict;
+`'unsafe-inline'` would hand any injected `<script>` the same permission.
+
+The hash and the script live in different files, so editing one silently
+breaks the other: the policy stops matching, the browser blocks the
+script, and the only symptom is the theme flash coming back. `npm run
+build` runs `--check` and fails on the mismatch. Verified by editing the
+script and watching the build exit 1.
+
+`style-src` keeps `'unsafe-inline'`. Astro emits scoped styles as inline
+`<style>` blocks that change with every component edit, and chasing those
+hashes would break far more often than it protects anything.
+
+Two exemptions, both deliberate:
+
+- **`/buttons/`** gets `Cross-Origin-Resource-Policy: cross-origin`. The
+  88×31 button's own alt text says "free to hotlink", and the site-wide
+  `same-origin` is exactly the header that stops that working.
+- **`/_astro/` and `/fonts/`** are immutable for a year. Their filenames
+  are fingerprinted; everything else revalidates.
+
+The whole set is verified by replaying it over the preview server and
+loading all 17 pages: zero CSP violations, zero JS errors, theme switch
+and window dragging still working, and the button still loading from a
+foreign origin.
+
+---
+
 ## Still to fill in
 
 `src/consts.ts` has `TODO(gabriel)` on the parts that need your word:

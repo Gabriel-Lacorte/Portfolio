@@ -222,10 +222,11 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
        finish past the bottom of the viewport. Lifting up front, once, at
        a known place removes both. */
     const POS_KEY = "win:pos";
+    const OPEN_KEY = "win:open";
     /* A window may only detach where it actually fits beside the column.
        That is arithmetic, not taste. The column is 984px and centred, so
        each gutter is (100vw - 984) / 2, and a window needs WIN_W + GAP of
-       it — hence 984 + 2 * (340 + 24) = 1712. Below that they stay in the
+       it — hence 984 + 2 * (280 + 24) = 1592. Below that they stay in the
        document flow, which is also the no-script behaviour.
 
        GAP has to be the same number the default placement uses, below.
@@ -234,9 +235,17 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
        at 1100px it sat at x=736 with the column running to 1042. Then it
        was derived correctly but with GAP=16 while the placement inset by
        24, and 1700px still overlapped — by exactly the 6px the two
-       constants disagreed about. One constant, used twice. */
+       constants disagreed about. One constant, used twice.
+
+       340 wide put the threshold at 1712, which no ordinary laptop
+       reaches: the windows only ever floated on a desktop monitor and
+       everyone else got two orphaned panels after the changelog. 280
+       still fits the widest line either window prints ("writeup.....
+       home-server-guide", 30 cells = 210px) and brings the threshold
+       down to 1592. 1440 cannot be served without narrowing the column,
+       and the column is not negotiable. */
     const COLUMN = 984;
-    const WIN_W = 340;
+    const WIN_W = 280;
     const GAP = 24;
     const FLOAT_FROM = COLUMN + 2 * (WIN_W + GAP);
 
@@ -270,22 +279,56 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
         }
     }
 
+    /* Closing is remembered too. Before this, a drag persisted and a
+       close did not: the site remembered the act that could bury the
+       text and forgot the one that tidied it away. */
+    function readOpen(): Record<string, boolean> {
+        try {
+            return JSON.parse(localStorage.getItem(OPEN_KEY) ?? "{}");
+        } catch {
+            return {};
+        }
+    }
+
+    function saveOpen(id: string, open: boolean) {
+        const all = readOpen();
+        all[id] = open;
+        try {
+            localStorage.setItem(OPEN_KEY, JSON.stringify(all));
+        } catch {
+            /* same as above: the click still works */
+        }
+    }
+
     function windows() {
         const wins = [...document.querySelectorAll<HTMLElement>(".window")];
         if (!wins.length) return;
 
-        const setOpen = (id: string, open: boolean) => {
+        const setOpen = (id: string, open: boolean, persist = true) => {
             const win = document.getElementById(id);
             const task = document.querySelector<HTMLButtonElement>(
                 `[data-window-task="${id}"]`,
             );
             if (win) win.hidden = !open;
             task?.setAttribute("aria-pressed", String(open));
-            /* An in-flow window can sit below the fold; reopening it with
-               no visible change reads as a dead button. */
-            if (open && win && win.style.position !== "fixed")
-                win.scrollIntoView({ block: "nearest" });
+            if (persist) saveOpen(id, open);
+            if (!open || !win) return;
+            /* Reopening has to show something. Floating: if the position
+               it remembers would land on the text, it parks instead —
+               that is the way back out of the one bad state a drag can
+               reach. In the flow: it can be below the fold, so scroll. */
+            if (win.style.position === "fixed") repark(win);
+            else win.scrollIntoView({ block: "nearest" });
         };
+
+        /* Hoisted on purpose: setOpen above is wired to a click that can
+           only fire long after the placement helpers below exist. */
+        function repark(win: HTMLElement) {
+            if (!buriesColumn(win)) return;
+            const p = parking(win, wins.indexOf(win));
+            place(win, p.x, p.y);
+            savePosition(win.id, p);
+        }
 
         document
             .querySelectorAll<HTMLButtonElement>("[data-window-close]")
@@ -304,8 +347,12 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
                 }),
             );
 
-        /* Too narrow to float anything without covering the text. */
-        if (window.innerWidth < FLOAT_FROM) return;
+        /* What the reader left closed stays closed, decided before
+           anything is measured so a dismissed window never flashes. */
+        const openState = readOpen();
+        wins.forEach((win) => {
+            if (openState[win.id] === false) setOpen(win.id, false, false);
+        });
 
         const saved = readPositions();
         let top = 50;
@@ -326,24 +373,80 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
             return p;
         };
 
-        wins.forEach((win, i) => {
+        /* The gutter slot: out of the column's way, stacked by index. */
+        function parking(win: HTMLElement, i: number): Pos {
+            return {
+                x: window.innerWidth - (win.offsetWidth || WIN_W) - GAP,
+                y: 96 + i * 240,
+            };
+        }
+
+        function buriesColumn(win: HTMLElement) {
+            const main = document.querySelector("main");
+            if (!main) return false;
+            const m = main.getBoundingClientRect();
+            const r = win.getBoundingClientRect();
+            return r.right > m.left && r.left < m.right;
+        }
+
+        const floats = () => window.innerWidth >= FLOAT_FROM;
+
+        const lift = (win: HTMLElement, i: number) => {
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            if (!bar || win.style.position === "fixed") return;
+
+            win.style.position = "fixed";
+            win.style.margin = "0";
+            win.style.width = `${Math.min(WIN_W, window.innerWidth - 32)}px`;
+            win.style.zIndex = String(++top);
+
+            const start = saved[win.id] ?? parking(win, i);
+            place(win, start.x, start.y);
+            repark(win);
+
+            /* Dragging is functionality, so it has to work without a
+               pointer too. The bar is a tab stop only while the window
+               actually floats — in the flow it moves nothing, and a tab
+               stop that does nothing is worse than no tab stop. */
+            bar.tabIndex = 0;
+            bar.setAttribute("role", "application");
+            bar.setAttribute("aria-roledescription", MOVE_HINT);
+        };
+
+        /* Narrowing past the threshold has to undo all of it. The width
+           check used to run once at startup, so a window loaded wide and
+           then resized narrow stayed fixed — on top of the prose, which
+           is the state the threshold exists to prevent. */
+        const drop = (win: HTMLElement) => {
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            if (win.style.position !== "fixed") return;
+
+            for (const p of ["position", "left", "top", "width", "margin", "z-index"])
+                win.style.removeProperty(p);
+
+            bar?.removeAttribute("tabindex");
+            bar?.removeAttribute("role");
+            bar?.removeAttribute("aria-roledescription");
+        };
+
+        const sync = () => {
+            wins.forEach((win, i) => {
+                if (!floats()) return drop(win);
+                lift(win, i);
+                place(
+                    win,
+                    parseFloat(win.style.left),
+                    parseFloat(win.style.top),
+                );
+            });
+        };
+
+        wins.forEach((win) => {
             const bar = win.querySelector<HTMLElement>(".window__bar");
             if (!bar) return;
 
-            const width = Math.min(340, window.innerWidth - 32);
-            win.style.position = "fixed";
-            win.style.margin = "0";
-            win.style.width = `${width}px`;
-            win.style.zIndex = String(++top);
-
-            const fallback = {
-                x: window.innerWidth - width - GAP,
-                y: 96 + i * 240,
-            };
-            const start = saved[win.id] ?? fallback;
-            place(win, start.x, start.y);
-
             bar.addEventListener("pointerdown", (e) => {
+                if (win.style.position !== "fixed") return;
                 if ((e.target as HTMLElement).closest("button")) return;
                 e.preventDefault();
                 win.style.zIndex = String(++top);
@@ -372,16 +475,8 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
                 bar.addEventListener("pointerup", up);
             });
 
-            /* Dragging is functionality, so it has to work without a
-               pointer too. The bar is only made focusable here, in the
-               branch that actually floats the window — in the flow it
-               moves nothing, and a tab stop that does nothing is worse
-               than no tab stop. */
-            bar.tabIndex = 0;
-            bar.setAttribute("role", "application");
-            bar.setAttribute("aria-roledescription", MOVE_HINT);
-
             bar.addEventListener("keydown", (e) => {
+                if (win.style.position !== "fixed") return;
                 const step = e.shiftKey ? 4 : 16;
                 const by: Record<string, [number, number]> = {
                     ArrowLeft: [-step, 0],
@@ -404,13 +499,11 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
             });
         });
 
-        /* A resize can strand a window past the new edge. */
-        window.addEventListener("resize", () => {
-            wins.forEach((win) => {
-                if (win.style.position !== "fixed") return;
-                place(win, parseFloat(win.style.left), parseFloat(win.style.top));
-            });
-        });
+        sync();
+
+        /* A resize can strand a window past the new edge, or take the
+           gutter away entirely. Both are the same call. */
+        window.addEventListener("resize", sync);
     }
 
     /* The theme switch: two labelled states beside the language switcher,
