@@ -280,6 +280,25 @@ foreign origin.
 
 ---
 
+## Structured data and feeds
+
+Posts carry a `BlogPosting` JSON-LD block; nothing else carries anything,
+because nothing else has anything structured to say. `mainEntityOfPage`
+is the *canonical*, not the current URL, so a borrowed Portuguese route
+points at the English article it duplicates instead of announcing itself
+as a second work — the same rule the hreflang set follows.
+
+`headline` is the article title, not the `<title>`: the `<title>` carries
+the " | Gabriel Lacorte" suffix meant for a browser tab, and it shipped
+inside the headline once.
+
+The two feeds are per locale, and both had the trailing-slash bug the
+hreflang tags had — every entry pointing one redirect away from the
+article. The Portuguese channel also pointed its `<link>` at the English
+home page.
+
+---
+
 ## Still to fill in
 
 `src/consts.ts` has `TODO(gabriel)` on the parts that need your word:

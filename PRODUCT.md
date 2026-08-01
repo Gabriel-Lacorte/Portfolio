@@ -46,9 +46,10 @@ Largely codified in the manifesto atop `src/styles/global.css`; kept here delibe
 
 1. **The command is the heading.** Every section is the output of something he would actually run (`$ whoami`, `$ ls ~/writing`, `$ systemctl status lab`). A new surface must find its command, not invent chrome.
 2. **One base pair, one signature, margin marks counted on one hand.** Bone on ink; blood is the signature and may carry a page — though within its triad only `--blood` ever carries text. Green (ok) and amber (warn) keep fixed meanings and a handful of uses each; a margin mark used more than ~4 times is decoration and gets cut.
-3. **Reading is the conversion.** Every choice is judged by whether it helps a peer finish a post: measure, contrast, and code-block legibility outrank any flourish.
-4. **JS is garnish, never load-bearing.** With scripting off the site works completely (windows sit in the flow, copy buttons vanish). The "no javascript" claim in the copy means no *required* JavaScript — keep it true.
-5. **Warmth over polish.** Prefer the handmade move — first-person changelog, closable windows, hotlinkable buttons — to the professional one.
+3. **Say only what the build can prove.** The site is a static artefact served from Vercel; the homelab is a separate machine that runs his own services and has a writeup. The home page once printed `systemctl status lab` with green `● up` dots and a request path through that tunnel — telemetry for infrastructure this page never touches, from a check that does not exist. A number goes on the page only if the build knows it (commit, timestamp, word count) or a human can verify it (hardware, hosting). Live state requires a live probe; absent one, a README states what a thing *is*, never that it is running. For this audience a single unverifiable claim costs more than a whole page of restraint buys.
+4. **Reading is the conversion.** Every choice is judged by whether it helps a peer finish a post: measure, contrast, and code-block legibility outrank any flourish.
+5. **JS is garnish, never load-bearing.** With scripting off the site works completely (windows sit in the flow, copy buttons vanish). The "no javascript" claim in the copy means no *required* JavaScript — keep it true.
+6. **Warmth over polish.** Prefer the handmade move — first-person changelog, closable windows, hotlinkable buttons — to the professional one.
 
 ## Accessibility & Inclusion
 

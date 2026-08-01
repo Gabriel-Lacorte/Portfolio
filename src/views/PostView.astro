@@ -13,7 +13,6 @@ const t = useTranslations(locale);
 
 const { Content, headings } = await post.render();
 const iso = post.data.date.toISOString().slice(0, 10);
-const br = iso.split("-").reverse().join("/");
 
 /* True when this locale has no translation yet and is reading the
    original. Saying so is the honest alternative to hiding the post or
@@ -52,13 +51,20 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
     description={post.data.description}
     untranslated={untranslated}
     canonicalPath={canonicalPath}
+    article={{
+        headline: post.data.title,
+        published: post.data.date,
+        lang: HTML_LANG[localeOf(post)],
+        tags: post.data.tags,
+        words: countWords(post.body),
+    }}
 >
     <Cmd
         run="cat"
         arg={file}
         icon="note"
         as="h1"
-        aside={`${br} · ${readingTime(post.body)} min`}
+        aside={`${iso} · ${readingTime(post.body)} min`}
     />
 
     <div class="out">

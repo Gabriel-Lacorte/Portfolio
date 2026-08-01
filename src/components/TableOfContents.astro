@@ -73,7 +73,11 @@ const toc = buildToc(headings);
 }
 
 <style>
+    /* Shrink to the outline it holds. Full-column width meant a frame
+       drawn around four short lines and 700px of empty ink. */
     .toc {
+        width: fit-content;
+        max-width: 100%;
         margin-bottom: 15px;
         border: var(--hair);
         padding: 6px 10px;

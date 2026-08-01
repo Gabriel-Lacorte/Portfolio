@@ -5,14 +5,7 @@ import Masthead from "@components/Masthead.astro";
 import { postsFor } from "@lib/posts";
 import { compact, getStats, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
-import {
-    CHANGELOG,
-    LAB,
-    NOW,
-    PROJECTS,
-    SITE,
-    STACK_GROUPS,
-} from "@consts";
+import { CHANGELOG, NOW, PROJECTS, SITE, STACK_GROUPS } from "@consts";
 
 type Props = { locale: Locale };
 const { locale } = Astro.props;
@@ -74,25 +67,6 @@ const isNew = (d: Date) =>
                         )}
                         <span class="len">{readingTime(post.body)} min</span>
                         <span class="desc comment">{post.data.description}</span>
-                    </li>
-                ))
-            }
-        </ul>
-    </div>
-
-    <Cmd run="systemctl status" arg="lab" icon="disk" />
-    <div class="out">
-        <ul class="boxes">
-            {
-                LAB.map(({ NAME, ROLE, SPEC, OS, STATE }) => (
-                    <li>
-                        <span class="bname">{NAME}</span>{" "}
-                        <span class="state" data-s={STATE}>
-                            ● {STATE}
-                        </span>{" "}
-                        <span class="comment">
-                            {ROLE} · {OS} · {SPEC}
-                        </span>
                     </li>
                 ))
             }
@@ -180,13 +154,15 @@ const isNew = (d: Date) =>
                     >
                 </span>
             </div>
-            {/* A window has to earn its glass: only telemetry the page
-                does not already show. Post and word counts live in the
-                ls aside; here is the build itself. */}
+            {/* Facts about the artefact you are reading, and nothing it
+                cannot prove: the commit it was built from, when, by
+                what, and where it is served from. It said "status.....
+                online" for a while, which is either a tautology or a
+                claim to a health check that does not exist. */}
             <pre class="window__body"><span class="prompt">$</span> ./status
 
 host....... lacorte.city
-status..... <span class="green">online</span>
+served..... vercel · static
 build...... {stats.commit}
 updated.... {stats.built}
 engine..... {Astro.generator.toLowerCase()}</pre>
@@ -203,20 +179,19 @@ engine..... {Astro.generator.toLowerCase()}</pre>
                     >
                 </span>
             </div>
-            {/* The systemctl section already says "ingress tunnel ·
-                outbound only · no open port", so repeating it here was
-                the exact thing a window is forbidden to do. The path is
-                what the page never draws. */}
-            <pre
-                class="window__body"><span class="prompt">$</span> traceroute ~/lab
+            {/* The homelab is a real machine and a finished writeup —
+                it is not what serves this page, and the home page used
+                to imply otherwise with green ● up dots it had no way to
+                check. A README states what a box is; only a live probe
+                may state that it is running, and there is no probe. */}
+            <pre class="window__body"><span class="prompt">$</span> cat ~/lab/README
 
-you
- └─ cloudflare edge   <span class="green">zero trust</span>
-     └─ tunnel        <span class="green">outbound</span>
-         └─ nginx     :80
-             └─ nyx   debian 12
-
-writeup..... <a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
+nyx........ debian 12
+parts...... 2 salvaged desktops
+runtime.... docker
+ingress.... cloudflare tunnel
+note....... runs my services
+writeup.... <a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
         </aside>
     </Fragment>
 

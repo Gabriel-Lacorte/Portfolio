@@ -112,7 +112,8 @@ This system explicitly rejects, in PRODUCT.md's words: **dashboard chrome** ("gr
 - Two inks and one signature — blood — with green and amber as fixed-meaning margin marks; flat as paper; corners always square.
 - Fully working with scripting off; JavaScript only enhances.
 - Bilingual (en / pt-BR) as equals — every string through the typed dictionary.
-- One 984px column (`width: calc(100% - 32px)`), breakpoints at 700px (windows join the flow, menu aligns left) and 1740px (windows dock in the gutter beside the column).
+- One 984px column (`width: calc(100% - 32px)`) in a flex page that fills the viewport, so the footer closes the column on short pages instead of floating mid-screen. Breakpoints: 700px (menu aligns left, asides drop lines, code wraps), 430px (figures step to 8px), 1592px (windows lift into the gutter).
+- **One listing grammar.** Date column, then title, then length, with the description hanging off the title's edge and `#tags` under it. The column width is a px token shared by row and description — `ch` measures against each element's own font, and the row is Departure while the description is Iosevka.
 
 ## 2. Colors
 
@@ -159,7 +160,7 @@ A two-ink page — bone on red-black ink — cut by one signature: blood. Blood 
 - **Body** (Departure 400, 15px, 1.32): the chrome — home, listings, menus, windows. The column caps at 984px.
 - **Prose** (Iosevka 400, 15px): every paragraph of running sentences, not just the article — `.out p` carries the same family and a 72ch measure. The chrome speaks Departure; a paragraph is reading, not chrome. Article body runs 1.65 leading; h3 16px, h4 15px in comment; `##`/`###` markers in blood.
 - **Label** (400, 14px): asides, figcaptions, taskbar buttons, metadata — usually in comment color. The code-bar strip runs 12px tracked uppercase.
-- **Code** (Iosevka 400, 14px, 1.5): blocks and inline, on the blood-dark ground. Bold spans use Iosevka 600.
+- **Code** (Iosevka 400, 14px, 1.5): blocks and inline, on the blood-dark ground. Bold spans use Iosevka 600. **Code wraps at every width** (`pre-wrap`), never scrolls sideways: a phone cannot swipe through a paragraph of shell, and on desktop the overflow was three characters vanishing behind a scrollbar too thin to notice. The copy button still yields the unwrapped text. ASCII figures are the exception — art cannot reflow, so `<Figure>` keeps its own scroll and steps the cell 14 → 10 → 8px (even sizes only) to clear 375px instead.
 
 ### Named Rules
 **The 19px Ceiling.** The largest type on the site is the masthead. If a new surface seems to need bigger type, it needs a better command instead.
@@ -205,7 +206,8 @@ Hand-labeled instruments: each control is real, load-bearing, and named by its o
 - **Inverted chip** (`.titulo`): bone background, ink text, weight 400 — how the chrome shouts without getting bigger. Currently unused in markup (the article carries `## ` marks in blood instead); kept as a system primitive, not a live component.
 
 ### Cards / Containers
-- **A window must earn its glass.** It shows only what the page does not: `status` carries build, timestamp, and engine (the counts live in the `ls` aside); `lab` draws the request path as line work — the topology no section states — since listing ingress and open ports again only repeated the `systemctl` row. A window that repeats the section beside it is decoration wearing an instrument's label, the exact thing the manifesto bans.
+- **A window must earn its glass, and may only print what is true.** `status` carries what the build knows about the artefact — commit, timestamp, engine, and that it is served from Vercel as static files. `lab` is a README for a *different* machine (the homelab), plainly marked as running his own services, with the writeup link. Neither claims live state: there is no probe, so nothing says `● up`. A window that repeats the section beside it is decoration wearing an instrument's label; a window that invents telemetry is worse, and both are banned.
+- **Body type:** Iosevka 14px/1.5 — an instrument readout is data, and the narrower cell (7px against Departure's 9.55px) is what lets a 280px window hold a 31-cell line instead of clipping it.
 - **The floating window is the only card the system tolerates.** 1px frame in window-line (#7a2b33): title bar (26px min, `4px 8px`, ground #1a0a0e, blood title, hairline bottom in blood-deep), monospace `pre` body (`10px 12px`), close control. 280px wide, which is what sets the float threshold: `984 + 2 × (280 + 24) = 1592px`, the width at which a gutter exists beside the column. Above it, windows lift to fixed and park in that gutter, draggable by the bar (pointer and arrow keys, viewport-clamped) with position remembered per id; below it they return to the document flow — **the check runs on every resize, not once at load**, so narrowing can never strand a panel over the prose. Open and closed both persist, and reopening a window whose remembered spot would cover the column re-parks it instead. With scripting off it simply sits open in the flow.
 - No other card, panel, or bordered grid exists. Do not add one.
 
