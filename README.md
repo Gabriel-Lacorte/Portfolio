@@ -104,6 +104,18 @@ while code blocks had their own darker one, and a comment token sat at
 16.15:1, dim 7.08:1, blood 6.23:1 — and every syntax token clears 4.5:1
 against `#1f0509`.
 
+**Focus is an outline, declared once and never turned off.** The site's
+hover and focus idiom is reverse video, which works everywhere except on
+a control that is *already* reversed — the current page in the menu, the
+current locale, the current theme, an open window's taskbar button.
+Focusing one of those changed nothing at all, so a keyboard user tabbing
+the header could not tell where they were: 71 controls across the site,
+every one of them in its selected state. Seven rules had bundled
+`:hover` and `:focus-visible` together with `outline: none`, which was
+only ever there to suppress the browser default. An outline sits outside
+the box, so it reads on an inverted element and a plain one alike, in
+both themes, and it does not move anything.
+
 Printing works, and is checked by rendering to PDF rather than assumed:
 controls are hidden (the menu, the copy buttons, the theme switch all
 printed as live-looking widgets that cannot be pressed), outbound link

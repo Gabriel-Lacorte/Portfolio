@@ -166,6 +166,25 @@ html.light {
     color-scheme: light;
 }
 
+/* ── focus ─────────────────────────────────────────────────────────── */
+
+/* The site's hover and focus idiom is reverse video, which works
+   everywhere except on a control that is *already* reversed: the
+   current page in the menu, the current locale, the current theme, an
+   open window's taskbar button. Focusing one of those changed nothing
+   at all, so a keyboard user tabbing the header could not tell where
+   they were — 71 controls across the site, every one of them a control
+   in its selected state.
+
+   An outline is the cue that does not depend on state. It sits outside
+   the box, so it reads on an inverted element and on a plain one, in
+   both themes, and it does not move anything: outlines are not part of
+   the layout. Declared once, here, and never turned off below. */
+:where(a, button, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--blood);
+    outline-offset: 2px;
+}
+
 /* ── reset ─────────────────────────────────────────────────────────── */
 
 *,
@@ -251,7 +270,6 @@ a:hover,
 a:focus-visible {
     color: var(--bg);
     background: var(--base);
-    outline: none;
 }
 
 ::selection {
@@ -371,7 +389,6 @@ header.site {
 .menu a:focus-visible {
     color: var(--bg);
     background: var(--base);
-    outline: none;
 }
 
 .menu .lang {
@@ -387,7 +404,6 @@ header.site {
 .menu .lang a:focus-visible {
     color: var(--bg);
     background: var(--base);
-    outline: none;
 }
 
 /* The theme switch mirrors the language switcher: two labelled states,
@@ -420,7 +436,6 @@ html.light .menu .mode button[data-theme-set="light"],
 .menu .mode button:focus-visible {
     color: var(--bg);
     background: var(--base);
-    outline: none;
 }
 
 /* ── identity ──────────────────────────────────────────────────────────
@@ -655,7 +670,6 @@ ul.plain {
 .listing .head:focus-visible {
     background: none;
     color: inherit;
-    outline: none;
 }
 
 .listing .head:hover .title,
@@ -801,7 +815,6 @@ main ul.rows > li::before {
 .window__controls button:focus-visible {
     color: var(--bg);
     background: var(--base);
-    outline: none;
 }
 
 /* An instrument readout is data, so it is set in the data face: Iosevka
@@ -855,7 +868,6 @@ html.js .taskbar {
 .taskbar button:focus-visible {
     color: var(--bg);
     background: var(--base);
-    outline: none;
 }
 
 /* ── footer ────────────────────────────────────────────────────────── */
