@@ -1,6 +1,5 @@
 import type {
     ChangelogEntry,
-    LabBox,
     ReadingItem,
     Metadata,
     NavItem,
@@ -201,33 +200,6 @@ export const CHANGELOG: ChangelogEntry[] = [
     },
 ];
 
-/* The homelab, from the machine itself. Real numbers out of the
-   home-server post; update them when the box changes.
-   TODO(gabriel): confirm the specs and add anything you have since put
-   in there. */
-export const LAB: LabBox[] = [
-    {
-        NAME: "nyx",
-        ROLE: "web · docker host",
-        SPEC: "2x salvaged desktops · 8GB DDR3",
-        OS: "Debian 12",
-        STATE: "up",
-    },
-    {
-        NAME: "cloudflared",
-        ROLE: "ingress tunnel",
-        SPEC: "outbound only · no open port",
-        OS: "container",
-        STATE: "up",
-    },
-    {
-        NAME: "nginx",
-        ROLE: "reverse proxy",
-        SPEC: ":80 behind the tunnel",
-        OS: "container",
-        STATE: "up",
-    },
-];
 
 /* One real entry beats three, two of which said "add yours" on the live
    site. Add rows as you actually pick things up.

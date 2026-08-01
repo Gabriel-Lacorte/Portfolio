@@ -20,14 +20,6 @@ export type NavItem = {
     HREF: string;
 };
 
-export type LabBox = {
-    NAME: string;
-    ROLE: string;
-    SPEC: string;
-    OS: string;
-    STATE: "up" | "down" | "idle";
-};
-
 export type ReadingItem = {
     TITLE: string;
     NOTE: string;

@@ -95,7 +95,7 @@ components:
 
 **Creative North Star: "The Operator's Notebook"**
 
-One person's working terminal, kept the way a systems engineer keeps a lab notebook. Every section on every page is the output of a command the operator would actually run — `$ whoami`, `$ ls -la ~/writing`, `$ systemctl status lab` — and the page is the session transcript: one column, top to bottom, set in type. It is a DOCUMENT, not a dashboard. Nothing appears that would not survive being printed.
+One person's working terminal, kept the way a systems engineer keeps a lab notebook. Every section on every page is the output of a command the operator would actually run — `$ whoami`, `$ ls -la ~/writing`, `$ cat ~/.config/stack` — and the page is the session transcript: one column, top to bottom, set in type. It is a DOCUMENT, not a dashboard. Nothing appears that would not survive being printed.
 
 The system is one engraving in two states: **lit** (bone phosphor on ink — the default, and the design) and **printed** (paper mode — the same marks pressed into paper). Dark is not a preference mirror; it is the artwork. Light is the printout, persisted once chosen.
 
