@@ -23,6 +23,14 @@ type Props = {
     noindex?: boolean;
     /** Forwarded to <Head> — points the canonical at another route. */
     canonicalPath?: string;
+    /** Forwarded to <Head> — article facts for JSON-LD. */
+    article?: {
+        headline: string;
+        published: Date;
+        lang: string;
+        tags?: string[];
+        words?: number;
+    };
 };
 
 const {
@@ -34,6 +42,7 @@ const {
     untranslated = [],
     noindex = false,
     canonicalPath,
+    article,
 } = Astro.props;
 
 const t = useTranslations(locale);
@@ -55,6 +64,7 @@ const isCurrent = (href: string) =>
             untranslated={untranslated}
             noindex={noindex}
             canonicalPath={canonicalPath}
+            article={article}
         />
     </head>
     <body class:list={[windows && "has-windows"]}>

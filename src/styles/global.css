@@ -181,11 +181,18 @@ html {
     text-size-adjust: 100%;
 }
 
+/* A short page used to end wherever its content ran out, leaving the
+   footer floating in the middle of the screen with 400px of ink below
+   it — the blog index and /uses both did this. The column now fills the
+   viewport and the footer sits on the bottom edge where it belongs. */
 body {
     margin: 0 auto;
     padding: 0;
     min-width: 0;
     max-width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
     overflow-x: hidden;
     background: var(--bg);
     color: var(--base);
@@ -264,6 +271,24 @@ button {
     max-width: 984px;
     min-width: 0;
     margin-inline: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The one part that grows; everything after it is pinned to the bottom.
+   Every view used to end with a <p><br /></p> spacer; the margin belongs
+   to the page, not the content. */
+main {
+    flex: 1 0 auto;
+    padding-bottom: 26px;
+}
+
+/* Section rhythm separates sections; it has no business above the first
+   one. (Inside a flex column that margin no longer collapses away, so
+   the gap under the menu grew by exactly one section break.) */
+main > :first-child {
+    margin-top: 0;
 }
 
 /* The padding exists for the fixed taskbar, and the taskbar exists only
@@ -272,11 +297,6 @@ html.js body.has-windows {
     padding-bottom: 56px;
 }
 
-/* Every view used to end with a <p><br /></p> spacer; the margin belongs
-   to the page, not the content. */
-main {
-    padding-bottom: 26px;
-}
 
 .skip {
     position: absolute;
@@ -702,10 +722,18 @@ main ul.rows > li::before {
     outline: none;
 }
 
+/* An instrument readout is data, so it is set in the data face: Iosevka
+   at 14px advances 7px per cell against Departure's 9.55px, which is
+   what lets a 280px window hold its widest line ("parts...... 2 salvaged
+   desktops", 31 cells = 217px) instead of clipping it. Even size, as
+   always — an odd one renders the dotted leaders ragged. */
 .window__body {
     padding: 10px 12px;
     overflow-x: auto;
     white-space: pre;
+    font-family: var(--code);
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .prompt {
@@ -750,8 +778,12 @@ html.js .taskbar {
 
 /* ── footer ────────────────────────────────────────────────────────── */
 
+/* Not `margin: auto` any more: the container is a flex column now, and
+   an auto inline margin on a flex item shrinks it to its content and
+   centres it — the footer pulled away from both edges of the column it
+   is supposed to close. */
 footer.site {
-    margin: 20px auto 15px;
+    margin: 20px 0 15px;
     padding-top: 10px;
     border-top: var(--hair);
     color: var(--base);
@@ -970,6 +1002,19 @@ footer.site {
     tab-size: 4;
 }
 
+/* Code wraps rather than scrolling sideways, at every width. A phone
+   cannot swipe through a paragraph of shell, and on a desktop the
+   overflow was 18-25px — three characters vanishing off the right edge
+   with a scrollbar too thin to notice, which is worse than a wrapped
+   line. The copy button still yields the real, unwrapped text.
+   (ASCII figures are not this: art cannot reflow, so <Figure> keeps its
+   own scroll and steps the cell size down instead.) */
+.article pre,
+.article pre code {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
 .article pre code {
     font-family: var(--code);
     color: inherit;
@@ -1092,6 +1137,7 @@ html.light {
     .window {
         width: 100%;
     }
+
 
     .menu ul {
         text-align: left;

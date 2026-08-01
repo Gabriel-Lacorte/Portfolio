@@ -41,13 +41,21 @@ function* walk(dir) {
     }
 }
 
-/* Only scripts with no src attribute: those are the ones a CSP hash
-   covers. Anything with a src is governed by 'self'. */
-const INLINE = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g;
+/* Only executable inline scripts. A <script> with a src is governed by
+   'self', and one with a data type — application/ld+json is the case
+   here — is not script at all: CSP never evaluates it, and hashing it
+   would put a different hash in the policy for every post that carries
+   structured data. */
+const INLINE = /<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/g;
+const EXECUTABLE = (attrs) => {
+    const type = /\btype=["']([^"']+)["']/.exec(attrs)?.[1];
+    return !type || type === "module" || /javascript|ecmascript/i.test(type);
+};
 
 const hashes = new Set();
 for (const file of walk(DIST)) {
-    for (const [, body] of readFileSync(file, "utf8").matchAll(INLINE)) {
+    for (const [, attrs, body] of readFileSync(file, "utf8").matchAll(INLINE)) {
+        if (!EXECUTABLE(attrs)) continue;
         hashes.add(`'sha256-${createHash("sha256").update(body).digest("base64")}'`);
     }
 }

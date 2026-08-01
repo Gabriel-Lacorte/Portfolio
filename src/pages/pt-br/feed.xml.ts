@@ -12,12 +12,18 @@ export async function GET(context: APIContext) {
     return rss({
         title: SITE.HANDLE,
         description: UI["pt-br"]["meta.blogDescription"],
-        site: context.site!,
+        /* The channel link is the Portuguese site, not the English one.
+           Item links are absolute paths, so they still resolve against
+           the origin and do not pick up the /pt-br/ prefix twice. */
+        site: new URL("/pt-br/", context.site!),
         items: posts.map((post) => ({
             title: post.data.title,
             description: post.data.description,
             pubDate: post.data.date,
-            link: localised(`/blog/${post.data.translationKey}`, "pt-br"),
+            /* Trailing slash: the build makes directory routes, so
+               without it every entry points one redirect away from the
+               article — same trap the hreflang tags fell into. */
+            link: `${localised(`/blog/${post.data.translationKey}`, "pt-br")}/`,
         })),
         customData: "<language>pt-BR</language>",
     });

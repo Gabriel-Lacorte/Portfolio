@@ -17,7 +17,9 @@ export async function GET(context: APIContext) {
             title: post.data.title,
             description: post.data.description,
             pubDate: post.data.date,
-            link: localised(`/blog/${post.data.translationKey}`, "en"),
+            /* Trailing slash: directory routes, so without it every
+               entry points one redirect away from the article. */
+            link: `${localised(`/blog/${post.data.translationKey}`, "en")}/`,
         })),
         customData: "<language>en</language>",
     });

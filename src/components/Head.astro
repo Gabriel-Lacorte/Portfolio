@@ -24,6 +24,17 @@ type Props = {
      * so, rather than competing with it for the same words.
      */
     canonicalPath?: string;
+    /** Article facts, when the page is one. Becomes JSON-LD. */
+    article?: {
+        /** The article's own title. Not `title`, which carries the
+         *  " | Gabriel Lacorte" suffix meant for the browser tab. */
+        headline: string;
+        published: Date;
+        /** The language the text is actually in, not the page's. */
+        lang: string;
+        tags?: string[];
+        words?: number;
+    };
 };
 
 const {
@@ -33,6 +44,7 @@ const {
     untranslated = [],
     noindex = false,
     canonicalPath,
+    article,
 } = Astro.props;
 const canonical = new URL(
     canonicalPath ?? Astro.url.pathname,
@@ -65,6 +77,37 @@ const urlFor = (code: Locale) =>
 const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
     (code) => ({ hreflang: HTML_LANG[code], href: urlFor(code) }),
 );
+
+/* Structured data, only where there is something structured to say: a
+   post gets BlogPosting, everything else gets nothing rather than a
+   WebPage node repeating the <title> in JSON.
+
+   mainEntityOfPage is the canonical, not the current URL, so a borrowed
+   Portuguese route points at the English article it is a copy of instead
+   of announcing itself as a second work. */
+/* Emitted with an explicit is:inline: this is data, not a module, and it
+   must land in the document exactly as written. Astro infers the same
+   thing and warns about having inferred it; saying so removes the warning
+   and records why. Putting that note beside the tag instead would make it
+   a second child of the expression, which is four type errors. */
+const jsonLd = article
+    ? {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: article.headline,
+          description,
+          inLanguage: article.lang,
+          datePublished: article.published.toISOString().slice(0, 10),
+          mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
+          author: {
+              "@type": "Person",
+              name: SITE.TITLE,
+              url: (Astro.site ?? Astro.url).origin + "/",
+          },
+          ...(article.tags?.length ? { keywords: article.tags.join(", ") } : {}),
+          ...(article.words ? { wordCount: article.words } : {}),
+      }
+    : null;
 ---
 
 <meta charset="utf-8" />
@@ -115,6 +158,16 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
+
+{
+    jsonLd && !noindex && (
+        <script
+            is:inline
+            type="application/ld+json"
+            set:html={JSON.stringify(jsonLd)}
+        />
+    )
+}
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 

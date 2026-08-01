@@ -77,9 +77,20 @@ const { alt, caption, label, bare = false } = Astro.props;
         color: var(--accent);
     }
 
+    /* Art cannot wrap, so the only way to fit a diagram on a phone is to
+       shrink the cell. Even sizes only: Iosevka advances 0.5em, and an
+       odd size lands every glyph on a half pixel and renders a solid rule
+       dashed. 10px covers a tablet; a 68-cell figure still needs 8px to
+       clear 375px without a sideways swipe. */
     @media (max-width: 700px) {
         .fig-art pre {
             font-size: 10px;
+        }
+    }
+
+    @media (max-width: 430px) {
+        .fig-art pre {
+            font-size: 8px;
         }
     }
 </style>
