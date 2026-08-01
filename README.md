@@ -78,6 +78,13 @@ Two things that will bite:
 - **Draw with box characters, not tone.** A character cell is 8×15 pixels
   carrying five grey levels. Line art works; a shaded illustration comes
   out as noise. If you want a picture, use a picture.
+- **ASCII arrowheads only: `>`, `<`, `->`, `v`.** Iosevka draws every
+  Unicode arrow and geometric shape at *two* cells — `►` `◄` `→` `⇒` `▼`
+  `▶`, all of them, and the em dash too. One in a line makes that line a
+  cell longer than its neighbours, so a box that is square in the editor
+  renders crooked and nothing in the source shows it. `node
+  scripts/check-figures.mjs` measures every character against the cell
+  and fails on anything that is not exactly one.
 - **Check the columns line up.** Iosevka advances 0.5em per cell, so an
   odd font-size puts every glyph on a half pixel and a solid `───` renders
   dashed. Figure type is pinned to even sizes for that reason.
@@ -101,6 +108,24 @@ Two faces, on purpose. Departure Mono is the chrome: menu, headings,
 windows, buttons. It is a pixel display face and long prose in it is
 tiring, so article body text is Iosevka, which is drawn to be read at
 length.
+
+Each stack carries a **stand-in** face — a system monospace with
+`size-adjust` set to the measured advance ratio (83% for Iosevka's
+0.5em, 106.3% for Departure's 0.64em, against ~0.6em system faces).
+Without them the swap from the fallback to the webfont rewraps every
+line and the page jumps: measured on a throttled connection, that reflow
+was the *only* source of layout shift on the site — CLS 0.0169 with the
+webfonts and exactly 0 with them blocked. With the stand-ins it is 0
+either way.
+
+**Order in `--mono` is load-bearing.** Departure, then the stand-in, then
+Iosevka. Iosevka has to stay in the chain because Departure is missing
+four box-drawing characters — but put it *ahead* of the stand-in and it
+also catches ordinary letters while Departure is still in flight, at
+0.5em against 0.64em, and the page reflows twice as the two webfonts
+land ~90ms apart. CLS went straight back to 0.045. The stand-in carves
+`U+2500-25FF` out of its own `unicode-range` so box characters fall past
+it to Iosevka and letters do not.
 
 ---
 
@@ -180,7 +205,11 @@ npm run build
 node scripts/check-links.mjs             # internal only, offline
 node scripts/check-links.mjs --external  # also hits the network
 python3 scripts/check-hreflang.py        # the two languages agree
+node scripts/check-figures.mjs           # every figure cell is one cell
 ```
+
+`check-figures.mjs` needs a preview server running and `playwright` on
+`NODE_PATH`; it is a check you run, not part of the build.
 
 Exits non-zero on the first broken link, so it drops into CI as-is.
 Internal links resolve against the files the build actually wrote, and

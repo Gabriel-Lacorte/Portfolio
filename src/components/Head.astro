@@ -161,10 +161,16 @@ const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
 <script>
     /* Code blocks get a strip naming their language and holding the copy
        button. The button lives on the wrapper, never inside <pre>: putting
-       it in the code block made its label part of the copied text. */
+       it in the code block made its label part of the copied text.
+
+       Figures are excluded. <Figure> already draws its own frame and
+       caption, so a diagram was coming out inside two nested borders with
+       a language strip reading "text" above it — and the art is exposed
+       to assistive tech as role="img" with a description, which a copy
+       button sitting inside it contradicts. */
     function codeBlocks() {
         document
-            .querySelectorAll<HTMLPreElement>(".article pre")
+            .querySelectorAll<HTMLPreElement>(".article pre:not(.ascii)")
             .forEach((pre) => {
                 if (pre.parentElement?.classList.contains("code-wrap")) return;
 

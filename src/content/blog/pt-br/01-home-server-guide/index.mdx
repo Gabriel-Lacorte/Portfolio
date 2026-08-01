@@ -270,22 +270,22 @@ Agora que você tem um servidor web no ar, seria interessante deixar seu site ac
               internet
                   │
                   │  TLS 443
-                  ▼
+                  v
       ┌───────────────────────┐
       │    cloudflare edge    │  WAF · DDoS · Zero Trust
       └───────────────────────┘
-                  ╎  só túnel de saída —
+                  ╎  só túnel de saída -
                   ╎  nenhuma porta aberta
-                  ▼
+                  v
       ┌───────────────────────┐
       │      cloudflared      │
       └───────────────────────┘
       ════════ home server ════
-                  ▼
+                  v
       ┌───────────────────────┐
       │       nginx  :80      │
       └───────────────────────┘
-                  ▼
+                  v
       ┌───────────────────────┐
       │    serviços docker    │
       └───────────────────────┘

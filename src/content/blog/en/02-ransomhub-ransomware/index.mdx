@@ -40,29 +40,29 @@ In the child process, where the ransomware will execute, the `setsid()` function
 {`
              ./locker
                  │
-                 ▼
+                 v
     ┌─────────────────────────┐
     │     -verbose given ?    │
     └─────────────────────────┘
-                 │  no  →  daemonise
-                 ▼
+                 │  no  ->  daemonise
+                 v
     ┌─────────────────────────┐
     │          fork()         │
     └─────────────────────────┘
-                 │  parent  →  waitpid(), reaps
-                 ▼  child
+                 │  parent  ->  waitpid(), reaps
+                 v  child
     ┌─────────────────────────┐
-    │         setsid()        │  fail → exit(1)
+    │         setsid()        │  fail -> exit(1)
     └─────────────────────────┘
-                 ▼
+                 v
     ┌─────────────────────────┐
     │       close(0,1,2)      │
     └─────────────────────────┘
-                 ▼
+                 v
     ┌─────────────────────────┐
     │open("/dev/null") + dup()│
     └─────────────────────────┘
-                 ▼
+                 v
     ┌─────────────────────────┐
     │       encrypt loop      │
     └─────────────────────────┘
