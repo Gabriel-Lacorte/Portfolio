@@ -270,22 +270,22 @@ Now that you have a web server up and running, it would be interesting to be abl
               internet
                   │
                   │  TLS 443
-                  ▼
+                  v
       ┌───────────────────────┐
       │    cloudflare edge    │  WAF · DDoS · Zero Trust
       └───────────────────────┘
-                  ╎  outbound tunnel only —
+                  ╎  outbound tunnel only -
                   ╎  no inbound port opened
-                  ▼
+                  v
       ┌───────────────────────┐
       │      cloudflared      │
       └───────────────────────┘
       ════════ home server ════
-                  ▼
+                  v
       ┌───────────────────────┐
       │       nginx  :80      │
       └───────────────────────┘
-                  ▼
+                  v
       ┌───────────────────────┐
       │    docker services    │
       └───────────────────────┘

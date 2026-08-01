@@ -60,6 +60,46 @@
     font-display: swap;
 }
 
+/* Stand-ins with matched advance widths.
+   Between first paint and the webfont arriving, text is set in whatever
+   monospace the system has — 0.6021em per character here against
+   Iosevka's 0.5em — so every line wraps somewhere else and the whole
+   page reflows when the real face lands. Measured: that reflow is the
+   *only* source of layout shift on this site. On a throttled connection
+   CLS was 0.0169 with the webfonts and exactly 0 with them blocked.
+
+   size-adjust makes the stand-in take up the same room, so the swap is a
+   change of shape and not of position. The percentages are the measured
+   ratios: 0.5 / 0.6021 and 0.64 / 0.6021. They are tuned to the ~0.60em
+   faces (DejaVu, Liberation, Menlo, Courier New); Consolas at 0.55em is
+   the one common exception and lands a little narrow, which is still far
+   closer than no adjustment at all. */
+@font-face {
+    font-family: "Iosevka stand-in";
+    src:
+        local("DejaVu Sans Mono"), local("Liberation Mono"), local("Menlo"),
+        local("Consolas"), local("Courier New");
+    size-adjust: 83%;
+}
+
+@font-face {
+    font-family: "Departure stand-in";
+    src:
+        local("DejaVu Sans Mono"), local("Liberation Mono"), local("Menlo"),
+        local("Consolas"), local("Courier New");
+    size-adjust: 106.3%;
+    /* Everything except U+2500-25FF. Departure is missing four box-drawing
+       characters and Iosevka has them, so Iosevka has to stay in the chrome
+       chain — but if it sits *before* this face it also catches ordinary
+       letters during the load window, at 0.5em against Departure's 0.64em,
+       and the page reflows twice as the two webfonts land ~90ms apart.
+       Measured: CLS went 0 -> 0.045 the moment Iosevka went in ahead of
+       this. Carving the box range out of this face puts it back to 0 and
+       keeps the coverage: letters take this, box characters fall past it
+       to Iosevka. */
+    unicode-range: U+0-24FF, U+2600-10FFFF;
+}
+
 :root {
     --base: #ece4e2;          /* warm bone */
     --bg: #0a0507;            /* near-black, red undertone */
@@ -90,8 +130,12 @@
     --win-edge: #a30f1e;
     --win-title: #ff4d5c;
 
-    --mono: "Departure Mono", "Iosevka", ui-monospace, monospace;
-    --code: "Iosevka", ui-monospace, "Cascadia Mono", monospace;
+    /* Order matters and is not alphabetical. Departure first; the stand-in
+       second so letters have correct metrics before it loads; Iosevka
+       third, reached only by the box-drawing characters the stand-in
+       deliberately does not claim. */
+    --mono: "Departure Mono", "Departure stand-in", "Iosevka", ui-monospace, monospace;
+    --code: "Iosevka", "Iosevka stand-in", ui-monospace, "Cascadia Mono", monospace;
 
     color-scheme: dark;
 }

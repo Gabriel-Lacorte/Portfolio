@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
+import rehypeImageSize from "./src/lib/rehype-image-size.mjs";
 
 export default defineConfig({
     site: "https://lacorte.city",
@@ -36,6 +37,9 @@ export default defineConfig({
     },
 
     markdown: {
+        /* Reads each image's real size off disk so nothing reflows when
+           the bytes land. See the file for why it is PNG-only. */
+        rehypePlugins: [rehypeImageSize],
         shikiConfig: {
             // Colours come from --astro-code-* in global.css, so syntax
             // highlighting follows the theme toggle instead of being baked in.
