@@ -597,31 +597,113 @@ ul.plain {
     padding: 0;
 }
 
-/* ── boxes: name, role, state ──────────────────────────────────────── */
+/* The `.boxes` block lived here: name, role, and a coloured ● up / down /
+   idle state for each machine in the lab listing. It went with the
+   listing itself — nothing on this site can know that a box is up, and a
+   dot that claims it anyway is the one kind of decoration this design
+   cannot afford. If a real probe ever exists, the state colours come
+   back with it. */
 
-/* This used to carry `.boxes > li::before { content: none }`, which never
-   once took effect: at (0,1,2) it loses to the dash rule above at (0,1,4),
-   so the lab list has always been dashed like every other list on the
-   page — and reads better for it. The rule is gone rather than
-   strengthened, and these items take the hanging indent with the rest. */
-.boxes > li {
-    padding: 2px 0;
+/* ── listings ──────────────────────────────────────────────────────────
+   One grammar for every index on the site: a fixed left column (a date,
+   a year), the name, a right-aligned note, and the detail hanging off
+   the name's edge. The blog and the projects page were two different
+   shapes for the same job — six stacked command headings on one, a real
+   listing on the other.
+
+   The column is a px token, not `ch`, and that is deliberate: the row is
+   set in Departure (9.55px per cell) while the description under it is
+   prose in Iosevka (7.5px), so the same `11ch` produced two different
+   widths and the description landed 23px left of the title. */
+
+.listing {
+    --datecol: 105px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-.boxes .bname {
-    color: var(--accent);
+.listing > li + li {
+    margin-top: 14px;
 }
 
-.boxes .state[data-s="up"] {
-    color: var(--green);
+.listing > li::before {
+    content: none;
 }
 
-.boxes .state[data-s="down"] {
-    color: var(--red);
+.listing .head {
+    display: grid;
+    grid-template-columns: var(--datecol) minmax(0, 1fr) auto;
+    gap: 0 12px;
+    align-items: baseline;
+    text-decoration: none;
 }
 
-.boxes .state[data-s="idle"] {
-    color: var(--amber);
+.listing .when,
+.listing .len {
+    color: var(--comment);
+}
+
+.listing .title {
+    color: var(--base);
+    text-decoration: underline;
+}
+
+/* Only the title inverts: lighting the whole grid row up swallowed the
+   date and the reading time with it. */
+.listing .head:hover,
+.listing .head:focus-visible {
+    background: none;
+    color: inherit;
+    outline: none;
+}
+
+.listing .head:hover .title,
+.listing .head:focus-visible .title {
+    color: var(--bg);
+    background: var(--blood);
+    text-decoration: none;
+}
+
+.listing .desc,
+.listing .tags {
+    margin: 2px 0 0;
+    padding-left: calc(var(--datecol) + 12px);
+    color: var(--comment);
+}
+
+.listing .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 1ch;
+}
+
+/* Bordered pills were chrome around two words of metadata — cards by
+   another name, and the system does not have cards. The hash carries the
+   mark; the word stays quiet. */
+.listing .tag {
+    color: var(--comment);
+    font-size: 14px;
+}
+
+.listing .tag::before {
+    content: "#";
+    color: var(--blood);
+}
+
+@media (max-width: 700px) {
+    .listing .head {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .listing .when {
+        grid-column: 1 / -1;
+    }
+
+    .listing .desc,
+    .listing .tags {
+        padding-left: 0;
+    }
 }
 
 /* ── row lists: [date] title ───────────────────────────────────────── */
@@ -1131,6 +1213,17 @@ html.light {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+
+    /* The universal selector does not reach these. View transitions
+       animate ::view-transition-old(root) and ::view-transition-new(root),
+       which are not elements, so the site cross-faded on every navigation
+       for someone who had asked it not to — the one animation on the
+       whole site, and the one the rule above missed. */
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
 }
 
 @media (max-width: 700px) {
@@ -1158,9 +1251,37 @@ html.light {
         --hair: solid 1px #999;
     }
 
+    /* Controls do nothing on paper. The menu, the copy buttons and the
+       theme switch all printed as live-looking widgets that cannot be
+       pressed — the menu even kept its current-page highlight. */
     .taskbar,
     .window,
+    .menu,
+    .code-bar,
     .no-print {
         display: none !important;
+    }
+
+    /* A printed article with underlined words and no addresses loses
+       every reference it makes. Internal links are reachable from the
+       site itself, so only outbound ones are worth the ink. */
+    .article a[href^="http"]::after {
+        content: " <" attr(href) ">";
+        font-size: 0.9em;
+        word-break: break-all;
+    }
+
+    /* Nothing that is drawn should be cut in half by a page edge. */
+    figure,
+    pre,
+    .code-wrap,
+    .fig-art {
+        break-inside: avoid;
+    }
+
+    h1,
+    h2,
+    h3 {
+        break-after: avoid;
     }
 }

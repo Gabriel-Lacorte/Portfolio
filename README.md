@@ -104,6 +104,20 @@ while code blocks had their own darker one, and a comment token sat at
 16.15:1, dim 7.08:1, blood 6.23:1 — and every syntax token clears 4.5:1
 against `#1f0509`.
 
+Printing works, and is checked by rendering to PDF rather than assumed:
+controls are hidden (the menu, the copy buttons, the theme switch all
+printed as live-looking widgets that cannot be pressed), outbound link
+addresses are printed after the text — an article on paper with
+underlined words and no URLs loses every reference it makes — and
+figures, code blocks and headings do not break across a page edge.
+
+`prefers-reduced-motion` disables the view transitions too. The usual
+`*, *::before, *::after` rule does not reach them: they animate
+`::view-transition-old(root)` and `::view-transition-new(root)`, which
+are not elements. The site cross-faded on every navigation for someone
+who had asked it not to — the only animation on the whole site, and the
+one that rule missed.
+
 Two faces, on purpose. Departure Mono is the chrome: menu, headings,
 windows, buttons. It is a pixel display face and long prose in it is
 tiring, so article body text is Iosevka, which is drawn to be read at
@@ -208,8 +222,14 @@ python3 scripts/check-hreflang.py        # the two languages agree
 node scripts/check-figures.mjs           # every figure cell is one cell
 ```
 
-`check-figures.mjs` needs a preview server running and `playwright` on
-`NODE_PATH`; it is a check you run, not part of the build.
+`check-figures.mjs` needs `playwright` resolvable from the project — it
+is a check you run, not a build dependency. It serves `dist/` itself, so
+there is no preview server to start first. (`NODE_PATH` does not work for
+this: ES module resolution ignores it.)
+
+All of it runs on every push through `.github/workflows/ci.yml`, plus
+weekly for the external links — the web moves under a site that is not
+being touched.
 
 Exits non-zero on the first broken link, so it drops into CI as-is.
 Internal links resolve against the files the build actually wrote, and

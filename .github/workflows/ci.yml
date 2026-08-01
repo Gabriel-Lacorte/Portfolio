@@ -1,0 +1,72 @@
+# Every check in this repository, run on every push.
+#
+# They exist because each one caught something that reading the source did
+# not: a CSP hash that stopped matching its script, hreflang tags pointing
+# one redirect away from the pages they meant, a font glyph two cells wide
+# in a diagram that has to be one, a link that rotted when Debian 12
+# became oldstable. None of those look wrong in a diff.
+#
+# The build itself already runs `astro check` and the header check, so a
+# type error or a stale vercel.json fails here without a separate step.
+
+name: checks
+
+on:
+  push:
+  pull_request:
+  # The web moves under a site that is not being touched. Once a week is
+  # enough to notice a dead link before a reader does.
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # astro check + astro build + gen-headers --check
+      - name: Build
+        run: npm run build
+
+      - name: Internal links
+        run: node scripts/check-links.mjs
+
+      - name: hreflang graph
+        run: python3 scripts/check-hreflang.py
+
+      # Needs a browser: the check measures glyph advances in the font
+      # that actually renders, which cannot be done from the source. The
+      # script serves dist/ itself, so there is no server to start, wait
+      # for, or leak between steps.
+      - name: Install Playwright
+        run: npm i --no-save playwright && npx playwright install --with-deps chromium
+
+      - name: Figure alignment
+        run: node scripts/check-figures.mjs
+
+  # Split out because it depends on the rest of the internet being up, and
+  # a third party going down should not turn the whole run red on a commit
+  # that changed nothing.
+  external-links:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: node scripts/check-links.mjs --external

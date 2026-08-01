@@ -57,7 +57,7 @@
       "kind": "custom",
       "refersTo": "cmd-heading",
       "description": "The signature section heading: a command the operator would actually run. Green $, bone command, blood argument, comment aside.",
-      "html": "<h2 class=\"ds-cmd\"><span class=\"ds-cmd-run\">systemctl status</span> <span class=\"ds-cmd-flag\">lab</span><span class=\"ds-cmd-aside\">3 up · 0 down</span></h2>",
+      "html": "<h2 class=\"ds-cmd\"><span class=\"ds-cmd-run\">ls -la</span> <span class=\"ds-cmd-flag\">~/writing</span><span class=\"ds-cmd-aside\">3 posts · 4.0k words</span></h2>",
       "css": ".ds-cmd{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin:0;font-family:\"Departure Mono\",Iosevka,ui-monospace,monospace;font-size:15px;font-weight:400;color:var(--base,#ece4e2)}.ds-cmd::before{content:\"$\";color:var(--green,#4fd67f)}.ds-cmd-flag{color:var(--accent,#ff4d5c)}.ds-cmd-aside{margin-left:auto;color:var(--comment,#a39694);font-size:14px}"
     },
     {
