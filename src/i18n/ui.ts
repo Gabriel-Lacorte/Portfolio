@@ -38,7 +38,9 @@ const en = {
     "home.stack": "what i use",
     "home.now": "right now",
     "home.intro1":
-        "Hey, welcome. I'm Gabriel, a systems engineer with a passion for cybersec and low-level programming. This is where I write down what I find when I take things apart.",
+        "Hey, welcome. I'm Gabriel, a systems engineer with a passion for cybersec and low-level programming, with a particular interest in compilers and windows.",
+    "home.intro2":
+        "This site is where I write about computers, cybersecurity, and low-level engineering. It's also where I show the projects I've built, and what I use to build them.",
     "win.status": "Blog status",
     "win.lab": "Homelab status",
     "win.close": "Close window",
