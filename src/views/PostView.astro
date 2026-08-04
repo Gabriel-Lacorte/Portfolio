@@ -1,8 +1,8 @@
 ---
+import { render } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Cmd from "@components/Cmd.astro";
 import TableOfContents from "@components/TableOfContents.astro";
-import { render } from "astro:content";
 import { borrowingLocales, isFallback, localeOf, type Post } from "@lib/posts";
 import { compact, countWords, readingTime } from "@lib/stats";
 import { HTML_LANG } from "@i18n/ui";
@@ -14,7 +14,6 @@ const t = useTranslations(locale);
 
 const { Content, headings } = await render(post);
 const iso = post.data.date.toISOString().slice(0, 10);
-const body = post.body ?? "";
 
 const borrowed = isFallback(post, locale);
 const untranslated = await borrowingLocales(post);
@@ -40,7 +39,7 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
         published: post.data.date,
         lang: HTML_LANG[localeOf(post)],
         tags: post.data.tags,
-        words: countWords(body),
+        words: countWords(post.body ?? ""),
     }}
 >
     <Cmd
@@ -48,7 +47,7 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
         arg={file}
         icon="note"
         as="h2"
-        aside={`${iso} * ${readingTime(body)} min`}
+        aside={`${iso} * ${readingTime(post.body ?? "")} min`}
     />
 
     <div class="out">
@@ -58,7 +57,7 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
             <span lang={bodyLang}>{post.data.description}</span>
             <br />
             <span class="comment">
-                {compact(countWords(body))} {t("unit.words")}
+                {compact(countWords(post.body ?? ""))} {t("unit.words")}
                 {post.data.tags.length > 0 && (
                     <> · {post.data.tags.join(", ")}</>
                 )}
