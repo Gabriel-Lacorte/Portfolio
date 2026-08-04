@@ -60,7 +60,7 @@ export async function getStats(): Promise<SiteStats> {
     }
     const posts = [...byKey.values()];
 
-    const words = posts.reduce((sum, p) => sum + countWords(p.body), 0);
+    const words = posts.reduce((sum, p) => sum + countWords(p.body ?? ""), 0);
 
     const latest = posts
         .map((p) => p.data.date)
