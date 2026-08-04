@@ -22,7 +22,7 @@ export async function GET(context: APIContext) {
             pubDate: post.data.date,
             /* Trailing slash: the build makes directory routes, so
                without it every entry points one redirect away from the
-               article — same trap the hreflang tags fell into. */
+               article, same trap the hreflang tags fell into. */
             link: `${localised(`/blog/${post.data.translationKey}`, "pt-br")}/`,
         })),
         customData: "<language>pt-BR</language>",

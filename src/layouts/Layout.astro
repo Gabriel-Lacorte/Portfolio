@@ -13,17 +13,17 @@ type Props = {
     locale: Locale;
     title: string;
     description: string;
-    /** Home passes false — its <title> is just the site name. */
+    /** Home passes false, its <title> is just the site name. */
     suffix?: boolean;
     /** Home shows the floating windows and the taskbar. */
     windows?: boolean;
-    /** Forwarded to <Head> — locales whose route serves borrowed text. */
+    /** Forwarded to <Head>, locales whose route serves borrowed text. */
     untranslated?: Locale[];
-    /** Forwarded to <Head> — keeps the page out of the index. */
+    /** Forwarded to <Head>, keeps the page out of the index. */
     noindex?: boolean;
-    /** Forwarded to <Head> — points the canonical at another route. */
+    /** Forwarded to <Head>, points the canonical at another route. */
     canonicalPath?: string;
-    /** Forwarded to <Head> — article facts for JSON-LD. */
+    /** Forwarded to <Head>, article facts for JSON-LD. */
     article?: {
         headline: string;
         published: Date;
@@ -94,6 +94,8 @@ const isCurrent = (href: string) =>
                                 </li>
                             ))
                         }
+                    </ul>
+                    <ul>
                         <li class="lang">
                             {
                                 LOCALES.map((code, i) => (
@@ -112,19 +114,6 @@ const isCurrent = (href: string) =>
                                     </>
                                 ))
                             }
-                        </li>
-                        <li
-                            class="mode no-print"
-                            role="group"
-                            aria-label={t("theme.label")}
-                        >
-                            <button type="button" data-theme-set="dark">
-                                {t("theme.dark")}
-                            </button>
-                            {" / "}
-                            <button type="button" data-theme-set="light">
-                                {t("theme.light")}
-                            </button>
                         </li>
                     </ul>
                 </nav>
@@ -166,22 +155,26 @@ const isCurrent = (href: string) =>
 
             <div class="buttons88">
                 <img
-                    src="/buttons/lacorte.png"
+                    src="https://lacorte.neocities.org/lacorte.gif"
                     width="88"
                     height="31"
-                    alt="lacorte.city — 88x31 button, free to hotlink"
-                />
-<img
-                    src="/buttons/nojs.png"
-                    width="88"
-                    height="31"
-                    alt="This site works without JavaScript"
+                    alt="lacorte.city"
                 />
                 <img
-                    src="/buttons/astro.png"
+                    src="https://lacorte.neocities.org/imgs/chill_pill.gif"
                     width="88"
                     height="31"
-                    alt="Built with Astro"
+                    alt="take a chill pill"
+                />
+                <img
+                    src="https://lacorte.neocities.org/imgs/privacynet.gif"
+                    width="88"
+                    height="31"
+                    alt="internet privacy now!"
+                />
+                <img
+                    src="https://nanacore.net/imgs/brs/bandeira.png"
+                    title="Esse site faz parte do WebCírculo BR!"
                 />
             </div>
         </div>

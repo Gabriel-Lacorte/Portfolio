@@ -28,7 +28,7 @@ Simple, isn't it? The whole exchange fits in one picture:
 
 <Figure
   label="fig.1"
-  caption="Kerberos authentication — six messages, three parties, no password on the wire."
+  caption="Kerberos authentication, six messages, three parties, no password on the wire."
   alt="Sequence diagram of Kerberos authentication. The client sends AS_REQ, a timestamp encrypted with its password hash, to the KDC. The KDC decrypts it to prove identity and replies with AS_REP carrying a TGT encrypted with the krbtgt key. The client then sends TGS_REQ with that TGT and a target SPN; the KDC looks the SPN up and replies with TGS_REP, a ticket encrypted with the service account's key. Finally the client sends AP_REQ with that ticket to the service, which decrypts it and replies AP_REP granting access."
 >
 {`

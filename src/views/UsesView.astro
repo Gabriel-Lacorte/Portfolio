@@ -34,7 +34,7 @@ const ICON: Record<number, string> = { 0: "chip", 1: "disk", 2: "term" };
                 <b>{row.k}</b>{" "}
                 {row.v.startsWith("/") ? (
                   <a href={localised(row.v, locale)}>{row.v}</a>
-                ) : row.v === "—" ? (
+                ) : row.v === "-" ? (
                   <span class="comment">{t("uses.unset")}</span>
                 ) : (
                   row.v

@@ -27,7 +27,7 @@ Simples, não? A troca inteira cabe em uma figura:
 
 <Figure
   label="fig.1"
-  caption="Autenticação Kerberos — seis mensagens, três partes, nenhuma senha na rede."
+  caption="Autenticação Kerberos, seis mensagens, três partes, nenhuma senha na rede."
   alt="Diagrama de sequência da autenticação Kerberos. O cliente envia AS_REQ, um timestamp cifrado com o hash da sua senha, ao KDC. O KDC decifra para provar a identidade e responde com AS_REP contendo um TGT cifrado com a chave do krbtgt. O cliente então envia TGS_REQ com esse TGT e um SPN alvo; o KDC resolve o SPN e responde com TGS_REP, um ticket cifrado com a chave da conta de serviço. Por fim o cliente envia AP_REQ com esse ticket ao serviço, que o decifra e responde AP_REP concedendo acesso."
 >
 {`
@@ -91,7 +91,7 @@ Então, quando um cliente pede autenticação, ele fornece o SPN. O Kerberos loc
 
 Agora que entendemos o básico do funcionamento do Kerberos, vamos ao clássico ataque de Kerberoasting.
 
-Kerberoasting é direto, mas poderoso. Continua comum porque não existe mitigação totalmente eficaz — ele explora o próprio desenho do protocolo.
+Kerberoasting é direto, mas poderoso. Continua comum porque não existe mitigação totalmente eficaz, ele explora o próprio desenho do protocolo.
 
 Para entender o ataque, é preciso lembrar do Ticket-Granting Service (TGS). Esse ticket é gerado pelo KDC quando um usuário pede acesso a um serviço, e é cifrado com a senha desse serviço.
 
@@ -151,7 +151,7 @@ python3 GetUserSPNs.py -dc-ip <dc_ip> <dominio>/<usuario> -request-all
 
 O ataque de AS_REP Roasting é parecido com o Kerberoasting e funciona explorando contas em que a pré-autenticação (pre-auth) está desabilitada.
 
-Em uma requisição normal de TGT, o cliente precisa enviar um AS_REQ cifrado com a própria senha para que o KDC responda. Com a pré-autenticação desabilitada, o KDC não precisa da senha do cliente para responder. Isso significa que ele responde a um AS_REQ sem exigir senha, permitindo que um atacante — mesmo sem acesso a nenhuma conta do AD — peça um TGT para qualquer conta com pré-autenticação desabilitada.
+Em uma requisição normal de TGT, o cliente precisa enviar um AS_REQ cifrado com a própria senha para que o KDC responda. Com a pré-autenticação desabilitada, o KDC não precisa da senha do cliente para responder. Isso significa que ele responde a um AS_REQ sem exigir senha, permitindo que um atacante, mesmo sem acesso a nenhuma conta do AD, peça um TGT para qualquer conta com pré-autenticação desabilitada.
 
 Para verificar se uma conta está com a pré-autenticação desabilitada, podemos usar:
 
@@ -182,4 +182,4 @@ john asrep.hash --wordlist=senhas.txt
 O objetivo deste artigo é dar uma noção básica de como o Kerberos funciona e de como atacá-lo.
 Espero que tenha sido útil. Se tiver dúvidas ou sugestões para artigos futuros, é só me chamar.
 
-O artigo ainda não está completo — em breve vai cobrir ataques de delegação em detalhe.
+O artigo ainda não está completo, em breve vai cobrir ataques de delegação em detalhe.

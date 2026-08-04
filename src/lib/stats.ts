@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 
 /**
  * Build-time facts about the site. Everything here is resolved once during
- * the static build — nothing ships to the client.
+ * the static build, nothing ships to the client.
  */
 
 export type SiteStats = {
@@ -83,7 +83,7 @@ export function compact(n: number): string {
 /**
  * The self-test readout, in the idiom of the avionics panels this design
  * is drawn from. Every line is a fact about this build rather than a
- * slogan — which is the only reason it is worth putting on the page.
+ * slogan, which is the only reason it is worth putting on the page.
  */
 export function getSelfTest(stats: SiteStats) {
     return [

@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""
-Regenerates every generated asset in public/.
-
-    python3 scripts/gen-assets.py           # everything
-    python3 scripts/gen-assets.py icons     # just one group
-
-Nothing here runs at build time. These files are committed, and this
-script exists so they can be changed — the first versions were made with
-throwaway snippets, which meant a palette change left the icons behind in
-the old colours with no way to redo them.
-
-Needs: pillow, fonttools  (pip install pillow fonttools)
-"""
 
 import sys
 from pathlib import Path
@@ -21,25 +8,12 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parent.parent
 PUBLIC = ROOT / "public"
 
-# Keep in step with :root in src/styles/global.css.
 BONE = "#ece4e2"
 INK = "#0a0507"
 BLOOD = "#ff4d5c"
 DIM = "#a39694"
 GREEN = "#4fd67f"
 AMBER = "#e8b04b"
-
-
-# ── icons ──────────────────────────────────────────────────────────────
-# 16x16 pixel grids, one per section heading. '.' is transparent, every
-# other character is drawn.
-#
-# These are rendered as solid white on transparent and used as CSS masks,
-# painted with currentColor. They were baked in the palette's colours at
-# first, which meant every palette change stranded them — twice — and on
-# the paper theme they sat at 1.04:1 against the background, invisible.
-# A mask cannot go stale: it follows the text colour of whatever it sits
-# in, in both themes, for ever.
 
 MASK = "#ffffff"
 PIXELS = {".": None}
@@ -119,7 +93,7 @@ BUTTONS = {
     "lacorte": ([("lacorte", BONE, 12), (".city", BLOOD, 11)], BLOOD),
     # "no javascript" was a lie: the site ships ~18KB of it for the theme
     # switch, the draggable windows and the copy buttons. What is true is
-    # that none of it is required — scripting off, every page still works.
+    # that none of it is required, scripting off, every page still works.
     "nojs": ([("works without", GREEN, 9), ("javascript", BONE, 10)], GREEN),
     "astro": ([("built with", DIM, 9), ("A S T R O", BONE, 10)], DIM),
 }

@@ -12,7 +12,7 @@ type Props = {
     /**
      * Locales whose route exists but serves another language's text.
      * A post with no Portuguese translation still answers at its
-     * Portuguese URL — with the English body and a notice — and that
+     * Portuguese URL, with the English body and a notice, and that
      * URL must not advertise itself as the Portuguese version.
      */
     untranslated?: Locale[];
@@ -55,7 +55,7 @@ const canonical = new URL(
    Without this the two languages are two unrelated documents competing
    with each other: nothing tells a search engine that /blog/x and
    /pt-br/blog/x are one article, so the wrong one gets served to half
-   the readers. Reciprocal by construction — the pair is derived from
+   the readers. Reciprocal by construction, the pair is derived from
    the path rather than hand-listed, so it cannot drift.
 
    x-default points at the unprefixed English route: the answer to
@@ -64,7 +64,7 @@ const canonical = new URL(
    An alternate has to be byte-identical to the target page's canonical
    or the pair is not reciprocal and the whole set is ignored. Astro
    builds directory routes, so every canonical ends in a slash while
-   `localised()` returns none — the first version pointed every tag at a
+   `localised()` returns none, the first version pointed every tag at a
    URL one redirect away from the real one, which is the same as having
    written nothing. Hence `withSlash`, and hence the check in
    scripts/check-hreflang.py. */
@@ -195,7 +195,7 @@ const jsonLd = article
      module below.
 
      Dark is the default rather than a mirror of prefers-color-scheme,
-     because dark *is* the design here — light is an alternative, and it
+     because dark *is* the design here, light is an alternative, and it
      stays one click away and persists once chosen. -->
 <script is:inline>
     (() => {
@@ -218,7 +218,7 @@ const jsonLd = article
 
        Figures are excluded. <Figure> already draws its own frame and
        caption, so a diagram was coming out inside two nested borders with
-       a language strip reading "text" above it — and the art is exposed
+       a language strip reading "text" above it, and the art is exposed
        to assistive tech as role="img" with a description, which a copy
        button sitting inside it contradicts. */
     function codeBlocks() {
@@ -266,7 +266,7 @@ const jsonLd = article
 
        All of it is an enhancement. Without scripting a window is simply
        always open and sits in the document flow, which is the right
-       fallback for a panel of static text — so the markup ships in flow
+       fallback for a panel of static text, so the markup ships in flow
        and this lifts it out, rather than the other way round.
 
        The first version lifted a window to fixed positioning lazily, on
@@ -279,7 +279,7 @@ const jsonLd = article
     /* A window may only detach where it actually fits beside the column.
        That is arithmetic, not taste. The column is 984px and centred, so
        each gutter is (100vw - 984) / 2, and a window needs WIN_W + GAP of
-       it — hence 984 + 2 * (280 + 24) = 1592. Below that they stay in the
+       it, hence 984 + 2 * (280 + 24) = 1592. Below that they stay in the
        document flow, which is also the no-script behaviour.
 
        GAP has to be the same number the default placement uses, below.
@@ -287,7 +287,7 @@ const jsonLd = article
        the floating moved into script) and a window landed on the prose:
        at 1100px it sat at x=736 with the column running to 1042. Then it
        was derived correctly but with GAP=16 while the placement inset by
-       24, and 1700px still overlapped — by exactly the 6px the two
+       24, and 1700px still overlapped, by exactly the 6px the two
        constants disagreed about. One constant, used twice.
 
        340 wide put the threshold at 1712, which no ordinary laptop
@@ -367,7 +367,7 @@ const jsonLd = article
             if (persist) saveOpen(id, open);
             if (!open || !win) return;
             /* Reopening has to show something. Floating: if the position
-               it remembers would land on the text, it parks instead —
+               it remembers would land on the text, it parks instead,
                that is the way back out of the one bad state a drag can
                reach. In the flow: it can be below the fold, so scroll. */
             if (win.style.position === "fixed") repark(win);
@@ -459,7 +459,7 @@ const jsonLd = article
 
             /* Dragging is functionality, so it has to work without a
                pointer too. The bar is a tab stop only while the window
-               actually floats — in the flow it moves nothing, and a tab
+               actually floats, in the flow it moves nothing, and a tab
                stop that does nothing is worse than no tab stop. */
             bar.tabIndex = 0;
             bar.setAttribute("role", "application");
@@ -468,7 +468,7 @@ const jsonLd = article
 
         /* Narrowing past the threshold has to undo all of it. The width
            check used to run once at startup, so a window loaded wide and
-           then resized narrow stayed fixed — on top of the prose, which
+           then resized narrow stayed fixed, on top of the prose, which
            is the state the threshold exists to prevent. */
         const drop = (win: HTMLElement) => {
             const bar = win.querySelector<HTMLElement>(".window__bar");
@@ -483,6 +483,15 @@ const jsonLd = article
         };
 
         const sync = () => {
+            /* Closing and reopening are affordances of the floating mode.
+               In the flow a window is a panel of static text near the end
+               of the page, and the taskbar was a fixed bar sitting in the
+               thumb zone of a phone to toggle something two screens away
+              , pressing it either did nothing visible or teleported the
+               reader to the bottom. The class carries the JS threshold
+               into CSS so the number stays declared once. */
+            document.documentElement.classList.toggle("floating", floats());
+
             wins.forEach((win, i) => {
                 if (!floats()) return drop(win);
                 lift(win, i);

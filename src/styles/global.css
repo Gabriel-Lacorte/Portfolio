@@ -1,41 +1,3 @@
-/* ══════════════════════════════════════════════════════════════════════
-   lacorte.city
-   ──────────────────────────────────────────────────────────────────────
-   Its own thing now. What it keeps from the references is the register —
-   terminal, 1-bit, no ornament for ornament's sake — and nothing of their
-   chrome:
-
-     · it is a DOCUMENT, not a dashboard. One column that flows top to
-       bottom. No grid of bordered cards — that is exactly what made the
-       previous pass read as a generic admin panel.
-     · bone on a red-black ink, and one signature: blood. Only --blood
-       carries text in its triad; --blood-deep and --blood-dark are fills
-       and grounds. Green and amber stay margin marks — a handful of uses
-       each, with fixed meanings.
-     · borders are hairlines or nothing — the dashed rule was the
-       reference's signature, not ours. The article's 2px quote rail is
-       the one committed exception.
-     · headings are the command whose output follows them.
-     · hover is reverse video, everywhere.
-     · one drawing: the home masthead wordmark, pixel-drawn in half
-       blocks with the domain dot in blood. Every image before it read
-       as clutter, and a 1-bit dither of anything complex is just
-       static — this is line work in the site's own characters, the
-       exception that rule was written to permit. Subpages keep type.
-     · the chrome speaks Departure Mono; the prose is Iosevka on a 72ch
-       measure, because twenty minutes of reading in a pixel face is a
-       punishment.
-     · warmth over polish: buttons, a changelog in the first person,
-       floating windows you can drag and close, a theme you can flip —
-       none of it required. Scripting off, everything still works.
-
-   Contrast on #0a0507 — bone 16.15:1, green 10.85:1, amber 10.35:1,
-   comment 7.08:1, all AAA; blood 6.23:1, AA and the floor. Printed flips
-   to #f0e9e6 and holds AA everywhere (worst: comment 5.30:1). --rule is
-   1.78:1 lit / 1.90:1 printed and never carries text; the code ground
-   keeps its own ledger beside --blood-dark.
-   ══════════════════════════════════════════════════════════════════════ */
-
 @font-face {
     font-family: "Departure Mono";
     src: url("/fonts/departure-mono.woff2") format("woff2");
@@ -60,20 +22,6 @@
     font-display: swap;
 }
 
-/* Stand-ins with matched advance widths.
-   Between first paint and the webfont arriving, text is set in whatever
-   monospace the system has — 0.6021em per character here against
-   Iosevka's 0.5em — so every line wraps somewhere else and the whole
-   page reflows when the real face lands. Measured: that reflow is the
-   *only* source of layout shift on this site. On a throttled connection
-   CLS was 0.0169 with the webfonts and exactly 0 with them blocked.
-
-   size-adjust makes the stand-in take up the same room, so the swap is a
-   change of shape and not of position. The percentages are the measured
-   ratios: 0.5 / 0.6021 and 0.64 / 0.6021. They are tuned to the ~0.60em
-   faces (DejaVu, Liberation, Menlo, Courier New); Consolas at 0.55em is
-   the one common exception and lands a little narrow, which is still far
-   closer than no adjustment at all. */
 @font-face {
     font-family: "Iosevka stand-in";
     src:
@@ -88,52 +36,31 @@
         local("DejaVu Sans Mono"), local("Liberation Mono"), local("Menlo"),
         local("Consolas"), local("Courier New");
     size-adjust: 106.3%;
-    /* Everything except U+2500-25FF. Departure is missing four box-drawing
-       characters and Iosevka has them, so Iosevka has to stay in the chrome
-       chain — but if it sits *before* this face it also catches ordinary
-       letters during the load window, at 0.5em against Departure's 0.64em,
-       and the page reflows twice as the two webfonts land ~90ms apart.
-       Measured: CLS went 0 -> 0.045 the moment Iosevka went in ahead of
-       this. Carving the box range out of this face puts it back to 0 and
-       keeps the coverage: letters take this, box characters fall past it
-       to Iosevka. */
     unicode-range: U+0-24FF, U+2600-10FFFF;
 }
 
 :root {
-    --base: #ece4e2;          /* warm bone */
-    --bg: #0a0507;            /* near-black, red undertone */
+    --base: #ece4e2;
+    --bg: #0a0507;
     --white: #ffffff;
     --comment: #a39694;
 
-    /* Blood is the signature, not a rare accent. --blood is the one that
-       carries text (6.23:1); --blood-deep and --blood-dark are fills and
-       rules and never do. */
-    --blood: #ff4d5c;
-    --blood-deep: #a30f1e;
-    /* Code-block ground. #33070d read as a wall of red boxes down a page
-       full of listings, and dropped the comment token to 4.36:1 against
-       it — the syntax colours had only been checked against the page
-       background, not this one. All seven pass here. */
-    --blood-dark: #1f0509;
+    --blood: #db001a;
+    --blood-deep: #9c0615;
+    --blood-dark: rgb(14, 2, 4);
 
-    --rule: #5e2a2f;
-    --hair: solid 1px #5e2a2f;
-
+    --rule: #50171c;
+    --hair: solid 1px #50171c;
     --accent: var(--blood);
     --green: #4fd67f;
     --amber: #e8b04b;
     --red: var(--blood);
 
-    --win-line: #7a2b33;
+    --win-line: #5f171e;
     --win-bar: #1a0a0e;
-    --win-edge: #a30f1e;
-    --win-title: #ff4d5c;
+    --win-edge: #8d1622;
+    --win-title: #e70e20;
 
-    /* Order matters and is not alphabetical. Departure first; the stand-in
-       second so letters have correct metrics before it loads; Iosevka
-       third, reached only by the box-drawing characters the stand-in
-       deliberately does not claim. */
     --mono: "Departure Mono", "Departure stand-in", "Iosevka", ui-monospace, monospace;
     --code: "Iosevka", "Iosevka stand-in", ui-monospace, "Cascadia Mono", monospace;
 
@@ -166,26 +93,10 @@ html.light {
     color-scheme: light;
 }
 
-/* ── focus ─────────────────────────────────────────────────────────── */
-
-/* The site's hover and focus idiom is reverse video, which works
-   everywhere except on a control that is *already* reversed: the
-   current page in the menu, the current locale, the current theme, an
-   open window's taskbar button. Focusing one of those changed nothing
-   at all, so a keyboard user tabbing the header could not tell where
-   they were — 71 controls across the site, every one of them a control
-   in its selected state.
-
-   An outline is the cue that does not depend on state. It sits outside
-   the box, so it reads on an inverted element and on a plain one, in
-   both themes, and it does not move anything: outlines are not part of
-   the layout. Declared once, here, and never turned off below. */
 :where(a, button, summary, [tabindex]):focus-visible {
     outline: 2px solid var(--blood);
     outline-offset: 2px;
 }
-
-/* ── reset ─────────────────────────────────────────────────────────── */
 
 *,
 *::before,
@@ -200,10 +111,6 @@ html {
     text-size-adjust: 100%;
 }
 
-/* A short page used to end wherever its content ran out, leaving the
-   footer floating in the middle of the screen with 400px of ink below
-   it — the blog index and /uses both did this. The column now fills the
-   viewport and the footer sits on the bottom edge where it belongs. */
 body {
     margin: 0 auto;
     padding: 0;
@@ -232,9 +139,6 @@ main img {
     vertical-align: middle;
 }
 
-/* Headings are body size. Hierarchy comes from the inverted chip, not from
-   scale — this is what keeps the page reading like a printout rather than
-   a marketing site. */
 h1,
 h2,
 h3,
@@ -282,8 +186,6 @@ button {
     color: inherit;
 }
 
-/* ── layout ────────────────────────────────────────────────────────── */
-
 .container {
     width: calc(100% - 32px);
     max-width: 984px;
@@ -294,24 +196,16 @@ button {
     flex-direction: column;
 }
 
-/* The one part that grows; everything after it is pinned to the bottom.
-   Every view used to end with a <p><br /></p> spacer; the margin belongs
-   to the page, not the content. */
 main {
     flex: 1 0 auto;
     padding-bottom: 26px;
 }
 
-/* Section rhythm separates sections; it has no business above the first
-   one. (Inside a flex column that margin no longer collapses away, so
-   the gap under the menu grew by exactly one section break.) */
 main > :first-child {
     margin-top: 0;
 }
 
-/* The padding exists for the fixed taskbar, and the taskbar exists only
-   once scripting has proven itself — same gate as the theme switch. */
-html.js body.has-windows {
+html.js.floating body.has-windows {
     padding-bottom: 56px;
 }
 
@@ -343,18 +237,16 @@ html.js body.has-windows {
     border: 0;
 }
 
-/* ── header ────────────────────────────────────────────────────────── */
-
 header.site {
     margin: 26px 0 10px;
 }
 
-
-/* The menu is a hairline above and below, links pushed right. */
 .menu {
     margin-bottom: 25px;
     border-top: var(--hair);
     border-bottom: var(--hair);
+    display: flex;
+    justify-content: space-between;
 }
 
 .menu ul {
@@ -369,9 +261,6 @@ header.site {
     margin-left: 10px;
 }
 
-/* inline-block + padding lifts the tap target past 24px without touching
-   the type; nowrap keeps "[ uses ]" from snapping between bracket and
-   word on a phone. */
 .menu a {
     display: inline-block;
     padding: 3px 0;
@@ -380,10 +269,6 @@ header.site {
     white-space: nowrap;
 }
 
-/* :focus-visible has to be named here, not left to the global rule: that
-   one sits earlier in the file at the same specificity, so `.menu a`
-   below it wins the colour and a focused link paints bone on bone —
-   invisible, with the outline already suppressed. */
 .menu a[aria-current="page"],
 .menu a:hover,
 .menu a:focus-visible {
@@ -397,6 +282,10 @@ header.site {
 }
 
 .menu .lang a {
+    display: inline-block;
+    min-width: 24px;
+    padding: 3px 3px;
+    text-align: center;
     color: var(--comment);
 }
 
@@ -406,15 +295,10 @@ header.site {
     background: var(--base);
 }
 
-/* The theme switch mirrors the language switcher: two labelled states,
-   the current one in reverse video. It exists only once scripting has
-   proven itself — the `js` class lands before first paint. */
 .menu .mode {
     display: none;
     margin-left: 18px;
     color: var(--comment);
-    /* The pair wraps as one unit; "crt /" orphaned on a line reads as a
-       typo rather than a control. */
     white-space: nowrap;
 }
 
@@ -438,15 +322,6 @@ html.light .menu .mode button[data-theme-set="light"],
     background: var(--base);
 }
 
-/* ── identity ──────────────────────────────────────────────────────────
-   The default masthead is two lines of type. Home swaps in the one
-   drawing the site allows itself — the pixel wordmark (Masthead.astro).
-   Everything else I tried here read as clutter, and a 1-bit dither of
-   anything complex is just static; the engravings in the references work
-   because they are line work, not tone. The wordmark is line work in the
-   file's own characters, which is the loophole that sentence always
-   held. Subpages keep the type and get on with it. */
-
 .ident {
     display: flex;
     flex-wrap: wrap;
@@ -464,12 +339,6 @@ html.light .menu .mode button[data-theme-set="light"],
 .ident .who {
     color: var(--comment);
 }
-
-/* ── the command line that heads each section ──────────────────────────
-   My own idea rather than the reference's inverted chip: every section is
-   the output of a command this person actually runs. It carries the same
-   terminal weight, but it says something about him instead of being
-   borrowed decoration. */
 
 .cmd {
     display: flex;
@@ -494,10 +363,6 @@ html.light .menu .mode button[data-theme-set="light"],
     color: var(--accent);
 }
 
-/* Painted with currentColor through a mask rather than served as a
-   coloured PNG. Baked pixels do not follow a palette: these were stranded
-   in an old one twice, and on the paper theme they sat at 1.04:1 against
-   the background — invisible. A mask cannot go stale. */
 .cmd .icon {
     flex: none;
     width: 16px;
@@ -508,9 +373,6 @@ html.light .menu .mode button[data-theme-set="light"],
     mask: var(--glyph) center / 16px 16px no-repeat;
 }
 
-/* margin-left:auto pins it to the right edge, which on a phone pushed the
-   heading past the viewport by exactly its own width. It drops to its own
-   line there instead. */
 .cmd .aside {
     margin-left: auto;
     color: var(--comment);
@@ -524,27 +386,17 @@ html.light .menu .mode button[data-theme-set="light"],
     }
 }
 
-/* Output sits indented under its command, the way it does in a terminal. */
 .out {
     padding-left: 16px;
+    padding-bottom: 8px;
     border-left: var(--hair);
 }
 
-/* Running prose is Iosevka wherever it appears, the same rule the
-   article follows: the chrome speaks Departure, but a paragraph of
-   sentences is reading, not chrome. The measure comes with it — at full
-   column width a line runs past 100 characters, and nobody reads that.
-   (Lists and rows stay Departure and keep the column: they are output,
-   scanned rather than read.) */
 .out p {
     max-width: 72ch;
     font-family: var(--code);
 }
 
-/* ── the inverted section chip ─────────────────────────────────────── */
-
-/* The chip carries the section break, so it needs the space a heading
-   would normally take. */
 p:has(> .titulo) {
     margin-top: 22px;
 }
@@ -577,15 +429,11 @@ p:has(> .titulo) {
     color: var(--accent);
 }
 
-/* No underline: that affordance belongs to anchors alone. Emphasis is
-   the ink, not the line. */
 strong,
 b {
     color: var(--accent);
     font-weight: normal;
 }
-
-/* ── lists get a dash, the way the reference does ──────────────────── */
 
 main ul:not(.plain) {
     list-style: none;
@@ -593,10 +441,6 @@ main ul:not(.plain) {
     margin-bottom: 15px;
 }
 
-/* Hanging indent, so a line that wraps sits under the text and not back
-   under the dash. The two values are the same distance in opposite
-   directions — the dash is 1ch and the gap after it is 9px — so the
-   marker hangs out into the padding and everything else lines up. */
 main ul:not(.plain):not(.rows) > li {
     padding-left: calc(1ch + 9px);
     text-indent: calc(-1ch - 9px);
@@ -612,25 +456,6 @@ ul.plain {
     padding: 0;
 }
 
-/* The `.boxes` block lived here: name, role, and a coloured ● up / down /
-   idle state for each machine in the lab listing. It went with the
-   listing itself — nothing on this site can know that a box is up, and a
-   dot that claims it anyway is the one kind of decoration this design
-   cannot afford. If a real probe ever exists, the state colours come
-   back with it. */
-
-/* ── listings ──────────────────────────────────────────────────────────
-   One grammar for every index on the site: a fixed left column (a date,
-   a year), the name, a right-aligned note, and the detail hanging off
-   the name's edge. The blog and the projects page were two different
-   shapes for the same job — six stacked command headings on one, a real
-   listing on the other.
-
-   The column is a px token, not `ch`, and that is deliberate: the row is
-   set in Departure (9.55px per cell) while the description under it is
-   prose in Iosevka (7.5px), so the same `11ch` produced two different
-   widths and the description landed 23px left of the title. */
-
 .listing {
     --datecol: 105px;
     list-style: none;
@@ -639,19 +464,29 @@ ul.plain {
 }
 
 .listing > li + li {
-    margin-top: 14px;
+    margin-top: 24px;
 }
 
 .listing > li::before {
     content: none;
 }
 
-.listing .head {
+.listing .head:not(.pornografo) {
     display: grid;
     grid-template-columns: var(--datecol) minmax(0, 1fr) auto;
     gap: 0 12px;
     align-items: baseline;
     text-decoration: none;
+    padding-bottom: 4px;
+}
+
+.listing .pornografo {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 0 12px;
+    align-items: baseline;
+    text-decoration: none;
+    padding-bottom: 4px;
 }
 
 .listing .when,
@@ -662,10 +497,9 @@ ul.plain {
 .listing .title {
     color: var(--base);
     text-decoration: underline;
+    padding: 4px;
 }
 
-/* Only the title inverts: lighting the whole grid row up swallowed the
-   date and the reading time with it. */
 .listing .head:hover,
 .listing .head:focus-visible {
     background: none;
@@ -682,19 +516,16 @@ ul.plain {
 .listing .desc,
 .listing .tags {
     margin: 2px 0 0;
-    padding-left: calc(var(--datecol) + 12px);
     color: var(--comment);
 }
 
 .listing .tags {
+    padding-top: 4px;
     display: flex;
     flex-wrap: wrap;
     gap: 4px 1ch;
 }
 
-/* Bordered pills were chrome around two words of metadata — cards by
-   another name, and the system does not have cards. The hash carries the
-   mark; the word stays quiet. */
 .listing .tag {
     color: var(--comment);
     font-size: 14px;
@@ -720,13 +551,12 @@ ul.plain {
     }
 }
 
-/* ── row lists: [date] title ───────────────────────────────────────── */
+.anal li {
+    margin-bottom: 8px;
+}
 
-/* The gap is a character wide, not 9px: at a 9.55px cell a 9px gap put
-   the date, the title and the length closer together than the spaces
-   inside them, and the three fields read as one run-on string. */
 .rows > li {
-    padding: 1px 0;
+    padding: 2px 0;
     display: flex;
     flex-wrap: wrap;
     gap: 2px 1ch;
@@ -751,8 +581,6 @@ main ul.rows > li::before {
 .new {
     color: var(--red);
 }
-
-/* ── floating windows ──────────────────────────────────────────────── */
 
 .window {
     width: min(340px, 100%);
@@ -785,23 +613,24 @@ main ul.rows > li::before {
     cursor: grabbing;
 }
 
-/* The bar is a tab stop only where the window actually floats, so the
-   cue has to sit inside it — an outline on the bar would be clipped by
-   the window's own border and read as part of the chrome. */
 .window__bar:focus-visible {
     outline: none;
     box-shadow: inset 0 0 0 1px var(--blood);
 }
 
 .window__controls {
-    display: flex;
+    display: none;
     gap: 4px;
     cursor: default;
 }
 
+html.js.floating .window__controls {
+    display: flex;
+}
+
 .window__controls button {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     border: 1px solid var(--win-line);
     background: transparent;
@@ -817,11 +646,6 @@ main ul.rows > li::before {
     background: var(--base);
 }
 
-/* An instrument readout is data, so it is set in the data face: Iosevka
-   at 14px advances 7px per cell against Departure's 9.55px, which is
-   what lets a 280px window hold its widest line ("parts...... 2 salvaged
-   desktops", 31 cells = 217px) instead of clipping it. Even size, as
-   always — an odd one renders the dotted leaders ragged. */
 .window__body {
     padding: 10px 12px;
     overflow-x: auto;
@@ -841,8 +665,6 @@ main ul.rows > li::before {
     right: 0;
     bottom: 0;
     z-index: 40;
-    /* Two buttons that only script can serve have no business rendering
-       without it — the Scripting-Off Rule, same as the theme switch. */
     display: none;
     gap: 6px;
     padding: 6px 10px;
@@ -850,11 +672,12 @@ main ul.rows > li::before {
     background: var(--win-bar);
 }
 
-html.js .taskbar {
+html.js.floating .taskbar {
     display: flex;
 }
 
 .taskbar button {
+    min-height: 24px;
     padding: 2px 10px;
     border: 1px solid var(--win-line);
     background: transparent;
@@ -870,12 +693,6 @@ html.js .taskbar {
     background: var(--base);
 }
 
-/* ── footer ────────────────────────────────────────────────────────── */
-
-/* Not `margin: auto` any more: the container is a flex column now, and
-   an auto inline margin on a flex item shrinks it to its content and
-   centres it — the footer pulled away from both edges of the column it
-   is supposed to close. */
 footer.site {
     margin: 20px 0 15px;
     padding-top: 10px;
@@ -905,20 +722,6 @@ footer.site {
     image-rendering: pixelated;
 }
 
-/* ── article ───────────────────────────────────────────────────────────
-   The one place the site stops being a terminal and becomes something to
-   read for twenty minutes. Measured before changing anything: 97
-   characters per line, 1.32 line-height, headings the same 15px as body,
-   set in a pixel display face. All four are wrong for long-form.
-
-   Departure Mono stays everywhere else — it is what gives the chrome its
-   character — but the prose is Iosevka, which is drawn to be read at
-   length. */
-
-/* The article itself is full width; the measure is applied to the prose
-   inside it. Capping the container instead meant a diagram or a pasted
-   hash was squeezed to reading width too, which is the one thing that
-   genuinely needs the whole column. */
 .article {
     font-family: var(--code);
     font-size: 15px;
@@ -935,10 +738,6 @@ footer.site {
     max-width: 72ch;
 }
 
-/* Both selectors are (0,1,0), so the sibling rule wins by order. Written
-   as `.article p { margin: 0 }` instead, it was (0,1,1), outranked the
-   spacing rule, and every paragraph after the first ran straight into the
-   one above it. */
 .article > * {
     margin: 0;
 }
@@ -1068,10 +867,6 @@ footer.site {
     font-weight: 400;
 }
 
-
-
-/* ── code ──────────────────────────────────────────────────────────── */
-
 .article :not(pre) > code {
     padding: 0 4px;
     border: var(--hair);
@@ -1089,20 +884,11 @@ footer.site {
     background: var(--blood-dark) !important;
     overflow-x: auto;
     font-family: var(--code);
-    /* Even size: Iosevka advances 0.5em per cell, so an odd font-size lands
-       every glyph on a half pixel and box rules render dashed. */
     font-size: 14px;
     line-height: 1.5;
     tab-size: 4;
 }
 
-/* Code wraps rather than scrolling sideways, at every width. A phone
-   cannot swipe through a paragraph of shell, and on a desktop the
-   overflow was 18-25px — three characters vanishing off the right edge
-   with a scrollbar too thin to notice, which is worse than a wrapped
-   line. The copy button still yields the real, unwrapped text.
-   (ASCII figures are not this: art cannot reflow, so <Figure> keeps its
-   own scroll and steps the cell size down instead.) */
 .article pre,
 .article pre code {
     white-space: pre-wrap;
@@ -1114,8 +900,6 @@ footer.site {
     color: inherit;
 }
 
-/* The wrapper carries a strip naming the language and holding the copy
-   button, so a block reads as a file rather than an unlabelled slab. */
 .code-wrap {
     margin: 15px 0;
     border: var(--hair);
@@ -1141,10 +925,11 @@ footer.site {
 }
 
 .code-copy {
+    min-height: 24px;
     padding: 0 8px;
     border: var(--hair);
     background: transparent;
-    color: var(--comment);
+    color: var(--base);
     font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -1176,8 +961,6 @@ footer.site {
     scrollbar-color: var(--win-line) transparent;
 }
 
-/* Shiki, near-monochrome with the one purple. Syntax colour should not be
-   the loudest thing on a page this quiet. */
 :root {
     --astro-code-color-text: #ece4e2;
     --astro-code-color-background: transparent;
@@ -1206,8 +989,6 @@ html.light {
     --astro-code-token-link: #a8071a;
 }
 
-/* ── ascii figures ─────────────────────────────────────────────────── */
-
 .ascii {
     margin: 0;
     font-family: var(--code);
@@ -1226,11 +1007,6 @@ html.light {
         scroll-behavior: auto !important;
     }
 
-    /* The universal selector does not reach these. View transitions
-       animate ::view-transition-old(root) and ::view-transition-new(root),
-       which are not elements, so the site cross-faded on every navigation
-       for someone who had asked it not to — the one animation on the
-       whole site, and the one the rule above missed. */
     ::view-transition-group(*),
     ::view-transition-old(*),
     ::view-transition-new(*) {
@@ -1263,9 +1039,6 @@ html.light {
         --hair: solid 1px #999;
     }
 
-    /* Controls do nothing on paper. The menu, the copy buttons and the
-       theme switch all printed as live-looking widgets that cannot be
-       pressed — the menu even kept its current-page highlight. */
     .taskbar,
     .window,
     .menu,
@@ -1274,16 +1047,12 @@ html.light {
         display: none !important;
     }
 
-    /* A printed article with underlined words and no addresses loses
-       every reference it makes. Internal links are reachable from the
-       site itself, so only outbound ones are worth the ink. */
     .article a[href^="http"]::after {
         content: " <" attr(href) ">";
         font-size: 0.9em;
         word-break: break-all;
     }
 
-    /* Nothing that is drawn should be cut in half by a page edge. */
     figure,
     pre,
     .code-wrap,

@@ -1,29 +1,4 @@
 #!/usr/bin/env node
-/**
- * Writes vercel.json from the build.
- *
- *     npm run build
- *     node scripts/gen-headers.mjs            # write it
- *     node scripts/gen-headers.mjs --check    # fail if it is stale
- *
- * The Content-Security-Policy carries a SHA-256 of every inline script in
- * dist/, which is why this is generated and not hand-written. There is
- * exactly one — the pre-paint theme script — and it has to stay inline or
- * the page flashes light before the stylesheet decides otherwise. Hashing
- * it is what lets script-src stay strict; `unsafe-inline` would hand any
- * injected <script> the same permission the theme script has.
- *
- * The hash and the script are two files apart, so editing one silently
- * breaks the other: the policy stops matching, the browser blocks the
- * script, and the only symptom is the theme flash coming back. --check
- * closes that gap and belongs in CI next to the build.
- *
- * style-src keeps 'unsafe-inline'. Astro emits scoped styles as inline
- * <style> blocks whose content changes with every component edit, and
- * chasing those hashes would break far more often than it would protect
- * anything: a stylesheet cannot exfiltrate.
- */
-
 import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -41,11 +16,6 @@ function* walk(dir) {
     }
 }
 
-/* Only executable inline scripts. A <script> with a src is governed by
-   'self', and one with a data type — application/ld+json is the case
-   here — is not script at all: CSP never evaluates it, and hashing it
-   would put a different hash in the policy for every post that carries
-   structured data. */
 const INLINE = /<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/g;
 const EXECUTABLE = (attrs) => {
     const type = /\btype=["']([^"']+)["']/.exec(attrs)?.[1];
@@ -75,7 +45,6 @@ const csp = [
     "upgrade-insecure-requests",
 ].join("; ");
 
-/* Everything the site does not use, turned off rather than left default. */
 const permissions = [
     "accelerometer", "autoplay", "camera", "display-capture", "encrypted-media",
     "fullscreen", "geolocation", "gyroscope", "magnetometer", "microphone",
@@ -101,11 +70,6 @@ const config = {
             ],
         },
         {
-            /* The 88x31 buttons say "free to hotlink" in their own alt
-               text, and Cross-Origin-Resource-Policy: same-origin is
-               precisely the header that stops that working. The webring
-               only functions if other people's pages can load the image,
-               so this one directory opts back out. */
             source: "/buttons/(.*)",
             headers: [
                 { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
@@ -114,9 +78,6 @@ const config = {
             ],
         },
         {
-            /* Fingerprinted filenames, so they can be cached for ever.
-               Everything else stays revalidated — a portfolio that serves
-               a stale front page is worse than one that serves it twice. */
             source: "/_astro/(.*)",
             headers: [
                 { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
@@ -143,7 +104,7 @@ if (CHECK) {
     }
     if (current !== json) {
         console.log(
-            "vercel.json is stale — the inline script changed and the CSP hash did not.\n" +
+            "vercel.json is stale, the inline script changed and the CSP hash did not.\n" +
                 "Run: node scripts/gen-headers.mjs",
         );
         process.exit(1);
@@ -151,6 +112,6 @@ if (CHECK) {
     console.log(`vercel.json matches the build (${hashes.size} inline script hash(es))`);
 } else {
     writeFileSync(OUT, json);
-    console.log(`vercel.json written — ${hashes.size} inline script hash(es) in the CSP`);
+    console.log(`vercel.json written, ${hashes.size} inline script hash(es) in the CSP`);
     for (const h of hashes) console.log(`   ${h}`);
 }

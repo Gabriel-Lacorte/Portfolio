@@ -5,7 +5,7 @@
  *   $ [icon] ls -la ~/writing                        3 posts · 4.0k words
  *
  * The `$` is drawn by CSS and the icon is decorative, so what a screen
- * reader actually announces is the heading text — "ls -la ~/writing" —
+ * reader actually announces is the heading text, "ls -la ~/writing",
  * rather than a prompt character and an image.
  */
 type Props = {
@@ -33,7 +33,7 @@ const {
 /* `astro check` reports Props as unused here. It is a false positive:
    Astro binds a component's prop types from this declaration through its
    own compiler transform, not through a reference in the file. Writing
-   `Astro.props as Props` to silence the hint severs that binding — every
+   `Astro.props as Props` to silence the hint severs that binding, every
    call site then sees IntrinsicAttributes and rejects every prop, which
    was 20 errors across the views. Leave it. */
 ---

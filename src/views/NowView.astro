@@ -1,15 +1,13 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Cmd from "@components/Cmd.astro";
-import { NOW, READING } from "@consts";
+import { NOW } from "@consts";
 import { useTranslations, type Locale } from "@i18n/utils";
 
 type Props = { locale: Locale };
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 
-/* Same rule as home: scaffold rows ("—") do not ship. */
-const reading = READING.filter((r) => r.TITLE !== "—");
 ---
 
 <Layout locale={locale} title={t("meta.nowTitle")} description={t("meta.nowDescription")}>
@@ -20,20 +18,6 @@ const reading = READING.filter((r) => r.TITLE !== "—");
     <p>{t("meta.nowLede")}</p>
     <ul>
       {NOW.LINES.map((line) => <li>{line}</li>)}
-    </ul>
-  </div>
-
-  <Cmd run="cat" arg="~/reading" icon="book" />
-  <div class="out">
-    <ul>
-      {
-        reading.map(({ TITLE, NOTE, STATE }) => (
-          <li>
-            <span class:list={[STATE === "now" && "blood"]}>{TITLE}</span>{" "}
-            <span class="comment">— {NOTE}</span>
-          </li>
-        ))
-      }
     </ul>
   </div>
 

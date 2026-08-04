@@ -1,21 +1,9 @@
 ---
-/**
- * An ASCII diagram.
- *
- * Deliberately not a diagram DSL — you write the art directly as the
- * slot's content and this handles the framing, caption, cell lock, mobile
- * scrolling, and text alternative. A sequence-diagram mini-language would
- * be more machinery than drawing the thing.
- *
- * `alt` is required: without it a screen reader gets several hundred box
- * characters read one at a time, which is worse than no figure at all.
- */
+
 type Props = {
-    /** Prose description announced in place of the art. */
     alt: string;
     caption?: string;
     label?: string;
-    /** Drop the frame — for figures already sitting inside a panel. */
     bare?: boolean;
 };
 
@@ -57,9 +45,6 @@ const { alt, caption, label, bare = false } = Astro.props;
         margin: 0;
         font-family: var(--code);
         color: var(--base);
-        /* Even size only: Iosevka advances 0.5em per cell, so an odd
-           font-size lands every glyph on a half pixel and a solid ───
-           run renders dashed. 14px gives a 7px advance. */
         font-size: 14px;
         line-height: 1.2;
     }
@@ -72,16 +57,9 @@ const { alt, caption, label, bare = false } = Astro.props;
 
     .fig-label {
         margin-right: 8px;
-        /* --purple never existed; the .purple class always meant the
-           accent. Cite the real token. */
         color: var(--accent);
     }
 
-    /* Art cannot wrap, so the only way to fit a diagram on a phone is to
-       shrink the cell. Even sizes only: Iosevka advances 0.5em, and an
-       odd size lands every glyph on a half pixel and renders a solid rule
-       dashed. 10px covers a tablet; a 68-cell figure still needs 8px to
-       clear 375px without a sideways swipe. */
     @media (max-width: 700px) {
         .fig-art pre {
             font-size: 10px;
