@@ -1017,10 +1017,10 @@ footer.site {
 }
 
 :root {
-    --code-surface: #0a0505;
-    --code-surface-2: #0d1218;
-    --code-panel: #140b0b;
-    --code-border: #331616;
+    --code-surface: #0c0505;
+    --code-surface-2: #180d0d;
+    --code-panel: #160606;
+    --code-border: #160606;
     --astro-code-color-text: #f5eee8;
     --astro-code-color-background: var(--code-surface);
     --astro-code-token-comment: #7f8da3;
