@@ -38,7 +38,7 @@ export function isFallback(post: Post, locale: Locale) {
 }
 
 /**
- * The locales that answer at this post's URL with someone else's text —
+ * The locales that answer at this post's URL with someone else's text,
  * every locale with no translation of its own, which under the fallback
  * above still serves the original.
  *

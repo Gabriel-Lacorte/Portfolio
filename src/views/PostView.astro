@@ -14,34 +14,16 @@ const t = useTranslations(locale);
 const { Content, headings } = await post.render();
 const iso = post.data.date.toISOString().slice(0, 10);
 
-/* True when this locale has no translation yet and is reading the
-   original. Saying so is the honest alternative to hiding the post or
-   blocking publication on a translation. */
 const borrowed = isFallback(post, locale);
-
-/* Which locales answer at this post's URL with someone else's language.
-   A borrowed page must not tell a search engine it is the Portuguese
-   article — it is the English one with a notice on top. Derived from
-   the post rather than from this route, so both routes agree. */
 const untranslated = await borrowingLocales(post);
 
-/* When this route is serving the original rather than a translation of
-   it, the original is the canonical. Two URLs carrying the same English
-   words otherwise compete with each other for it, and the one that wins
-   is a coin toss. */
 const canonicalPath = borrowed
     ? `${localised(`/blog/${post.data.translationKey}`, localeOf(post))}/`
     : undefined;
-const hasToc = headings.filter((h) => h.depth <= 3).length > 1;
 
-/* A borrowed page is English text inside a page that says lang="pt-BR".
-   Left unmarked, a screen reader pronounces English words with
-   Portuguese phonetics and the result is not words at all. Marking the
-   parts that are actually the post — title, description, contents,
-   body — lets it switch voice and leaves the chrome alone. */
+    const hasToc = headings.filter((h) => h.depth <= 3).length > 1;
 const bodyLang = borrowed ? HTML_LANG[localeOf(post)] : undefined;
 
-/* The file the reader is notionally reading — the post's own source. */
 const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
 ---
 
@@ -63,8 +45,8 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
         run="cat"
         arg={file}
         icon="note"
-        as="h1"
-        aside={`${iso} · ${readingTime(post.body)} min`}
+        as="h2"
+        aside={`${iso} * ${readingTime(post.body)} min`}
     />
 
     <div class="out">

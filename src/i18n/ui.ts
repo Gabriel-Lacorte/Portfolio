@@ -24,12 +24,12 @@ export const HTML_LANG: Record<Locale, string> = {
 };
 
 const en = {
-    "site.designation": "lacorte.city — systems engineering notebook",
+    "site.designation": "lacorte.city",
     "site.role": "systems engineer",
-    "site.tagline": "systems · compilers · operating systems",
+    "site.tagline": "python * backend * offensive security",
     "site.overline": "the systems engineering notebook of",
     "site.statement":
-        "I work below the abstraction line — hypervisors, compilers, and operating systems. This is where I write down what I find when I take them apart.",
+        "I am a systems engineer with a passion for cybersec and low-level programming. This is where I write down what I find when I take things apart.",
 
     "home.about": "about me",
     "home.changelog": "changelog",
@@ -38,9 +38,7 @@ const en = {
     "home.stack": "what i use",
     "home.now": "right now",
     "home.intro1":
-        "Hey, welcome. I'm Gabriel — I work below the abstraction line: hypervisors, compilers, operating systems, and the protocols that hold them together.",
-    "home.intro2":
-        "This is where I write down what I find when I take those things apart. No tracking, no newsletter, nothing that needs javascript to read. Just the notes.",
+        "Hey, welcome. I'm Gabriel, a systems engineer with a passion for cybersec and low-level programming. This is where I write down what I find when I take things apart.",
     "win.status": "Blog status",
     "win.lab": "Homelab status",
     "win.close": "Close window",
@@ -82,7 +80,7 @@ const en = {
     "value.yes": "yes",
     "value.active": "active",
     "value.whatIUse": "what I work with",
-    "value.systemsCompilers": "systems · compilers",
+    "value.systemsCompilers": "",
 
     "unit.posts": "posts",
     "unit.words": "words",
@@ -120,9 +118,9 @@ const en = {
     "meta.nowLede":
         "What has my attention at the moment. Updated when it changes, not on a schedule.",
     "meta.homeDescription":
-        "Systems engineer — hypervisors, compilers, and operating systems.",
+        "Systems engineer, cybersec, and low-level programming.",
 
-    "err.title": "404 — no such file or directory",
+    "err.title": "404. No such file or directory",
     "err.description": "That path does not resolve.",
     "err.noent": "No such file or directory",
     "err.body":
@@ -134,23 +132,19 @@ const en = {
     "status.build": "build",
 
     "fallback.notice":
-        "This post has not been translated yet — showing the English original.",
+        "This post has not been translated yet, showing the English original.",
     "lang.switch": "Change language",
-
-    "theme.label": "Theme",
-    "theme.dark": "crt",
-    "theme.light": "paper",
 } as const;
 
 export type UIKey = keyof typeof en;
 
 const ptBR: Record<UIKey, string> = {
-    "site.designation": "lacorte.city — caderno de engenharia de sistemas",
+    "site.designation": "lacorte.city",
     "site.role": "engenheiro de sistemas",
-    "site.tagline": "sistemas · compiladores · sistemas operacionais",
+    "site.tagline": "python * backend * segurança ofensiva",
     "site.overline": "o caderno de engenharia de sistemas de",
     "site.statement":
-        "Trabalho abaixo da linha de abstração — hipervisores, compiladores e sistemas operacionais. É aqui que anoto o que encontro quando desmonto essas coisas.",
+        "Sou engenheiro de sistemas com paixão por segurança ofensiva e programação de baixo nível. Aqui é onde anoto o que encontro quando desmonto essas coisas.",
 
     "home.about": "sobre mim",
     "home.changelog": "changelog",
@@ -159,9 +153,9 @@ const ptBR: Record<UIKey, string> = {
     "home.stack": "o que eu uso",
     "home.now": "agora",
     "home.intro1":
-        "Olá, seja bem-vindo. Sou o Gabriel — trabalho abaixo da linha de abstração: hipervisores, compiladores, sistemas operacionais e os protocolos que seguram tudo isso.",
+        "Olá, seja bem-vindo. Sou o Gabriel, engenheiro de sistemas com paixão por segurança ofensiva e programação de baixo nível. Aqui é onde anoto o que encontro quando desmonto essas coisas.",
     "home.intro2":
-        "É aqui que eu anoto o que encontro quando desmonto essas coisas. Sem rastreio, sem newsletter, nada que precise de javascript para ler. Só as anotações.",
+        "Este site é onde escrevo sobre sistemas, compiladores e engenharia de baixo nível. Também é onde mostro os projetos que construí, e o que uso para construí-los.",
     "win.status": "Status do blog",
     "win.lab": "Status do homelab",
     "win.close": "Fechar janela",
@@ -203,7 +197,7 @@ const ptBR: Record<UIKey, string> = {
     "value.yes": "sim",
     "value.active": "ativo",
     "value.whatIUse": "com o que trabalho",
-    "value.systemsCompilers": "sistemas · compiladores",
+    "value.systemsCompilers": "",
 
     "unit.posts": "posts",
     "unit.words": "palavras",
@@ -241,9 +235,9 @@ const ptBR: Record<UIKey, string> = {
     "meta.nowLede":
         "O que tem minha atenção neste momento. Atualizado quando muda, não por cronograma.",
     "meta.homeDescription":
-        "Engenheiro de sistemas — hipervisores, compiladores e sistemas operacionais.",
+        "Engenheiro de sistemas, hipervisores, compiladores e sistemas operacionais.",
 
-    "err.title": "404 — arquivo ou diretório inexistente",
+    "err.title": "404, arquivo ou diretório inexistente",
     "err.description": "Esse caminho não resolve.",
     "err.noent": "Arquivo ou diretório inexistente",
     "err.body": "Pode ter mudado, ou pode nunca ter existido.",
@@ -254,12 +248,8 @@ const ptBR: Record<UIKey, string> = {
     "status.build": "build",
 
     "fallback.notice":
-        "Este post ainda não foi traduzido — exibindo o original em inglês.",
+        "Este post ainda não foi traduzido, exibindo o original em inglês.",
     "lang.switch": "Mudar idioma",
-
-    "theme.label": "Tema",
-    "theme.dark": "crt",
-    "theme.light": "papel",
 };
 
 export const UI: Record<Locale, Record<UIKey, string>> = {

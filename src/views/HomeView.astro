@@ -15,14 +15,8 @@ const L = (path: string) => localised(path, locale);
 const posts = await postsFor(locale);
 const stats = await getStats();
 
-/* One date format in the chrome. The page used to print 24/12/2024 in the
-   listings and 2026-07-31 in the asides and the status window — three
-   formats on one screen. ISO is the one this register would actually
-   type, and it sorts. */
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
-/* Anything filed in the last 90 days carries the [new] marker, decided
-   once against the build date. */
 const NEW_FOR_DAYS = 90;
 const isNew = (d: Date) =>
     (Date.parse(stats.built) - d.valueOf()) / 86_400_000 < NEW_FOR_DAYS;
@@ -37,7 +31,7 @@ const isNew = (d: Date) =>
 >
     <Masthead slot="ident" tagline={t("site.tagline")} />
 
-    <h1 class="sr-only">{SITE.TITLE} — {t("site.role")}</h1>
+    <h1 class="sr-only">{SITE.TITLE} - {t("site.role")}</h1>
 
     <Cmd run="whoami" icon="term" />
     <div class="out">
@@ -48,25 +42,28 @@ const isNew = (d: Date) =>
         </p>
     </div>
 
-    {/* The one section that serves the page's job. It gets the weight:
-        first after the greeting, its own breathing room, and a line of
-        description per post — the same rows as /blog/, not a bare index.
-        Everything below it is context for a reader who already stayed. */}
-    <Cmd run="ls -la" arg="~/writing" icon="note" aside={`${posts.length} ${t("unit.posts")} · ${compact(stats.words)} ${t("unit.words")}`} />
+    <Cmd
+        run="ls -la"
+        arg="~/writing"
+        icon="note"
+        aside={`${posts.length} ${t("unit.posts")} · ${compact(stats.words)} ${t("unit.words")}`}
+    />
     <div class="out lede">
-        <ul class="rows">
+        <ul class="rows anal">
             {
                 posts.map((post) => (
                     <li>
                         <span class="when">{iso(post.data.date)}</span>
-                        <a href={L(`/blog/${post.data.translationKey}`)}
-                            >{post.data.title}</a
-                        >
+                        <a href={L(`/blog/${post.data.translationKey}`)}>
+                            {post.data.title}
+                        </a>
                         {isNew(post.data.date) && (
                             <span class="new">[new]</span>
                         )}
                         <span class="len">{readingTime(post.body)} min</span>
-                        <span class="desc comment">{post.data.description}</span>
+                        <span class="desc comment">
+                            {post.data.description}
+                        </span>
                     </li>
                 ))
             }
@@ -86,47 +83,6 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <Cmd
-        run="ls"
-        arg="~/projects"
-        icon="star"
-        aside={`${PROJECTS.length} ${t("unit.listed")}`}
-    />
-    <div class="out">
-        <ul>
-            {/* The head of the list only — the count above says how many
-                there are and [ projects ] has the rest. Printing all of
-                them here turned the front page into the projects page. */}
-            {
-                PROJECTS.slice(0, 4).map((project) => (
-                    <li>
-                        <a
-                            href={
-                                project.HREF.startsWith("http")
-                                    ? project.HREF
-                                    : L(project.HREF)
-                            }
-                            >{project.NAME}</a
-                        >{" "}
-                        <span class="comment">{project.SUMMARY}</span>
-                    </li>
-                ))
-            }
-        </ul>
-    </div>
-
-    {/* `tail -n 1`, and it means it: one line here, the rest on /now.
-        The whole file used to print on both pages, which made [ now ] a
-        link to something the reader had already finished — and the
-        reading list said the same thing a third time. */}
-    <Cmd run="tail -n 1" arg="~/now" icon="term" aside={NOW.UPDATED} />
-    <div class="out">
-        <ul>
-            <li>{NOW.LINES[0]}</li>
-        </ul>
-        <p><a href={L("/now")}>{t("action.fullNow")} -&gt;</a></p>
-    </div>
-
     <Cmd run="git log" arg="--oneline" icon="term" />
     <div class="out">
         <ul class="rows">
@@ -141,7 +97,6 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-
     <Fragment slot="windows">
         <aside id="win-status" class="window" aria-label={t("win.status")}>
             <div class="window__bar">
@@ -154,15 +109,11 @@ const isNew = (d: Date) =>
                     >
                 </span>
             </div>
-            {/* Facts about the artefact you are reading, and nothing it
-                cannot prove: the commit it was built from, when, by
-                what, and where it is served from. It said "status.....
-                online" for a while, which is either a tautology or a
-                claim to a health check that does not exist. */}
-            <pre class="window__body"><span class="prompt">$</span> ./status
+            <pre
+                class="window__body"><span class="prompt">$</span> ./status
 
 host....... lacorte.city
-served..... vercel · static
+served..... vercel
 build...... {stats.commit}
 updated.... {stats.built}
 engine..... {Astro.generator.toLowerCase()}</pre>
@@ -179,12 +130,8 @@ engine..... {Astro.generator.toLowerCase()}</pre>
                     >
                 </span>
             </div>
-            {/* The homelab is a real machine and a finished writeup —
-                it is not what serves this page, and the home page used
-                to imply otherwise with green ● up dots it had no way to
-                check. A README states what a box is; only a live probe
-                may state that it is running, and there is no probe. */}
-            <pre class="window__body"><span class="prompt">$</span> cat ~/lab/README
+            <pre
+                class="window__body"><span class="prompt">$</span> cat ~/README
 
 nyx........ debian 12
 parts...... 2 salvaged desktops
@@ -194,37 +141,13 @@ note....... runs my services
 writeup.... <a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
         </aside>
     </Fragment>
-
-    <Fragment slot="taskbar">
-        <nav class="taskbar no-print" aria-label={t("win.windows")}>
-            <button
-                type="button"
-                data-window-task="win-status"
-                aria-controls="win-status"
-                aria-pressed="true">status</button
-            >
-            <button
-                type="button"
-                data-window-task="win-lab"
-                aria-controls="win-lab"
-                aria-pressed="true">lab</button
-            >
-        </nav>
-    </Fragment>
 </Layout>
 
 <style>
-    /* No floating rules here any more: the script lifts the windows once,
-       at a known position, above the float threshold. Leaving a media
-       query to do it as well meant CSS and JS disagreed about where a
-       window was, and a restored position never matched. In the flow is
-       the no-script fallback. */
     .window {
         max-width: 100%;
     }
 
-    /* The writing section is the page's job, so it gets the room. Weight
-       without scale: every heading on this site is still 15px. */
     .lede {
         margin-bottom: 34px;
     }
@@ -233,8 +156,6 @@ writeup.... <a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
         padding: 3px 0;
     }
 
-    /* The description belongs to its row, so it wraps under the title
-       rather than starting a second list. */
     .lede :global(.desc) {
         flex-basis: 100%;
     }

@@ -7,7 +7,7 @@
  * down as it lands. It measures as CLS 0 on localhost, where the images
  * are there before the paint, and as a page that jumps three times on a
  * phone. The numbers have to come from the file, not from the author
- * remembering to type them — so they are read at build time.
+ * remembering to type them, so they are read at build time.
  *
  * PNG only, deliberately: that is all the posts use, and reading a PNG
  * header is nine bytes of arithmetic against a dependency that would

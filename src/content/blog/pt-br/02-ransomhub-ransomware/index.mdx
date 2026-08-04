@@ -13,7 +13,7 @@ Este relatório apresenta minha análise detalhada das principais funções do r
 
 ## CTI do RansomHub
 
-O RansomHub surgiu como uma operação de ransomware-as-a-service (RaaS), especialmente após a desarticulação de outros grupos grandes como o LockBit. O grupo parece ter crescido rápido na segunda metade de 2024. Vale notar que o RansomHub é tido como ligado a ex-afiliados de outros grupos, como LockBit e BlackCat, e adotou várias táticas desses predecessores — incluindo estratégias de "living-off-the-land" e alvos multiplataforma, tanto Linux quanto Windows.
+O RansomHub surgiu como uma operação de ransomware-as-a-service (RaaS), especialmente após a desarticulação de outros grupos grandes como o LockBit. O grupo parece ter crescido rápido na segunda metade de 2024. Vale notar que o RansomHub é tido como ligado a ex-afiliados de outros grupos, como LockBit e BlackCat, e adotou várias táticas desses predecessores, incluindo estratégias de "living-off-the-land" e alvos multiplataforma, tanto Linux quanto Windows.
 
 As atividades do grupo têm algumas características distintas. Consta que o RansomHub dá aos afiliados o controle direto sobre os pagamentos de resgate, o que o tornou atraente para criminosos vindos de outros grupos. Foi associado a vários ataques de repercussão, incluindo os contra empresas como Halliburton e Kawasaki Europe. Além disso, o RansomHub explora vulnerabilidades em diversos setores, inclusive saúde, e é conhecido pelas práticas de exfiltração de dados.
 
@@ -28,7 +28,7 @@ Ao iniciar a execução, a primeira coisa que o ransomware faz depois de interpr
 
 A execução em segundo plano começa com a criação de um processo filho pela chamada de sistema `fork()`, que duplica o processo atual criando uma instância separada.
 
-Se a criação do processo der certo, o processo pai (o original) espera a conclusão do filho — onde o ransomware seguirá com sua execução principal — usando `waitpid()`.
+Se a criação do processo der certo, o processo pai (o original) espera a conclusão do filho, onde o ransomware seguirá com sua execução principal, usando `waitpid()`.
 
 No processo filho, onde o ransomware executa, a função `setsid()` é usada para criar uma nova sessão. Isso desacopla o processo de qualquer terminal de controle. Se `setsid()` falhar, o processo é encerrado imediatamente com `exit(1)`.
 
@@ -69,7 +69,7 @@ No processo filho, onde o ransomware executa, a função `setsid()` é usada par
 `}
 </Figure>
 
-Os descritores padrão do processo filho — `stdin`, `stdout` e `stderr` — também são fechados com `close()`. Isso impede que o daemon continue interagindo com o terminal. Os descritores fechados são então redirecionados para `/dev/null` e duplicados com `dup()`, forçando qualquer tentativa de acessar os canais padrão a cair em `/dev/null`.
+Os descritores padrão do processo filho, `stdin`, `stdout` e `stderr`, também são fechados com `close()`. Isso impede que o daemon continue interagindo com o terminal. Os descritores fechados são então redirecionados para `/dev/null` e duplicados com `dup()`, forçando qualquer tentativa de acessar os canais padrão a cair em `/dev/null`.
 
 ```c
 child_proc_pid_var = fork();
@@ -101,7 +101,7 @@ dup(0);
 
 ### Decifragem da Configuração
 
-Antes de executar a parte principal do malware, o ransomware precisa decifrar sua configuração — e para isso exige que o operador forneça uma senha como argumento. Essa senha é usada em operações de decifragem baseadas em XOR sobre a configuração cifrada.
+Antes de executar a parte principal do malware, o ransomware precisa decifrar sua configuração, e para isso exige que o operador forneça uma senha como argumento. Essa senha é usada em operações de decifragem baseadas em XOR sobre a configuração cifrada.
 
 Com a senha informada, o programa a transforma com operações de manipulação binária e depois compara o resultado com o dado esperado dentro do malware. Se a senha estiver errada, uma mensagem de erro é exibida e o processo termina.
 
@@ -239,7 +239,7 @@ A tabela abaixo mostra os valores de salto entre os blocos cifrados, definidos c
 | > 128 GB ≤ 512 GB  | 9 MB             |
 | > 512 GB           | 10 MB            |
 
-Se o parâmetro `-fast` for especificado, o valor do salto é multiplicado por quatro, aumentando a quantidade de dados pulada entre as partes cifradas — o que acelera o processo.
+Se o parâmetro `-fast` for especificado, o valor do salto é multiplicado por quatro, aumentando a quantidade de dados pulada entre as partes cifradas, o que acelera o processo.
 
 Depois de definir o tamanho do salto, o ransomware cria uma estrutura de dados que guarda informações como o tamanho do salto, a chave pública do arquivo, o nonce e outras variáveis que serão usadas para decifrar o arquivo depois. Essa estrutura é então escrita no fim do arquivo cifrado.
 

@@ -1,28 +1,4 @@
 #!/usr/bin/env python3
-"""
-Checks the hreflang graph in dist/.
-
-    npm run build
-    python3 scripts/check-hreflang.py
-
-Three things have to hold or search engines drop the whole set and go
-back to guessing, which for a bilingual site means serving half the
-readers the wrong language:
-
-  1. every page names itself among its own alternates
-  2. every alternate points at a page that exists
-  3. that page points back
-
-Number 3 is why this script exists rather than a spot check. The tags
-were right in shape and wrong in detail the first time: Astro builds
-directory routes so a canonical is `/blog/x/`, while the helper that
-built the alternates returned `/blog/x`. Every tag pointed one redirect
-away from the page it meant, nothing was reciprocal, and nothing about
-the markup looked wrong.
-
-Pages marked `noindex` are skipped — the 404 and the redirect stubs are
-not supposed to be in the graph at all.
-"""
 
 import re
 import sys
@@ -77,7 +53,7 @@ def main() -> int:
             continue
 
         if canonical not in {path_of(v) for v in alts.values()}:
-            print(f"NO SELF-REF     {route} — canonical {canonical} is not among {sorted(path_of(v) for v in alts.values())}")
+            print(f"NO SELF-REF     {route}, canonical {canonical} is not among {sorted(path_of(v) for v in alts.values())}")
             problems += 1
 
         for lang, href in alts.items():

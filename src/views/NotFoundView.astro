@@ -18,8 +18,6 @@ const t = useTranslations(locale);
 >
   <h1 class="sr-only">{t("err.title")}</h1>
 
-  {/* The page is the command that failed. It is the one place where the
-      conceit lands exactly on the real thing. */}
   <Cmd run="cat" arg={`.${Astro.url.pathname}`} icon="warn" />
   <div class="out">
     <p>

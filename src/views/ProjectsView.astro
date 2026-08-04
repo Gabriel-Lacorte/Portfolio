@@ -9,7 +9,6 @@ const { locale } = Astro.props;
 const t = useTranslations(locale);
 const external = (href: string) => href.startsWith("http");
 
-/* Newest first. The years are strings in consts, compared as such. */
 const projects = [...PROJECTS].sort((a, b) => b.YEAR.localeCompare(a.YEAR));
 ---
 
@@ -31,18 +30,13 @@ const projects = [...PROJECTS].sort((a, b) => b.YEAR.localeCompare(a.YEAR));
         <p>{t("meta.projectsDescription")}</p>
     </div>
 
-    {/* The same listing the blog index uses: year, name, where it goes,
-        and the detail hanging off the name. This page used to stack one
-        full command heading per project — six `$ cat ~/projects/x/README`
-        rows for six lines of prose, which read as six sections rather
-        than one index. */}
     <div class="out">
         <ol class="listing">
             {
                 projects.map((project) => (
                     <li>
                         <a
-                            class="head"
+                            class="head pornografo"
                             href={
                                 external(project.HREF)
                                     ? project.HREF

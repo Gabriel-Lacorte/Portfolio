@@ -22,7 +22,7 @@ Quanto ao armazenamento, a escolha depende do que você pretende fazer. Se plane
 
 Neste guia vamos usar o Debian 12 netinstall como sistema operacional ([baixar ISO](https://www.debian.org/distrib/netinst)), por ser leve, seguro e estável. A escolha pode variar conforme sua preferência: para quem está começando em self-hosting, recomendo o Debian; fora isso, opções como Ubuntu Server ou Fedora também servem. Para um NAS, o TrueNAS é altamente recomendado.
 
-O sistema não precisa — e não deve — ter interface gráfica, já que só será acessado por SSH. Durante a instalação, marque a opção de instalar o servidor SSH. Terminada a instalação, você acessa o sistema assim:
+O sistema não precisa, e não deve, ter interface gráfica, já que só será acessado por SSH. Durante a instalação, marque a opção de instalar o servidor SSH. Terminada a instalação, você acessa o sistema assim:
 
 ```sh
 ssh user@server_ip
@@ -46,7 +46,7 @@ apt install sudo
 
 Depois saia e entre de novo pelo SSH para aplicar as mudanças.
 
-Agora algumas dicas de configuração do SSH — por padrão ele é um pouco inseguro. O arquivo de configuração fica em `/etc/ssh/sshd_config`. As mudanças que recomendo são trocar a porta padrão (22) e desabilitar o login como root:
+Agora algumas dicas de configuração do SSH, por padrão ele é um pouco inseguro. O arquivo de configuração fica em `/etc/ssh/sshd_config`. As mudanças que recomendo são trocar a porta padrão (22) e desabilitar o login como root:
 
 ```sh
 Port 2222
@@ -145,7 +145,7 @@ Se tudo foi configurado corretamente, você está pronto para continuar.
 
 ## Instalando e configurando as primeiras aplicações
 
-Neste post vamos usar Docker e Docker Compose para instalar e configurar as aplicações — o que é altamente recomendado. Se você não tem experiência com Docker, é uma boa hora para estudar um pouco. Vamos começar instalando o Docker:
+Neste post vamos usar Docker e Docker Compose para instalar e configurar as aplicações, o que é altamente recomendado. Se você não tem experiência com Docker, é uma boa hora para estudar um pouco. Vamos começar instalando o Docker:
 
 ```sh
 sudo apt install docker.io docker-compose
@@ -292,7 +292,7 @@ Agora que você tem um servidor web no ar, seria interessante deixar seu site ac
 `}
 </Figure>
 
-Primeiro, crie uma conta na Cloudflare — é um processo simples e direto. Depois adicione seu domínio à conta seguindo as instruções. Após algumas horas seu site vai aparecer na Cloudflare.
+Primeiro, crie uma conta na Cloudflare, é um processo simples e direto. Depois adicione seu domínio à conta seguindo as instruções. Após algumas horas seu site vai aparecer na Cloudflare.
 
 ![Cloudflare Create Account](/cloudflare_create_account.png)
 
@@ -352,7 +352,7 @@ Mude o caminho do volume para a pasta que quiser e a porta conforme necessário.
 sudo docker-compose up -d
 ```
 
-Você acessa seu gerenciador de senhas em [http://localhost:8002](http://localhost:8002). Para criar uma conta, é preciso acessar o site com SSL — o que dá para fazer via Cloudflared, que adiciona automaticamente, ou consultando a documentação do VaultWarden sobre como adicionar um certificado. Criada a conta, você já pode gerenciar suas senhas.
+Você acessa seu gerenciador de senhas em [http://localhost:8002](http://localhost:8002). Para criar uma conta, é preciso acessar o site com SSL, o que dá para fazer via Cloudflared, que adiciona automaticamente, ou consultando a documentação do VaultWarden sobre como adicionar um certificado. Criada a conta, você já pode gerenciar suas senhas.
 
 ### Motor de busca: SearxNG
 
@@ -392,9 +392,9 @@ Agora você acessa seu motor de busca em [http://localhost:8003](http://localhos
 
 Esse foi o guia para montar seu home server. Ainda há muito o que aprender, então deixo aqui a lista de recursos que me foram muito úteis quando montei o meu pela primeira vez:
 
--   [https://noted.lol/](https://noted.lol/) — artigos sobre aplicações úteis para o servidor
--   [https://github.com/imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server) — dicas de como deixar o servidor seguro
--   [https://awesome-selfhosted.net/](https://awesome-selfhosted.net/) — diversas aplicações para o servidor
--   [https://www.youtube.com/watch?v=hzpN-JhBJBQ](https://www.youtube.com/watch?v=hzpN-JhBJBQ) — tutorial de configuração inicial, muito útil
+-   [https://noted.lol/](https://noted.lol/), artigos sobre aplicações úteis para o servidor
+-   [https://github.com/imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server), dicas de como deixar o servidor seguro
+-   [https://awesome-selfhosted.net/](https://awesome-selfhosted.net/), diversas aplicações para o servidor
+-   [https://www.youtube.com/watch?v=hzpN-JhBJBQ](https://www.youtube.com/watch?v=hzpN-JhBJBQ), tutorial de configuração inicial, muito útil
 
 Se você tiver dúvidas ou quiser sugerir algo para este guia, é só me chamar.

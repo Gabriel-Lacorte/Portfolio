@@ -1,32 +1,4 @@
 #!/usr/bin/env node
-/**
- * Checks that every character in an ASCII figure occupies exactly one
- * cell in the font that actually renders it.
- *
- *     npm run build
- *     node scripts/check-figures.mjs
- *     BASE=http://127.0.0.1:4321 node scripts/check-figures.mjs   # use a running server
- *
- * The figures are the one drawn thing on this site, and they only work if
- * a column is a column. That is not guaranteed by using a monospace face:
- * Iosevka draws the arrow and geometric-shape glyphs — U+25BA, U+25C4,
- * U+2192, U+21D2, U+25BC and the em dash — at two cells. A line carrying
- * one of them is a cell longer than a line of the same character count
- * without one, so a box that is square in the editor renders crooked, and
- * nothing in the source shows it. Measured: the Kerberos figure had six
- * such lines, each exactly 7px out at 14px type.
- *
- * The rule that falls out: draw with box characters and ASCII arrowheads
- * (`->`, `<-`, `>`, `v`), never Unicode arrows. This is what enforces it.
- *
- * It serves dist/ from inside this process rather than expecting a
- * preview server. An external one has to be started, waited for, and torn
- * down, and when it dies mid-run the failure looks exactly like a broken
- * page — a different one on every pass, which is a bad hour.
- *
- * Needs playwright, which is not a project dependency: this is a check
- * you run, not part of the build. NODE_PATH can point at any install.
- */
 
 import { createServer } from "node:http";
 import { readFile, readdir } from "node:fs/promises";
@@ -41,7 +13,6 @@ const TYPES = {
     ".xml": "application/xml", ".json": "application/json", ".txt": "text/plain",
 };
 
-/** Read the tree once. A stat per request runs out of descriptors. */
 async function index(dir, prefix = "") {
     const files = new Map();
     for (const entry of await readdir(dir, { withFileTypes: true })) {
