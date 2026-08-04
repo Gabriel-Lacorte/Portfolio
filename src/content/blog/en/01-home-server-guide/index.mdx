@@ -1,0 +1,400 @@
+---
+title: "Home Server Guide"
+description: "A guide to setting up and configuring a home server"
+date: "2024-06-01"
+tags: ["linux", "self-hosting", "docker"]
+translationKey: "home-server-guide"
+---
+
+import Figure from "@components/ascii/Figure.astro";
+
+Hello, in this post, I'm going to cover the steps needed to set up and configure your own home server, including tips on choosing hardware, installing the operating system, configuring applications, and exposing the server to the Internet.
+
+## Choosing the parts for your server
+
+Setting up a home server can be done in various ways, depending on what you have at your disposal. You can choose to reuse old parts or old computers, or invest in new parts. In my case, I used two old computers, combining them into one. Although it's not the ideal solution, it works well for my purposes.
+
+If you're looking for a more professional solution or don't have old hardware to reuse, the best option is to buy. I recommend looking on sites like AliExpress or buying used parts. On AliExpress, you can find Xeon kits, which offer good quality processors at a cheap price. You don't need a dedicated GPU; an integrated video card is sufficient (in most cases). The main focus of the server is the CPU; a basic processor is sufficient. Now, about RAM, it's important for server performance. I recommend 8GB, or at least 4GB. On my server, I use 8GB DDR3.
+
+As for storage, the choice depends on what you intend to do with the server. If you plan to host files or set up a NAS, an SSD is essential. However, for hosting websites, etc., a 500GB hard drive is sufficient.
+
+## Installing the operating system and configuring
+
+In this guide, we will use Debian 12 netinstall as the operating system [Download ISO](https://www.debian.org/distrib/netinst), as it is lightweight, secure, and stable. However, the choice of operating system may vary according to your preferences. For self-hosting beginners, I recommend using Debian. Otherwise, other options such as Ubuntu Server or Fedora can be considered. For a NAS, TrueNAS is highly recommended.
+
+The operating system does not need and should not have a graphical interface, as it will only be accessed via SSH. During installation, be sure to check the option to install an SSH server. Once the installation is complete, you can access the system as follows:
+
+```sh
+ssh user@server_ip
+```
+
+Replace "user" with the username you created during installation or use "root". Then enter the user's password and you'll be connected to your server.
+
+When you log in, the first step is to access as the root user and update the packages:
+
+```sh
+su root
+apt update && apt upgrade
+```
+
+With the packages updated, the next step is to install sudo and add your user to the sudo group:
+
+```sh
+apt install sudo
+/usr/sbin/usermod -aG sudo <your_user>
+```
+
+Then log out and log back into SSH to apply the changes.
+
+Now for some SSH configuration tips. By default, it's a bit insecure. The SSH configuration file can be found in `/etc/ssh/sshd_config`. When accessing it, the settings I recommend are changing the default port (22) and disabling root login:
+
+```sh
+Port 2222
+PermitRootLogin no
+```
+
+After making these changes, restart the SSH service to apply the settings:
+
+```sh
+systemctl restart sshd
+```
+
+This way your SSH is already a little more secure, nothing much, but enough.
+
+Another important setting is to add automatic updates for security packages. To do this, we can use unattended-upgrades:
+
+1. Install unattended-upgrades, apt-listchanges, and apticron:
+
+```sh
+sudo apt install unattended-upgrades apt-listchanges apticron
+```
+
+2. Create the file `/etc/apt/apt.conf.d/51myunattended-upgrades` and add the following content:
+
+```plaintext
+// Enable the update/upgrade script (0=disable)
+APT::Periodic::Enable "1";
+
+// Do "apt-get update" automatically every n-days (0=disable)
+APT::Periodic::Update-Package-Lists "1";
+
+// Do "apt-get upgrade --download-only" every n-days (0=disable)
+APT::Periodic::Download-Upgradeable-Packages "1";
+
+// Do "apt-get autoclean" every n-days (0=disable)
+APT::Periodic::AutocleanInterval "7";
+
+// Send report mail to root
+//     0:  no report             (or null string)
+//     1:  progress report       (actually any string)
+//     2:  + command outputs     (remove -qq, remove 2>/dev/null, add -d)
+APT::Periodic::Verbose "2";
+APT::Periodic::Unattended-Upgrade "1";
+
+// Automatically upgrade packages from these
+Unattended-Upgrade::Origins-Pattern {
+    "o=Debian,a=stable";
+    "o=Debian,a=stable-updates";
+    "origin=Debian,codename=${distro_codename},label=Debian-Security";
+};
+
+// You can specify your own packages to NOT automatically upgrade here
+Unattended-Upgrade::Package-Blacklist {
+};
+
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+
+// Perform the upgrade when the machine is running because we won't be shutting our server down often
+Unattended-Upgrade::InstallOnShutdown "false";
+
+// Send an email to this address with information about the packages upgraded.
+Unattended-Upgrade::Mail "root";
+
+// Always send an e-mail
+Unattended-Upgrade::MailOnlyOnError "false";
+
+// Remove all unused dependencies after the upgrade has finished
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+// Remove any new unused dependencies after the upgrade has finished
+Unattended-Upgrade::Remove-New-Unused-Dependencies "true";
+
+// Automatically reboot WITHOUT CONFIRMATION if the file /var/run/reboot-required is found after the upgrade.
+Unattended-Upgrade::Automatic-Reboot "true";
+
+// Automatically reboot even if users are logged in.
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+```
+
+3. Run the unattended-upgrade in test mode to make sure everything is correct:
+
+```sh
+sudo unattended-upgrades --dry-run --debug
+```
+
+4. If all is well, enable unattended-upgrade and restart the server:
+
+```sh
+sudo systemctl enable --now unattended-upgrades
+sudo reboot
+```
+
+If everything is set up correctly, you're ready to continue configuring your server.
+
+---
+
+## Installing and configuring the first applications
+
+In this post, we're going to use Docker and Docker Compose to install and configure our applications, which is highly recommended. If you don't have any experience with Docker, it's time to study up a bit. Let's start by installing Docker:
+
+```sh
+sudo apt install docker.io docker-compose
+```
+
+I like to organize my applications in folders in my home and use these folders as volumes in Docker. You can organize them any way you like, but I'll show you how I usually do it:
+
+```plaintext
+.
+├── app1/
+│   ├── docker-compose.yml
+│   └── app1_data/
+├── app2/
+│   ├── docker-compose.yml
+│   └── app2_data/
+└── app3/
+    ├── docker-compose.yml
+    └── app3_data/
+```
+
+Another tip is to use web ports in the 800x range (e.g. 8001, 8002, 8003, etc.) to keep things organized.
+
+Now, let's host our first application. Let's start with a web server using Apache2. First, create a "www" folder in your home and place a docker-compose.yml file inside it:
+
+```plaintext
+.
+└── www/
+    └── docker-compose.yml
+```
+
+Within the docker-compose.yml file, you can define the Apache2 service as follows:
+
+```yaml
+version: "3"
+services:
+    apache:
+        image: httpd:latest
+        volumes:
+            - /home/<your_username>/www:/usr/local/apache2/htdocs
+            - /home/<your_username>/www/httpd.conf:/usr/local/apache2/conf/httpd.conf
+        ports:
+            - 8001:8001
+        restart: unless-stopped
+```
+
+In the volume, change the path to the folder where you want to store your site's files, replacing `<your_username>` with your user. In ports, you can add more as needed.
+
+```yaml
+ports:
+    - 8001:8001
+    - 8002:8002
+    - 8003:8003
+```
+
+Now start the Apache2 container:
+
+```sh
+sudo docker-compose up -d
+```
+
+You will see some files being created in the "www" folder, including the httpd.conf file. Open the file and add your website settings at the end of it:
+
+```plaintext
+Listen 8001
+<VirtualHost *:8001>
+    DocumentRoot /usr/local/apache2/htdocs/<YOUR_WEBSITE_FOLDER>/
+    ServerName <WEBSITE_DOMAIN>
+</VirtualHost>
+```
+
+Replace `<YOUR_WEBSITE_FOLDER>` with the name of the folder containing your website files. If you don't have a domain, you can leave it as "localhost". Make sure the port matches the one you set in Docker Compose.
+
+For example, if you created the folder structure as follows:
+
+```plaintext
+.
+└── www/
+    ├── my_website/
+    │   └── index.html
+    ├── httpd.conf
+    └── docker-compose.yml
+```
+
+You should replace `<YOUR_WEBSITE_FOLDER>` with "my_website".
+
+After making the changes to httpd.conf, restart Apache Docker:
+
+```sh
+sudo docker-compose restart
+```
+
+If everything is correct, you will be able to access your site on the port you have configured.
+
+To add more sites, simply add more VirtualHost settings in httpd.conf, along with the respective site folders and port settings in Docker Compose. This way, you can host as many sites as you like on your server.
+
+```plaintext
+Listen 8001
+<VirtualHost *:8001>
+    DocumentRoot /usr/local/apache2/htdocs/website1/
+    ServerName <DOMAIN_1>
+</VirtualHost>
+
+Listen 8002
+<VirtualHost *:8002>
+    DocumentRoot /usr/local/apache2/htdocs/website2/
+    ServerName <DOMAIN_2>
+</VirtualHost>
+```
+
+---
+
+## Exposing the server to the internet
+
+Now that you have a web server up and running, it would be interesting to be able to make your site available for other people to access or even add a domain to it. However, many people have difficulties with this process, as a home server generally doesn't have a static public IP and also has no protection against DDoS attacks. To solve this, we're going to use Cloudflare Tunnel, part of Cloudflare.
+
+<Figure
+  label="fig.1"
+  caption="The shape of it: the tunnel dials out, so the router never needs an inbound port open."
+  alt="Topology diagram. Traffic from the internet reaches the Cloudflare edge over TLS on port 443, where WAF, DDoS protection and Zero Trust are applied. The cloudflared daemon on the home server holds an outbound-only tunnel to that edge, so no inbound port is ever opened on the router. Behind it on the home server sit nginx on port 80 and the Docker services."
+>
+{`
+              internet
+                  │
+                  │  TLS 443
+                  v
+      ┌───────────────────────┐
+      │    cloudflare edge    │  WAF · DDoS · Zero Trust
+      └───────────────────────┘
+                  ╎  outbound tunnel only -
+                  ╎  no inbound port opened
+                  v
+      ┌───────────────────────┐
+      │      cloudflared      │
+      └───────────────────────┘
+      ════════ home server ════
+                  v
+      ┌───────────────────────┐
+      │       nginx  :80      │
+      └───────────────────────┘
+                  v
+      ┌───────────────────────┐
+      │    docker services    │
+      └───────────────────────┘
+`}
+</Figure>
+
+First, create a Cloudflare account, it's a simple and straightforward process. Then add your domain to your account following the instructions provided. After a few hours, your site will be visible on Cloudflare.
+
+![Cloudflare Create Account](/cloudflare_create_account.png)
+
+Now go to the Zero Trust area of Cloudflare to find the option to configure the tunnel.
+
+![Zero Trust](/zerotrust.png)
+
+You may probably be asked to add a credit card, but rest assured, you won't be charged anything, their free plan is very good and more than enough.
+
+On the Zero Trust platform. Click on "Networks" and then "Tunnels". Here you have to create your first tunnel.
+
+![Create Tunnel](/cloudflare_create_account.png)
+
+Select the tunnel type as Cloudflared and give the tunnel a name (e.g. "Home server"). Click on save. Then run the command that will appear for your operating system (Debian), to install Cloudflared and connect your tunnel. It should be something like:
+
+```sh
+curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb &&
+sudo dpkg -i cloudflared.deb &&
+sudo cloudflared service install <TOKEN>
+```
+
+![Setup Tunnel](/setup_tunnel.png)
+
+After connecting your machine, click on "Next" and start configuring your tunnel. Choose the domain where your site will be, the path or subdomain if you like, and your server port. For a simple site, select HTTP and fill in the necessary information.
+
+![Tunnel Config](/tunnel_config.png)
+
+You can add as many tunnels as you like, for as many sites and ports as you need. Cloudflared is a great tool for this!
+
+---
+
+## Some applications to install
+
+Now that you've learned almost everything, let's install some useful and cool applications on your server. Here are some suggestions for applications that you can host on your own server.
+
+### Password manager: Vaultwarden
+
+A password manager is an essential tool for keeping your passwords safe. Hosting your own password manager, such as VaultWarden (a modified version of BitWarden), is a safe and reliable option. First, create a folder called "vault" in your home and add the following docker-compose.yml:
+
+```yaml
+version: "3"
+
+services:
+    vaultwarden:
+        container_name: vaultwarden
+        image: vaultwarden/server:latest
+        restart: unless-stopped
+        volumes:
+            - /home/<your_user>/vault/data/:/data/
+        ports:
+            - 8002:80
+```
+
+Change the path on the volume to your desired folder and the port as necessary. Then run the command below to start docker:
+
+```sh
+sudo docker-compose up -d
+```
+
+You can access your password manager at [http://localhost:8002](http://localhost:8002). To create an account, make sure you use the site with SSL, which can be done using Cloudflared to add it automatically, or consult the VaultWarden documentation on how to add an SSL certificate. Once you have created your account, you can easily manage your passwords.
+
+### Search Engine: SearxNG
+
+Having a secure, private search engine that you host yourself is an excellent addition to your home server. You can use SearxNG for this. Create a folder in your home called "searxng" and add the following docker-compose.yml:
+
+```yaml
+version: "3"
+services:
+    searxng:
+        image: searxng/searxng:latest
+        container_name: searxng
+        environment:
+            - SEARXNG_BASE_URL=https://example.com
+        cap_drop:
+            - ALL
+        cap_add:
+            - CHOWN
+            - SETGID
+            - SETUID
+            - DAC_OVERRIDE
+        volumes:
+            - /home/<your_user>/searxng:/etc/searxng
+        ports:
+            - 8003:8080
+        restart: unless-stopped
+```
+
+Change the volume path to your desired folder, the port, and your domain as required. Then start the container with the command:
+
+```sh
+sudo docker-compose up -d
+```
+
+You can now access your search engine at [http://localhost:8003](http://localhost:8003). To customize it further, you can edit the settings.yml file inside the "searxng" folder.
+
+---
+
+That was the guide to setting up your home server. There's still a lot to learn, so I'll leave you with this list of resources that were very useful to me when I first set up my home server:
+
+-   [https://noted.lol/](https://noted.lol/) - Articles on useful applications for your server
+-   [https://github.com/imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server) - Tips on how to make your server secure
+-   [https://awesome-selfhosted.net/](https://awesome-selfhosted.net/) - Various applications for your server
+-   [https://www.youtube.com/watch?v=hzpN-JhBJBQ](https://www.youtube.com/watch?v=hzpN-JhBJBQ) - Very useful initial configuration tutorial
+
+If you have any questions, or think something belongs in this guide, get in touch, my address is in the footer.

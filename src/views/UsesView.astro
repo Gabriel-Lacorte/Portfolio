@@ -1,0 +1,50 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
+import { USES } from "@consts";
+import { localised, useTranslations, type Locale } from "@i18n/utils";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const ICON: Record<number, string> = { 0: "chip", 1: "disk", 2: "term" };
+---
+
+<Layout locale={locale} title={t("meta.usesTitle")} description={t("meta.usesDescription")}>
+  <h1 class="sr-only">{t("meta.usesTitle")}</h1>
+
+  <Cmd run="cat" arg="~/.config/*" icon="chip" />
+  <div class="out">
+    <p>{t("meta.usesLede")}</p>
+  </div>
+
+  {
+    USES.map(({ GROUP, ROWS }, i) => (
+      <>
+        <Cmd
+          run="cat"
+          arg={`~/.config/${GROUP.replace(/\s+/g, "-")}`}
+          icon={ICON[i] ?? "term"}
+        />
+        <div class="out">
+          <ul>
+            {ROWS.map((row) => (
+              <li>
+                <b>{row.k}</b>{" "}
+                {row.v.startsWith("/") ? (
+                  <a href={localised(row.v, locale)}>{row.v}</a>
+                ) : row.v === "-" ? (
+                  <span class="comment">{t("uses.unset")}</span>
+                ) : (
+                  row.v
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </>
+    ))
+  }
+
+</Layout>

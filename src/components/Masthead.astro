@@ -1,0 +1,57 @@
+---
+type Props = {
+    tagline: string;
+};
+
+const { tagline } = Astro.props;
+
+const R0 = "██   ▄▄▄▄   ▄▄▄▄  ▄▄▄▄  ▄▄▄▄▄  ▄▄   ▄▄▄▄      ▄▄▄▄ ██   ▄▄  ▄▄  ▄▄";
+const R1 = "██   ▄▄▄██ ██    ██  ██ ██ ▀▀ ▀██▀ ██▄▄██    ██        ▀██▀ ██  ██";
+const R2 = `██  ██  ██ ██    ██  ██ ██     ██  ██     <span class="dot">▄▄</span> ██    ██   ██   ▀▀▀██`;
+const R3 = `▀▀▀  ▀▀▀▀▀  ▀▀▀▀  ▀▀▀▀  ▀▀     ▀▀▀  ▀▀▀▀  <span class="dot">▀▀</span>  ▀▀▀▀ ▀▀▀  ▀▀▀  ▄▄▄█▀`;
+
+const ART = [R0, R1, R2, R3].join("\n");
+---
+
+<div class="masthead">
+    <div class="art" role="img" aria-label="lacorte.city">
+        <pre set:html={ART} />
+    </div>
+    <p class="who">{tagline}</p>
+</div>
+
+<style>
+    .masthead {
+        margin: 0 0 10px;
+    }
+
+    .art pre {
+        margin: 0;
+        font-family: var(--code);
+        font-size: 14px;
+        line-height: 1;
+        white-space: pre;
+        color: var(--base);
+    }
+
+    .art :global(.dot) {
+        color: var(--accent);
+    }
+
+    .who {
+        margin: 8px 0 0;
+        color: var(--comment);
+    }
+
+    @media (max-width: 700px) {
+        .art pre {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 370px) {
+        .art pre {
+            font-size: 8px;
+        }
+    }
+</style>

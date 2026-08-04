@@ -1,0 +1,21 @@
+---
+const {
+    run,
+    arg,
+    aside,
+    icon = "term",
+    as: Tag = "h2",
+    id,
+} = Astro.props;
+
+---
+
+<Tag class="cmd" id={id}>
+    <span
+        class="icon"
+        style={`--glyph: url(/icons/${icon}.png)`}
+        aria-hidden="true"></span>
+    <span class="run">{run}</span>
+    {arg && <span class="flag">{arg}</span>}
+    {aside && <span class="aside" aria-hidden="true">{aside}</span>}
+</Tag>

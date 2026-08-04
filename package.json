@@ -1,28 +1,28 @@
 {
-    "name": "",
+    "name": "lacorte-city",
     "type": "module",
     "version": "0.0.1",
+    "engines": {
+        "node": "24.x"
+    },
     "scripts": {
         "dev": "astro dev",
         "start": "astro dev",
-        "build": "astro check && astro build",
+        "build": "astro check && astro build && node scripts/gen-headers.mjs",
         "preview": "astro preview",
-        "astro": "astro"
+        "astro": "astro",
+        "headers": "node scripts/gen-headers.mjs",
+        "headers:check": "node scripts/gen-headers.mjs --check"
     },
     "dependencies": {
-        "@astrojs/check": "^0.9.4",
-        "@astrojs/mdx": "^3.1.8",
-        "@astrojs/sitemap": "^3.2.1",
-        "@astrojs/tailwind": "^5.1.2",
-        "@astrojs/vercel": "^7.8.2",
-        "@fontsource/geist-mono": "^5.1.0",
-        "@fontsource/geist-sans": "^5.1.0",
-        "@tailwindcss/typography": "^0.5.15",
-        "astro": "^4.16.7",
-        "autoprefixer": "^10.4.20",
-        "rehype-katex": "^7.0.1",
-        "remark-math": "^6.0.0",
-        "tailwind-merge": "^2.5.4",
+        "@astrojs/check": "^0.9.10",
+        "@astrojs/mdx": "^7.0.5",
+        "@astrojs/rss": "^4.0.19",
+        "@astrojs/sitemap": "^3.7.3",
+        "astro": "^7.1.6",
         "typescript": "^5.6.3"
+    },
+    "devDependencies": {
+        "npm-check-updates": "^23.0.1"
     }
 }

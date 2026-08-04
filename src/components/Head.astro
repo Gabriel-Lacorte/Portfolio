@@ -1,240 +1,630 @@
 ---
 import "../styles/global.css";
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
+import { SITE } from "@consts";
+import { DEFAULT_LOCALE, HTML_LANG, LOCALES } from "@i18n/ui";
+import { localised, unlocalised, type Locale } from "@i18n/utils";
 
-import "@fontsource/geist-sans/100.css";
-import "@fontsource/geist-sans/200.css";
-import "@fontsource/geist-sans/300.css";
-import "@fontsource/geist-sans/400.css";
-import "@fontsource/geist-sans/500.css";
-import "@fontsource/geist-sans/600.css";
-import "@fontsource/geist-sans/700.css";
-import "@fontsource/geist-sans/800.css";
-import "@fontsource/geist-sans/900.css";
-import "@fontsource/geist-mono/100.css";
-import "@fontsource/geist-mono/200.css";
-import "@fontsource/geist-mono/300.css";
-import "@fontsource/geist-mono/400.css";
-import "@fontsource/geist-mono/500.css";
-import "@fontsource/geist-mono/600.css";
-import "@fontsource/geist-mono/700.css";
-import "@fontsource/geist-mono/800.css";
-import "@fontsource/geist-mono/900.css";
+type Props = {
+    locale: Locale;
+    title: string;
+    description: string;
+    /**
+     * Locales whose route exists but serves another language's text.
+     * A post with no Portuguese translation still answers at its
+     * Portuguese URL, with the English body and a notice, and that
+     * URL must not advertise itself as the Portuguese version.
+     */
+    untranslated?: Locale[];
+    /** Pages that should never be indexed. The 404 is the only one. */
+    noindex?: boolean;
+    /**
+     * Overrides the canonical with another route's path. A page serving
+     * borrowed text is a duplicate of the page it borrowed from and says
+     * so, rather than competing with it for the same words.
+     */
+    canonicalPath?: string;
+    /** Article facts, when the page is one. Becomes JSON-LD. */
+    article?: {
+        /** The article's own title. Not `title`, which carries the
+         *  " | Gabriel Lacorte" suffix meant for the browser tab. */
+        headline: string;
+        published: Date;
+        /** The language the text is actually in, not the page's. */
+        lang: string;
+        tags?: string[];
+        words?: number;
+    };
+};
 
-interface Props {
-  title: string;
-  description: string;
-}
+const {
+    locale,
+    title,
+    description,
+    untranslated = [],
+    noindex = false,
+    canonicalPath,
+    article,
+} = Astro.props;
+const canonical = new URL(
+    canonicalPath ?? Astro.url.pathname,
+    Astro.site ?? Astro.url,
+).href;
 
-const { title, description } = Astro.props;
+/* Every route exists in every locale, so each page names its siblings.
+   Without this the two languages are two unrelated documents competing
+   with each other: nothing tells a search engine that /blog/x and
+   /pt-br/blog/x are one article, so the wrong one gets served to half
+   the readers. Reciprocal by construction, the pair is derived from
+   the path rather than hand-listed, so it cannot drift.
+
+   x-default points at the unprefixed English route: the answer to
+   "this reader matches no listed language", not a fourth translation.
+
+   An alternate has to be byte-identical to the target page's canonical
+   or the pair is not reciprocal and the whole set is ignored. Astro
+   builds directory routes, so every canonical ends in a slash while
+   `localised()` returns none, the first version pointed every tag at a
+   URL one redirect away from the real one, which is the same as having
+   written nothing. Hence `withSlash`, and hence the check in
+   scripts/check-hreflang.py. */
+const here = unlocalised(Astro.url.pathname);
+const base = Astro.site ?? Astro.url;
+const withSlash = (path: string) => (path.endsWith("/") ? path : `${path}/`);
+const urlFor = (code: Locale) =>
+    new URL(withSlash(localised(here, code)), base).href;
+
+const alternates = LOCALES.filter((code) => !untranslated.includes(code)).map(
+    (code) => ({ hreflang: HTML_LANG[code], href: urlFor(code) }),
+);
+
+/* Structured data, only where there is something structured to say: a
+   post gets BlogPosting, everything else gets nothing rather than a
+   WebPage node repeating the <title> in JSON.
+
+   mainEntityOfPage is the canonical, not the current URL, so a borrowed
+   Portuguese route points at the English article it is a copy of instead
+   of announcing itself as a second work. */
+/* Emitted with an explicit is:inline: this is data, not a module, and it
+   must land in the document exactly as written. Astro infers the same
+   thing and warns about having inferred it; saying so removes the warning
+   and records why. Putting that note beside the tag instead would make it
+   a second child of the expression, which is four type errors. */
+const jsonLd = article
+    ? {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: article.headline,
+          description,
+          inLanguage: article.lang,
+          datePublished: article.published.toISOString().slice(0, 10),
+          mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
+          author: {
+              "@type": "Person",
+              name: SITE.TITLE,
+              url: (Astro.site ?? Astro.url).origin + "/",
+          },
+          ...(article.tags?.length ? { keywords: article.tags.join(", ") } : {}),
+          ...(article.words ? { wordCount: article.words } : {}),
+      }
+    : null;
 ---
 
-<!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
-
 <meta name="generator" content={Astro.generator} />
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#0a0507" />
 
-<!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+{
+    !noindex &&
+    alternates.map(({ hreflang, href }) => (
+        <link rel="alternate" hreflang={hreflang} href={href} />
+    ))
+}
+{
+    !noindex && (
+        <link rel="alternate" hreflang="x-default" href={urlFor(DEFAULT_LOCALE)} />
+    )
+}
+<link
+    rel="alternate"
+    type="application/rss+xml"
+    title={SITE.HANDLE}
+    href={localised("/feed.xml", locale)}
+/>
 
-<ViewTransitions />
+<meta property="og:type" content="website" />
+{
+    LOCALES.filter((code) => code !== locale && !untranslated.includes(code)).map(
+        (code) => (
+            <meta
+                property="og:locale:alternate"
+                content={HTML_LANG[code].replace("-", "_")}
+            />
+        ),
+    )
+}
+<meta property="og:site_name" content={SITE.TITLE} />
+<meta property="og:locale" content={HTML_LANG[locale].replace("-", "_")} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
 
+{
+    jsonLd && !noindex && (
+        <script
+            is:inline
+            type="application/ld+json"
+            set:html={JSON.stringify(jsonLd)}
+        />
+    )
+}
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<!-- The ch-based layout is measured against Iosevka, so it is worth the
+     early fetch: 19KB each, and everything reflows if they land late. -->
+<link
+    rel="preload"
+    href="/fonts/iosevka-400.woff2"
+    as="font"
+    type="font/woff2"
+    crossorigin
+/>
+<link
+    rel="preload"
+    href="/fonts/departure-mono.woff2"
+    as="font"
+    type="font/woff2"
+    crossorigin
+/>
+
+<ClientRouter />
+
+<!-- Runs before first paint: no theme flash, and no flash of hidden
+     content either. Deliberately tiny; everything else waits for the
+     module below.
+
+     Dark is the default rather than a mirror of prefers-color-scheme,
+     because dark *is* the design here, light is an alternative, and it
+     stays one click away and persists once chosen. -->
 <script is:inline>
-  function init() {
-    preloadTheme();
-    onScroll();
-    animate();
-    updateThemeButtons();
-    addCopyCodeButtons();
-    setGiscusTheme();
+    (() => {
+        const root = document.documentElement;
+        /* Scripting has proven itself, so controls that need it (the theme
+           switch) may exist. Lands before first paint: no dead control
+           without JS, no shift with it. */
+        root.classList.add("js");
+        root.classList.toggle(
+            "light",
+            localStorage.getItem("theme") === "light",
+        );
+    })();
+</script>
 
-    const backToTop = document.getElementById("back-to-top");
-    backToTop?.addEventListener("click", (event) => scrollToTop(event));
+<script>
+    /* Code blocks get a strip naming their language and holding the copy
+       button. The button lives on the wrapper, never inside <pre>: putting
+       it in the code block made its label part of the copied text.
 
-    const backToPrev = document.getElementById("back-to-prev");
-    backToPrev?.addEventListener("click", () => window.history.back());
+       Figures are excluded. <Figure> already draws its own frame and
+       caption, so a diagram was coming out inside two nested borders with
+       a language strip reading "text" above it, and the art is exposed
+       to assistive tech as role="img" with a description, which a copy
+       button sitting inside it contradicts. */
+    function codeBlocks() {
+        document
+            .querySelectorAll<HTMLPreElement>(".article pre:not(.ascii)")
+            .forEach((pre) => {
+                if (pre.parentElement?.classList.contains("code-wrap")) return;
 
-    const lightThemeButton = document.getElementById("light-theme-button");
-    lightThemeButton?.addEventListener("click", () => {
-      localStorage.setItem("theme", "light");
-      toggleTheme(false);
-      updateThemeButtons();
-    });
+                const wrap = document.createElement("div");
+                wrap.className = "code-wrap";
+                pre.replaceWith(wrap);
 
-    const darkThemeButton = document.getElementById("dark-theme-button");
-    darkThemeButton?.addEventListener("click", () => {
-      localStorage.setItem("theme", "dark");
-      toggleTheme(true);
-      updateThemeButtons();
-    });
+                const bar = document.createElement("div");
+                bar.className = "code-bar";
 
-    const systemThemeButton = document.getElementById("system-theme-button");
-    systemThemeButton?.addEventListener("click", () => {
-      localStorage.setItem("theme", "system");
-      toggleTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-      updateThemeButtons();
-    });
+                const lang = document.createElement("span");
+                lang.textContent =
+                    pre.dataset.language && pre.dataset.language !== "plaintext"
+                        ? pre.dataset.language
+                        : "text";
+                bar.append(lang);
 
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", (event) => {
-        if (localStorage.theme === "system") {
-          toggleTheme(event.matches);
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "code-copy";
+                button.textContent = "copy";
+                button.setAttribute("aria-label", "Copy code to clipboard");
+                button.addEventListener("click", async () => {
+                    try {
+                        await navigator.clipboard.writeText(pre.innerText);
+                        button.textContent = "copied";
+                    } catch {
+                        button.textContent = "failed";
+                    }
+                    setTimeout(() => (button.textContent = "copy"), 1600);
+                });
+                bar.append(button);
+
+                wrap.append(bar, pre);
+            });
+    }
+
+    /* Windows: closable, reopenable from the taskbar, and draggable by
+       their title bar.
+
+       All of it is an enhancement. Without scripting a window is simply
+       always open and sits in the document flow, which is the right
+       fallback for a panel of static text, so the markup ships in flow
+       and this lifts it out, rather than the other way round.
+
+       The first version lifted a window to fixed positioning lazily, on
+       first drag. That left it measured from wherever it happened to sit
+       in the flow, so a restored position never matched and a drag could
+       finish past the bottom of the viewport. Lifting up front, once, at
+       a known place removes both. */
+    const POS_KEY = "win:pos";
+    const OPEN_KEY = "win:open";
+    /* A window may only detach where it actually fits beside the column.
+       That is arithmetic, not taste. The column is 984px and centred, so
+       each gutter is (100vw - 984) / 2, and a window needs WIN_W + GAP of
+       it, hence 984 + 2 * (280 + 24) = 1592. Below that they stay in the
+       document flow, which is also the no-script behaviour.
+
+       GAP has to be the same number the default placement uses, below.
+       It was 900 for a while (where the old CSS media query sat, before
+       the floating moved into script) and a window landed on the prose:
+       at 1100px it sat at x=736 with the column running to 1042. Then it
+       was derived correctly but with GAP=16 while the placement inset by
+       24, and 1700px still overlapped, by exactly the 6px the two
+       constants disagreed about. One constant, used twice.
+
+       340 wide put the threshold at 1712, which no ordinary laptop
+       reaches: the windows only ever floated on a desktop monitor and
+       everyone else got two orphaned panels after the changelog. 280
+       still fits the widest line either window prints ("writeup.....
+       home-server-guide", 30 cells = 210px) and brings the threshold
+       down to 1592. 1440 cannot be served without narrowing the column,
+       and the column is not negotiable. */
+    const COLUMN = 984;
+    const WIN_W = 280;
+    const GAP = 24;
+    const FLOAT_FROM = COLUMN + 2 * (WIN_W + GAP);
+
+    /* The one string this script says out loud. Read off <html lang>
+       rather than imported from the dictionary: importing it would pull
+       both locales and all ~260 keys into the client bundle to use one
+       of them, which is more JavaScript than the whole site ships. */
+    const MOVE_HINT = document.documentElement.lang.startsWith("pt")
+        ? "janela, setas movem"
+        : "window, arrow keys move";
+
+    type Pos = { x: number; y: number };
+
+    function readPositions(): Record<string, Pos> {
+        try {
+            return JSON.parse(localStorage.getItem(POS_KEY) ?? "{}");
+        } catch {
+            return {};
         }
-      });
-
-    document.addEventListener("scroll", onScroll);
-  }
-
-  function updateThemeButtons() {
-    const theme = localStorage.getItem("theme");
-    const lightThemeButton = document.getElementById("light-theme-button");
-    const darkThemeButton = document.getElementById("dark-theme-button");
-    const systemThemeButton = document.getElementById("system-theme-button");
-
-    function removeActiveButtonTheme(button) {
-      button?.classList.remove("bg-black/5");
-      button?.classList.remove("dark:bg-white/5");
     }
 
-    function addActiveButtonTheme(button) {
-      button?.classList.add("bg-black/5");
-      button?.classList.add("dark:bg-white/5");
+    function savePosition(id: string, pos: Pos) {
+        const all = readPositions();
+        all[id] = pos;
+        /* Storage can be denied (private mode, quota); a drag that cannot
+           be remembered should still finish. */
+        try {
+            localStorage.setItem(POS_KEY, JSON.stringify(all));
+        } catch {
+            /* forget it, literally */
+        }
     }
 
-    removeActiveButtonTheme(lightThemeButton);
-    removeActiveButtonTheme(darkThemeButton);
-    removeActiveButtonTheme(systemThemeButton);
-
-    if (theme === "light") {
-      addActiveButtonTheme(lightThemeButton);
-    } else if (theme === "dark") {
-      addActiveButtonTheme(darkThemeButton);
-    } else {
-      addActiveButtonTheme(systemThemeButton);
-    }
-  }
-
-  function animate() {
-    const animateElements = document.querySelectorAll(".animate");
-
-    animateElements.forEach((element, index) => {
-      setTimeout(() => {
-        element.classList.add("show");
-      }, index * 100);
-    });
-  }
-
-  function onScroll() {
-    if (window.scrollY > 0) {
-      document.documentElement.classList.add("scrolled");
-    } else {
-      document.documentElement.classList.remove("scrolled");
-    }
-  }
-
-  function scrollToTop(event) {
-    event.preventDefault();
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }
-
-  function toggleTheme(dark) {
-    const css = document.createElement("style");
-
-    css.appendChild(
-      document.createTextNode(
-        `* {
-             -webkit-transition: none !important;
-             -moz-transition: none !important;
-             -o-transition: none !important;
-             -ms-transition: none !important;
-             transition: none !important;
-          }
-        `
-      )
-    );
-
-    document.head.appendChild(css);
-
-    if (dark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+    /* Closing is remembered too. Before this, a drag persisted and a
+       close did not: the site remembered the act that could bury the
+       text and forgot the one that tidied it away. */
+    function readOpen(): Record<string, boolean> {
+        try {
+            return JSON.parse(localStorage.getItem(OPEN_KEY) ?? "{}");
+        } catch {
+            return {};
+        }
     }
 
-    window.getComputedStyle(css).opacity;
-    document.head.removeChild(css);
-
-    setGiscusTheme();
-  }
-
-  function preloadTheme() {
-    const userTheme = localStorage.theme;
-
-    if (userTheme === "light" || userTheme === "dark") {
-      toggleTheme(userTheme === "dark");
-    } else {
-      toggleTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    }
-  }
-
-  function addCopyCodeButtons() {
-    let copyButtonLabel = "📋";
-    let codeBlocks = Array.from(document.querySelectorAll("pre"));
-
-    async function copyCode(codeBlock, copyButton) {
-      const codeText = codeBlock.innerText;
-      const buttonText = copyButton.innerText;
-      const textToCopy = codeText.replace(buttonText, "");
-
-      await navigator.clipboard.writeText(textToCopy);
-      copyButton.innerText = "✅";
-
-      setTimeout(() => {
-        copyButton.innerText = copyButtonLabel;
-      }, 2000);
+    function saveOpen(id: string, open: boolean) {
+        const all = readOpen();
+        all[id] = open;
+        try {
+            localStorage.setItem(OPEN_KEY, JSON.stringify(all));
+        } catch {
+            /* same as above: the click still works */
+        }
     }
 
-    for (let codeBlock of codeBlocks) {
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
+    function windows() {
+        const wins = [...document.querySelectorAll<HTMLElement>(".window")];
+        if (!wins.length) return;
 
-      const copyButton = document.createElement("button");
-      copyButton.innerText = copyButtonLabel;
-      copyButton.classList = "copy-code";
+        const setOpen = (id: string, open: boolean, persist = true) => {
+            const win = document.getElementById(id);
+            const task = document.querySelector<HTMLButtonElement>(
+                `[data-window-task="${id}"]`,
+            );
+            if (win) win.hidden = !open;
+            task?.setAttribute("aria-pressed", String(open));
+            if (persist) saveOpen(id, open);
+            if (!open || !win) return;
+            /* Reopening has to show something. Floating: if the position
+               it remembers would land on the text, it parks instead,
+               that is the way back out of the one bad state a drag can
+               reach. In the flow: it can be below the fold, so scroll. */
+            if (win.style.position === "fixed") repark(win);
+            else win.scrollIntoView({ block: "nearest" });
+        };
 
-      codeBlock.setAttribute("tabindex", "0");
-      codeBlock.appendChild(copyButton);
+        /* Hoisted on purpose: setOpen above is wired to a click that can
+           only fire long after the placement helpers below exist. */
+        function repark(win: HTMLElement) {
+            if (!buriesColumn(win)) return;
+            const p = parking(win, wins.indexOf(win));
+            place(win, p.x, p.y);
+            savePosition(win.id, p);
+        }
 
-      codeBlock.parentNode.insertBefore(wrapper, codeBlock);
-      wrapper.appendChild(codeBlock);
+        document
+            .querySelectorAll<HTMLButtonElement>("[data-window-close]")
+            .forEach((b) =>
+                b.addEventListener("click", () =>
+                    setOpen(b.dataset.windowClose!, false),
+                ),
+            );
 
-      copyButton?.addEventListener("click", async () => {
-        await copyCode(codeBlock, copyButton);
-      });
+        document
+            .querySelectorAll<HTMLButtonElement>("[data-window-task]")
+            .forEach((b) =>
+                b.addEventListener("click", () => {
+                    const id = b.dataset.windowTask!;
+                    setOpen(id, b.getAttribute("aria-pressed") !== "true");
+                }),
+            );
+
+        /* What the reader left closed stays closed, decided before
+           anything is measured so a dismissed window never flashes. */
+        const openState = readOpen();
+        wins.forEach((win) => {
+            if (openState[win.id] === false) setOpen(win.id, false, false);
+        });
+
+        const saved = readPositions();
+        let top = 50;
+
+        const clamp = (win: HTMLElement, x: number, y: number): Pos => {
+            const maxX = Math.max(0, window.innerWidth - win.offsetWidth);
+            const maxY = Math.max(0, window.innerHeight - win.offsetHeight);
+            return {
+                x: Math.min(Math.max(0, x), maxX),
+                y: Math.min(Math.max(0, y), maxY),
+            };
+        };
+
+        const place = (win: HTMLElement, x: number, y: number) => {
+            const p = clamp(win, x, y);
+            win.style.left = `${p.x}px`;
+            win.style.top = `${p.y}px`;
+            return p;
+        };
+
+        function parking(win: HTMLElement, i: number): Pos {
+            const width = win.offsetWidth || WIN_W;
+            if (win.id === "win-status") {
+                return { x: GAP+150, y: 175 };
+            }
+            if (win.id === "win-lab") {
+                return {
+                    x: Math.max(GAP, window.innerWidth - width - 170),
+                    y: 460,
+                };
+            }
+            return {
+                x: Math.max(GAP, window.innerWidth - width - GAP),
+                y: 96 + i * 240,
+            };
+        }
+
+        function buriesColumn(win: HTMLElement) {
+            const main = document.querySelector("main");
+            if (!main) return false;
+            const m = main.getBoundingClientRect();
+            const r = win.getBoundingClientRect();
+            return r.right > m.left && r.left < m.right;
+        }
+
+        const floats = () => window.innerWidth >= FLOAT_FROM;
+
+        const lift = (win: HTMLElement, i: number) => {
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            if (!bar || win.style.position === "fixed") return;
+
+            win.style.position = "fixed";
+            win.style.margin = "0";
+            win.style.width = `${Math.min(WIN_W, window.innerWidth - 32)}px`;
+            win.style.zIndex = String(++top);
+
+            const start = saved[win.id] ?? parking(win, i);
+            place(win, start.x, start.y);
+            repark(win);
+
+            /* Dragging is functionality, so it has to work without a
+               pointer too. The bar is a tab stop only while the window
+               actually floats, in the flow it moves nothing, and a tab
+               stop that does nothing is worse than no tab stop. */
+            bar.tabIndex = 0;
+            bar.setAttribute("role", "application");
+            bar.setAttribute("aria-roledescription", MOVE_HINT);
+        };
+
+        /* Narrowing past the threshold has to undo all of it. The width
+           check used to run once at startup, so a window loaded wide and
+           then resized narrow stayed fixed, on top of the prose, which
+           is the state the threshold exists to prevent. */
+        const drop = (win: HTMLElement) => {
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            if (win.style.position !== "fixed") return;
+
+            for (const p of ["position", "left", "top", "width", "margin", "z-index"])
+                win.style.removeProperty(p);
+
+            bar?.removeAttribute("tabindex");
+            bar?.removeAttribute("role");
+            bar?.removeAttribute("aria-roledescription");
+        };
+
+        const sync = () => {
+            /* Closing and reopening are affordances of the floating mode.
+               In the flow a window is a panel of static text near the end
+               of the page, and the taskbar was a fixed bar sitting in the
+               thumb zone of a phone to toggle something two screens away
+              , pressing it either did nothing visible or teleported the
+               reader to the bottom. The class carries the JS threshold
+               into CSS so the number stays declared once. */
+            document.documentElement.classList.toggle("floating", floats());
+
+            wins.forEach((win, i) => {
+                if (!floats()) return drop(win);
+                lift(win, i);
+                place(
+                    win,
+                    parseFloat(win.style.left),
+                    parseFloat(win.style.top),
+                );
+            });
+        };
+
+        wins.forEach((win) => {
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            if (!bar) return;
+
+            bar.addEventListener("pointerdown", (e) => {
+                if (win.style.position !== "fixed") return;
+                if ((e.target as HTMLElement).closest("button")) return;
+                e.preventDefault();
+                win.style.zIndex = String(++top);
+
+                const r = win.getBoundingClientRect();
+                const dx = e.clientX - r.left;
+                const dy = e.clientY - r.top;
+                bar.setPointerCapture(e.pointerId);
+                bar.dataset.dragging = "1";
+
+                const move = (ev: PointerEvent) =>
+                    place(win, ev.clientX - dx, ev.clientY - dy);
+
+                const up = (ev: PointerEvent) => {
+                    delete bar.dataset.dragging;
+                    bar.releasePointerCapture(ev.pointerId);
+                    bar.removeEventListener("pointermove", move);
+                    bar.removeEventListener("pointerup", up);
+                    savePosition(win.id, {
+                        x: parseFloat(win.style.left),
+                        y: parseFloat(win.style.top),
+                    });
+                };
+
+                bar.addEventListener("pointermove", move);
+                bar.addEventListener("pointerup", up);
+            });
+
+            bar.addEventListener("keydown", (e) => {
+                if (win.style.position !== "fixed") return;
+                const step = e.shiftKey ? 4 : 16;
+                const by: Record<string, [number, number]> = {
+                    ArrowLeft: [-step, 0],
+                    ArrowRight: [step, 0],
+                    ArrowUp: [0, -step],
+                    ArrowDown: [0, step],
+                };
+                const d = by[e.key];
+                if (!d) return;
+                e.preventDefault();
+                win.style.zIndex = String(++top);
+                savePosition(
+                    win.id,
+                    place(
+                        win,
+                        parseFloat(win.style.left) + d[0],
+                        parseFloat(win.style.top) + d[1],
+                    ),
+                );
+            });
+        });
+
+        sync();
+
+        /* A resize can strand a window past the new edge, or take the
+           gutter away entirely. Both are the same call. */
+        window.addEventListener("resize", sync);
     }
-  }
 
-  const setGiscusTheme = () => {
-    const giscus = document.querySelector(".giscus-frame");
+    /* The theme switch: two labelled states beside the language switcher,
+       current one in reverse video. The visual state comes straight from
+       the `light` class on <html>, so this only keeps the pressed
+       semantics and the browser chrome colour in step, and persists the
+       choice under the key the pre-paint script reads. */
+    function theme() {
+        const root = document.documentElement;
+        const meta = document.querySelector<HTMLMetaElement>(
+            'meta[name="theme-color"]',
+        );
+        const buttons =
+            document.querySelectorAll<HTMLButtonElement>("[data-theme-set]");
 
-    const isDark = document.documentElement.classList.contains("dark");
+        const sync = () => {
+            const light = root.classList.contains("light");
+            buttons.forEach((b) =>
+                b.setAttribute(
+                    "aria-pressed",
+                    String((b.dataset.themeSet === "light") === light),
+                ),
+            );
+            /* Read the live token so a palette change can never strand a
+               stale hex here. */
+            const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
+            if (bg) meta?.setAttribute("content", bg);
+        };
 
-    if (giscus) {
-      const url = new URL(giscus.src);
-      url.searchParams.set("theme", isDark ? "dark" : "light");
-      giscus.src = url.toString();
+        buttons.forEach((b) =>
+            b.addEventListener("click", () => {
+                const light = b.dataset.themeSet === "light";
+                root.classList.toggle("light", light);
+                try {
+                    localStorage.setItem("theme", light ? "light" : "dark");
+                } catch {
+                    /* the flip still happens; it just will not persist */
+                }
+                sync();
+            }),
+        );
+
+        sync();
     }
-  };
 
-  document.addEventListener("DOMContentLoaded", () => init());
-  document.addEventListener("astro:after-swap", () => init());
-  preloadTheme();
+    function init() {
+        codeBlocks();
+        windows();
+        theme();
+    }
+
+    document.addEventListener("astro:page-load", init);
 </script>

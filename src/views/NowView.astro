@@ -1,0 +1,24 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
+import { NOW } from "@consts";
+import { useTranslations, type Locale } from "@i18n/utils";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+---
+
+<Layout locale={locale} title={t("meta.nowTitle")} description={t("meta.nowDescription")}>
+  <h1 class="sr-only">{t("meta.nowTitle")}</h1>
+
+  <Cmd run="tail -f" arg="~/now" icon="term" aside={NOW.UPDATED} />
+  <div class="out">
+    <p>{t("meta.nowLede")}</p>
+    <ul>
+      {NOW.LINES.map((line) => <li>{line}</li>)}
+    </ul>
+  </div>
+
+</Layout>

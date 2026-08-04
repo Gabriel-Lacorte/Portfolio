@@ -1,0 +1,162 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
+import Masthead from "@components/Masthead.astro";
+import { postsFor } from "@lib/posts";
+import { compact, getStats, readingTime } from "@lib/stats";
+import { localised, useTranslations, type Locale } from "@i18n/utils";
+import { CHANGELOG, SITE, STACK_GROUPS } from "@consts";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const L = (path: string) => localised(path, locale);
+
+const posts = await postsFor(locale);
+const stats = await getStats();
+
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+const NEW_FOR_DAYS = 90;
+const isNew = (d: Date) =>
+    (Date.parse(stats.built) - d.valueOf()) / 86_400_000 < NEW_FOR_DAYS;
+---
+
+<Layout
+    locale={locale}
+    title={SITE.TITLE}
+    description={t("meta.homeDescription")}
+    suffix={false}
+    windows
+>
+    <Masthead slot="ident" tagline={t("site.tagline")} />
+
+    <h1 class="sr-only">{SITE.TITLE} - {t("site.role")}</h1>
+
+    <Cmd run="whoami" icon="term" />
+    <div class="out">
+        <p>
+            {t("home.intro1")}
+            <br />
+            {t("home.intro2")}
+        </p>
+    </div>
+
+    <Cmd
+        run="ls -la"
+        arg="~/writing"
+        icon="note"
+        aside={`${posts.length} ${t("unit.posts")} · ${compact(stats.words)} ${t("unit.words")}`}
+    />
+    <div class="out lede">
+        <ul class="rows anal">
+            {
+                posts.map((post) => (
+                    <li>
+                        <span class="when">{iso(post.data.date)}</span>
+                        <a href={L(`/blog/${post.data.translationKey}`)}>
+                            {post.data.title}
+                        </a>
+                        {isNew(post.data.date) && (
+                            <span class="new">[new]</span>
+                        )}
+                        <span class="len">{readingTime(post.body ?? "")} min</span>
+                        <span class="desc comment">
+                            {post.data.description}
+                        </span>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+
+    <Cmd run="cat" arg="~/.config/stack" icon="chip" />
+    <div class="out">
+        <ul>
+            {
+                STACK_GROUPS.map(({ GROUP, ITEMS }) => (
+                    <li>
+                        <b>{GROUP}</b> {ITEMS.join(", ")}
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+
+    <Cmd run="git log" arg="--oneline" icon="term" />
+    <div class="out">
+        <ul class="rows">
+            {
+                CHANGELOG.map(({ DATE, TEXT }) => (
+                    <li>
+                        <span class="when">{iso(new Date(DATE))}</span>
+                        <span>{TEXT}</span>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+
+    <Fragment slot="windows">
+        <aside id="win-status" class="window" aria-label={t("win.status")}>
+            <div class="window__bar">
+                <span>status</span>
+                <span class="window__controls">
+                    <button
+                        type="button"
+                        data-window-close="win-status"
+                        aria-label={t("win.close")}>x</button
+                    >
+                </span>
+            </div>
+            <pre
+                class="window__body"><span class="prompt">$</span> ./status
+
+host....... lacorte.city
+served..... vercel
+build...... {stats.commit}
+updated.... {stats.built}
+engine..... {Astro.generator.toLowerCase()}</pre>
+        </aside>
+
+        <aside id="win-lab" class="window" aria-label={t("win.lab")}>
+            <div class="window__bar">
+                <span>lab</span>
+                <span class="window__controls">
+                    <button
+                        type="button"
+                        data-window-close="win-lab"
+                        aria-label={t("win.close")}>x</button
+                    >
+                </span>
+            </div>
+            <pre
+                class="window__body"><span class="prompt">$</span> cat ~/README
+
+nyx........ debian 12
+parts...... 2 salvaged desktops
+runtime.... docker
+ingress.... cloudflare tunnel
+note....... runs my services
+writeup.... <a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
+        </aside>
+    </Fragment>
+</Layout>
+
+<style>
+    .window {
+        max-width: 100%;
+    }
+
+    .lede {
+        margin-bottom: 34px;
+    }
+
+    .lede :global(.rows > li) {
+        padding: 3px 0;
+    }
+
+    .lede :global(.desc) {
+        flex-basis: 100%;
+    }
+</style>

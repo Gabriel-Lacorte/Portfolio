@@ -1,27 +1,184 @@
 ---
 import Head from "@components/Head.astro";
-import Header from "@components/Header.astro";
-import Footer from "@components/Footer.astro";
-import { SITE } from "@consts";
+import { NAV_KEYS, SITE, SOCIALS } from "@consts";
+import { HTML_LANG, LOCALE_LABEL, LOCALES } from "@i18n/ui";
+import {
+    localised,
+    unlocalised,
+    useTranslations,
+    type Locale,
+} from "@i18n/utils";
 
 type Props = {
-  title: string;
-  description: string;
+    locale: Locale;
+    title: string;
+    description: string;
+    /** Home passes false, its <title> is just the site name. */
+    suffix?: boolean;
+    /** Home shows the floating windows and the taskbar. */
+    windows?: boolean;
+    /** Forwarded to <Head>, locales whose route serves borrowed text. */
+    untranslated?: Locale[];
+    /** Forwarded to <Head>, keeps the page out of the index. */
+    noindex?: boolean;
+    /** Forwarded to <Head>, points the canonical at another route. */
+    canonicalPath?: string;
+    /** Forwarded to <Head>, article facts for JSON-LD. */
+    article?: {
+        headline: string;
+        published: Date;
+        lang: string;
+        tags?: string[];
+        words?: number;
+    };
 };
 
-const { title, description } = Astro.props;
+const {
+    locale,
+    title,
+    description,
+    suffix = true,
+    windows = false,
+    untranslated = [],
+    noindex = false,
+    canonicalPath,
+    article,
+} = Astro.props;
+
+const t = useTranslations(locale);
+
+/* Compared with the locale segment stripped, so the same logic serves both
+   languages. */
+const here = unlocalised(Astro.url.pathname);
+const isCurrent = (href: string) =>
+    href === "/" ? here === "/" : here === href || here.startsWith(href + "/");
 ---
 
 <!doctype html>
-<html lang="en">
-  <head>
-    <Head title={`${title} | ${SITE.TITLE}`} description={description} />
-  </head>
-  <body>
-    <Header />
-    <main>
-      <slot />
-    </main>
-    <Footer />
-  </body>
+<html lang={HTML_LANG[locale]}>
+    <head>
+        <Head
+            locale={locale}
+            title={suffix ? `${title} | ${SITE.TITLE}` : title}
+            description={description}
+            untranslated={untranslated}
+            noindex={noindex}
+            canonicalPath={canonicalPath}
+            article={article}
+        />
+    </head>
+    <body class:list={[windows && "has-windows"]}>
+        <a class="skip" href="#main">{t("action.skip")}</a>
+
+        <div class="container">
+            <header class="site">
+                <slot name="ident">
+                    <p class="ident">
+                        <span class="mark">{SITE.HANDLE}</span>
+                        <span class="who">{t("site.tagline")}</span>
+                    </p>
+                </slot>
+
+                <nav class="menu" aria-label="Main">
+                    <ul>
+                        {
+                            NAV_KEYS.map(({ KEY, HREF }) => (
+                                <li>
+                                    <a
+                                        href={localised(HREF, locale)}
+                                        aria-current={
+                                            isCurrent(HREF) ? "page" : undefined
+                                        }
+                                        >[ {t(KEY)} ]</a
+                                    >
+                                </li>
+                            ))
+                        }
+                    </ul>
+                    <ul>
+                        <li class="lang">
+                            {
+                                LOCALES.map((code, i) => (
+                                    <>
+                                        {i > 0 && " / "}
+                                        <a
+                                            href={localised(here, code)}
+                                            hreflang={HTML_LANG[code]}
+                                            aria-current={
+                                                code === locale
+                                                    ? "true"
+                                                    : undefined
+                                            }
+                                            >{LOCALE_LABEL[code]}</a
+                                        >
+                                    </>
+                                ))
+                            }
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+            <main id="main">
+                <slot />
+            </main>
+
+            <slot name="windows" />
+
+            <footer class="site">
+                <div class="contacts">
+                    <span>
+                        <span class="comment">mail:</span>{" "}
+                        <a href={`mailto:${SITE.EMAIL}`}>{SITE.EMAIL}</a>
+                    </span>
+                    <span>
+                        <span class="comment">feed:</span>{" "}
+                        <a href={localised("/feed.xml", locale)}>rss</a>
+                    </span>
+                    <span>
+                        {
+                            SOCIALS.map(({ NAME, HREF }, i) => (
+                                <>
+                                    {i > 0 && " | "}
+                                    <a
+                                        href={HREF}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        >{NAME}</a
+                                    >
+                                </>
+                            ))
+                        }
+                    </span>
+                </div>
+            </footer>
+
+            <div class="buttons88">
+                <img
+                    src="https://lacorte.neocities.org/lacorte.gif"
+                    width="88"
+                    height="31"
+                    alt="lacorte.city"
+                />
+                <img
+                    src="https://lacorte.neocities.org/imgs/chill_pill.gif"
+                    width="88"
+                    height="31"
+                    alt="take a chill pill"
+                />
+                <img
+                    src="https://lacorte.neocities.org/imgs/privacynet.gif"
+                    width="88"
+                    height="31"
+                    alt="internet privacy now!"
+                />
+                <img
+                    src="https://nanacore.net/imgs/brs/bandeira.png"
+                    title="Esse site faz parte do WebCírculo BR!"
+                />
+            </div>
+        </div>
+
+        <slot name="taskbar" />
+    </body>
 </html>

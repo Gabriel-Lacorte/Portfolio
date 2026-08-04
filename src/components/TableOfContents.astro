@@ -1,54 +1,127 @@
 ---
 import TableOfContentsHeading from "./TableOfContentsHeading.astro";
 
-// https://kld.dev/building-table-of-contents/
-const { headings } = Astro.props;
-const toc = buildToc(headings);
-
 export interface Heading {
-  depth: number;
-  slug: string;
-  text: string;
+    depth: number;
+    slug: string;
+    text: string;
+    subheadings: Heading[];
 }
 
-function buildToc(headings: Heading[]) {
-  const toc: Heading[] = [];
-  const parentHeadings = new Map();
-  headings.forEach((h) => {
-    const heading = { ...h, subheadings: [] };
-    parentHeadings.set(heading.depth, heading);
-    if (heading.depth === 2) {
-      toc.push(heading);
-    } else {
-      parentHeadings.get(heading.depth - 1).subheadings.push(heading);
+type Props = {
+    headings: Omit<Heading, "subheadings">[];
+    /** Localised label for the summary. Ignored when `bare`. */
+    label?: string;
+    /** Drop the disclosure wrapper, for when a panel already titles it,
+     *  which otherwise renders "contents" twice, one inside the other. */
+    bare?: boolean;
+    /** The headings' own language, when it is not the page's. Goes on the
+     *  list rather than the wrapper so `label` stays in the page's. */
+    lang?: string;
+};
+
+const { headings, label = "contents", bare = false, lang } = Astro.props;
+
+/* Only h2/h3 make the outline, deeper levels turn it into noise.
+ *
+ * The previous implementation did `parentHeadings.get(depth - 1).subheadings
+ * .push(...)`, which throws on any post whose first heading is an h3, or that
+ * has an h4 with no h3 above it. Orphans are promoted here instead. */
+function buildToc(flat: Omit<Heading, "subheadings">[]): Heading[] {
+    const toc: Heading[] = [];
+
+    for (const raw of flat) {
+        if (raw.depth > 3) continue;
+
+        const heading: Heading = { ...raw, subheadings: [] };
+
+        if (heading.depth <= 2 || toc.length === 0) {
+            toc.push(heading);
+        } else {
+            toc[toc.length - 1].subheadings.push(heading);
+        }
     }
-  });
-  return toc;
+
+    return toc;
 }
+
+const toc = buildToc(headings);
 ---
 
-<details
-  open
-  class="animate rounded-lg border border-black/15 dark:border-white/20"
->
-  <summary>Table of Contents</summary>
-  <nav class="">
-    <ul class="py-3">
-      {toc.map((heading) => <TableOfContentsHeading heading={heading} />)}
-    </ul>
-  </nav>
-</details>
+{
+    toc.length > 0 &&
+        (bare ? (
+            <nav class="toc-bare" aria-label={label}>
+                <ul lang={lang}>
+                    {toc.map((heading) => (
+                        <TableOfContentsHeading heading={heading} />
+                    ))}
+                </ul>
+            </nav>
+        ) : (
+            <details class="toc" open>
+                <summary>{label}</summary>
+                <nav aria-label={label}>
+                    <ul lang={lang}>
+                        {toc.map((heading) => (
+                            <TableOfContentsHeading heading={heading} />
+                        ))}
+                    </ul>
+                </nav>
+            </details>
+        ))
+}
 
 <style>
-  summary {
-    @apply cursor-pointer rounded-t-lg px-3 py-1.5 font-medium transition-colors;
-  }
+    .toc {
+        width: fit-content;
+        max-width: 100%;
+        margin-bottom: 15px;
+        border-left: var(--hair);
+        padding: 6px 10px;
+    }
 
-  summary:hover {
-    @apply bg-black/5 dark:bg-white/5;
-  }
+    summary {
+        cursor: pointer;
+        list-style: none;
+        color: var(--comment);
+    }
 
-  details[open] summary {
-    @apply bg-black/5 dark:bg-white/5;
-  }
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    summary::before {
+        content: "[+] ";
+    }
+
+    .toc[open] summary::before {
+        content: "[-] ";
+    }
+
+    summary:hover {
+        color: var(--bg);
+        background: var(--base);
+    }
+
+    nav :global(ul) {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    nav > ul {
+        margin-top: 6px;
+    }
+
+    .toc-bare > ul {
+        columns: 2;
+        column-gap: 24px;
+    }
+
+    @media (max-width: 700px) {
+        .toc-bare > ul {
+            columns: 1;
+        }
+    }
 </style>

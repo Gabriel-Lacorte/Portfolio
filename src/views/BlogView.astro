@@ -1,0 +1,79 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
+import { postsFor } from "@lib/posts";
+import { compact, countWords, readingTime } from "@lib/stats";
+import { localised, useTranslations, type Locale } from "@i18n/utils";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const posts = await postsFor(locale);
+const years = [...new Set(posts.map((p) => p.data.date.getUTCFullYear()))].sort(
+    (a, b) => b - a,
+);
+
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+const postWords = (post: (typeof posts)[number]) => countWords(post.body ?? "");
+---
+
+<Layout
+    locale={locale}
+    title={t("meta.blogTitle")}
+    description={t("meta.blogDescription")}
+>
+    <h1 class="sr-only">{t("meta.blogTitle")}</h1>
+
+    {
+        years.map((year) => (
+            <>
+                <Cmd run="cd" arg={`~/writing/${year}`} icon="disk" as="h2" aside={`${posts.filter((p) => p.data.date.getUTCFullYear() === year).length} ${t("unit.posts")} · ${compact(posts.filter((p) => p.data.date.getUTCFullYear() === year).reduce((sum, p) => sum + postWords(p), 0))} ${t("unit.words")}`} />                <div class="out">
+                    { }
+                    <ol class="listing">
+                        {posts
+                            .filter(
+                                (p) => p.data.date.getUTCFullYear() === year,
+                            )
+                            .map((post) => (
+                                <li>
+                                    <a
+                                        class="head"
+                                        href={localised(
+                                            `/blog/${post.data.translationKey}`,
+                                            locale,
+                                        )}
+                                    >
+                                        <time
+                                            class="when"
+                                            datetime={post.data.date
+                                                .toISOString()
+                                                .slice(0, 10)}
+                                        >
+                                            {iso(post.data.date)}
+                                        </time>
+                                        <span class="title">
+                                            {post.data.title}
+                                        </span>
+                                        <span class="len">
+                                            {readingTime(post.body ?? "")} min
+                                        </span>
+                                    </a>
+                                    <p class="desc">{post.data.description}</p>
+                                    {post.data.tags.length > 0 && (
+                                        <p class="tags">
+                                            {post.data.tags.map((tag) => (
+                                                <span class="tag">{tag}</span>
+                                            ))}
+                                        </p>
+                                    )}
+                                </li>
+                            ))}
+                    </ol>
+                </div>
+            </>
+        ))
+    }
+
+</Layout>
+

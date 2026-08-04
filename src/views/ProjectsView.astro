@@ -1,0 +1,74 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Cmd from "@components/Cmd.astro";
+import { PROJECTS } from "@consts";
+import { localised, useTranslations, type Locale } from "@i18n/utils";
+
+type Props = { locale: Locale };
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const external = (href: string) => href.startsWith("http");
+
+const projects = [...PROJECTS].sort((a, b) => b.YEAR.localeCompare(a.YEAR));
+---
+
+<Layout
+    locale={locale}
+    title={t("meta.projectsTitle")}
+    description={t("meta.projectsDescription")}
+>
+    <h1 class="sr-only">{t("meta.projectsTitle")}</h1>
+
+    <Cmd
+        run="ls -la"
+        arg="~/projects"
+        icon="star"
+        as="h2"
+        aside={`${PROJECTS.length} ${t("unit.listed")}`}
+    />
+    <div class="out">
+        <p>{t("meta.projectsDescription")}</p>
+    </div>
+
+    <div class="out">
+        <ol class="listing">
+            {
+                projects.map((project) => (
+                    <li>
+                        <a
+                            class="head pornografo"
+                            href={
+                                external(project.HREF)
+                                    ? project.HREF
+                                    : localised(project.HREF, locale)
+                            }
+                            target={external(project.HREF) ? "_blank" : undefined}
+                            rel={
+                                external(project.HREF)
+                                    ? "noopener noreferrer"
+                                    : undefined
+                            }
+                        >
+                            <span class="when">{project.YEAR}</span>
+                            <span class="title">{project.NAME}</span>
+                            <span class="len">
+                                {external(project.HREF)
+                                    ? t("field.source")
+                                    : t("field.writeup")}{" "}
+                                -&gt;
+                            </span>
+                        </a>
+                        <p class="desc">{project.SUMMARY}</p>
+                        {project.STACK.length > 0 && (
+                            <p class="tags">
+                                {project.STACK.map((item) => (
+                                    <span class="tag">{item}</span>
+                                ))}
+                            </p>
+                        )}
+                    </li>
+                ))
+            }
+        </ol>
+    </div>
+</Layout>

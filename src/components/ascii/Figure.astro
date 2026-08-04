@@ -1,0 +1,74 @@
+---
+
+type Props = {
+    alt: string;
+    caption?: string;
+    label?: string;
+    bare?: boolean;
+};
+
+const { alt, caption, label, bare = false } = Astro.props;
+---
+
+<figure class:list={["fig", bare && "bare"]}>
+    <div class="fig-art" role="img" aria-label={alt}>
+        <pre class="ascii"><slot /></pre>
+    </div>
+    {
+        (label || caption) && (
+            <figcaption>
+                {label && <span class="fig-label">{label}</span>}
+                {caption}
+            </figcaption>
+        )
+    }
+</figure>
+
+<style>
+    .fig {
+        margin: 15px 0;
+    }
+
+    .fig-art {
+        padding: 10px 12px;
+        border: var(--hair);
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+    }
+
+    .fig.bare .fig-art {
+        padding: 0;
+        border: 0;
+    }
+
+    .fig-art pre {
+        margin: 0;
+        font-family: var(--code);
+        color: var(--base);
+        font-size: 14px;
+        line-height: 1.2;
+    }
+
+    figcaption {
+        margin-top: 6px;
+        color: var(--comment);
+        font-size: 14px;
+    }
+
+    .fig-label {
+        margin-right: 8px;
+        color: var(--accent);
+    }
+
+    @media (max-width: 700px) {
+        .fig-art pre {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 430px) {
+        .fig-art pre {
+            font-size: 8px;
+        }
+    }
+</style>

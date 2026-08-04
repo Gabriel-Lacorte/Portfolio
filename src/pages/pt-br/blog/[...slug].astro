@@ -1,0 +1,20 @@
+---
+import PostView from "@views/PostView.astro";
+import { postsFor } from "@lib/posts";
+
+/* Routed on translationKey, not the entry slug: a post and its
+   translation share the same URL path under different locale prefixes.
+   postsFor() also supplies the English original for any post this locale
+   has not translated yet, so no path 404s mid-translation. */
+export async function getStaticPaths() {
+    const posts = await postsFor("pt-br");
+    return posts.map((post) => ({
+        params: { slug: post.data.translationKey },
+        props: { post },
+    }));
+}
+
+const { post } = Astro.props;
+---
+
+<PostView locale="pt-br" post={post} />
