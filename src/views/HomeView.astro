@@ -5,7 +5,7 @@ import Masthead from "@components/Masthead.astro";
 import { postsFor } from "@lib/posts";
 import { compact, getStats, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
-import { CHANGELOG, NOW, PROJECTS, SITE, STACK_GROUPS } from "@consts";
+import { CHANGELOG, SITE, STACK_GROUPS } from "@consts";
 
 type Props = { locale: Locale };
 const { locale } = Astro.props;
@@ -60,7 +60,7 @@ const isNew = (d: Date) =>
                         {isNew(post.data.date) && (
                             <span class="new">[new]</span>
                         )}
-                        <span class="len">{readingTime(post.body)} min</span>
+                        <span class="len">{readingTime(post.body ?? "")} min</span>
                         <span class="desc comment">
                             {post.data.description}
                         </span>

@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
 import { SITE } from "@consts";
 import { DEFAULT_LOCALE, HTML_LANG, LOCALES } from "@i18n/ui";
 import { localised, unlocalised, type Locale } from "@i18n/utils";
@@ -188,7 +188,7 @@ const jsonLd = article
     crossorigin
 />
 
-<ViewTransitions />
+<ClientRouter />
 
 <!-- Runs before first paint: no theme flash, and no flash of hidden
      content either. Deliberately tiny; everything else waits for the

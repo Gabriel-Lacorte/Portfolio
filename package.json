@@ -15,11 +15,14 @@
         "headers:check": "node scripts/gen-headers.mjs --check"
     },
     "dependencies": {
-        "@astrojs/check": "^0.9.4",
-        "@astrojs/mdx": "^3.1.8",
+        "@astrojs/check": "^0.9.10",
+        "@astrojs/mdx": "^7.0.5",
         "@astrojs/rss": "^4.0.19",
-        "@astrojs/sitemap": "^3.2.1",
-        "astro": "^4.16.7",
+        "@astrojs/sitemap": "^3.7.3",
+        "astro": "^7.1.6",
         "typescript": "^5.6.3"
+    },
+    "devDependencies": {
+        "npm-check-updates": "^23.0.1"
     }
 }

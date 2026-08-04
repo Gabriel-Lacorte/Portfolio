@@ -10,12 +10,12 @@ const { locale } = Astro.props;
 const t = useTranslations(locale);
 
 const posts = await postsFor(locale);
-const totalWords = posts.reduce((sum, p) => sum + countWords(p.body), 0);
 const years = [...new Set(posts.map((p) => p.data.date.getUTCFullYear()))].sort(
     (a, b) => b - a,
 );
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
+const postWords = (post: (typeof posts)[number]) => countWords(post.body ?? "");
 ---
 
 <Layout
@@ -28,7 +28,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
     {
         years.map((year) => (
             <>
-                <Cmd run="cd" arg={`~/writing/${year}`} icon="disk" as="h2" aside={`${posts.filter((p) => p.data.date.getUTCFullYear() === year).length} ${t("unit.posts")} · ${compact(posts.filter((p) => p.data.date.getUTCFullYear() === year).reduce((sum, p) => sum + countWords(p.body), 0))} ${t("unit.words")}`} />                <div class="out">
+                <Cmd run="cd" arg={`~/writing/${year}`} icon="disk" as="h2" aside={`${posts.filter((p) => p.data.date.getUTCFullYear() === year).length} ${t("unit.posts")} · ${compact(posts.filter((p) => p.data.date.getUTCFullYear() === year).reduce((sum, p) => sum + postWords(p), 0))} ${t("unit.words")}`} />                <div class="out">
                     { }
                     <ol class="listing">
                         {posts
@@ -56,7 +56,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
                                             {post.data.title}
                                         </span>
                                         <span class="len">
-                                            {readingTime(post.body)} min
+                                            {readingTime(post.body ?? "")} min
                                         </span>
                                     </a>
                                     <p class="desc">{post.data.description}</p>

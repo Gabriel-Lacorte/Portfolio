@@ -1,6 +1,5 @@
 import type {
     ChangelogEntry,
-    ReadingItem,
     Metadata,
     NavItem,
     Project,

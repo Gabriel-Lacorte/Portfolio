@@ -1,4 +1,5 @@
 import { defineConfig } from "astro/config";
+import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import rehypeImageSize from "./src/lib/rehype-image-size.mjs";
@@ -25,7 +26,7 @@ export default defineConfig({
     },
 
     markdown: {
-        rehypePlugins: [rehypeImageSize],
+        processor: unified({ rehypePlugins: [rehypeImageSize] }),
         shikiConfig: {
             theme: "css-variables",
         },
