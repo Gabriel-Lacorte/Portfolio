@@ -8,10 +8,11 @@
     "scripts": {
         "dev": "astro dev",
         "start": "astro dev",
-        "build": "astro check && astro build && node scripts/gen-headers.mjs --check",
+        "build": "astro check && astro build && node scripts/gen-headers.mjs",
         "preview": "astro preview",
         "astro": "astro",
-        "headers": "node scripts/gen-headers.mjs"
+        "headers": "node scripts/gen-headers.mjs",
+        "headers:check": "node scripts/gen-headers.mjs --check"
     },
     "dependencies": {
         "@astrojs/check": "^0.9.4",
