@@ -32,43 +32,6 @@ If the process creation is successful, the parent (original) process waits for t
 
 In the child process, where the ransomware will execute, the `setsid()` function is used to create a new session. This decouples the process from any controlling terminal. If `setsid()` fails, the process is immediately terminated with `exit(1)`.
 
-<Figure
-  label="fig.1"
-  caption="Daemonisation: everything the locker does before it touches a single file."
-  alt="Flow diagram of the ransomware's daemonisation. The locker starts and checks whether -verbose was given; without it, it daemonises. It calls fork(); the parent goes to waitpid() and reaps the child, while the child calls setsid(), exiting with status 1 if that fails. The child then closes file descriptors 0, 1 and 2, reopens /dev/null and duplicates it over them, and only then enters the encrypt loop."
->
-{`
-             ./locker
-                 │
-                 v
-    ┌─────────────────────────┐
-    │     -verbose given ?    │
-    └─────────────────────────┘
-                 │  no  ->  daemonise
-                 v
-    ┌─────────────────────────┐
-    │          fork()         │
-    └─────────────────────────┘
-                 │  parent  ->  waitpid(), reaps
-                 v  child
-    ┌─────────────────────────┐
-    │         setsid()        │  fail -> exit(1)
-    └─────────────────────────┘
-                 v
-    ┌─────────────────────────┐
-    │       close(0,1,2)      │
-    └─────────────────────────┘
-                 v
-    ┌─────────────────────────┐
-    │open("/dev/null") + dup()│
-    └─────────────────────────┘
-                 v
-    ┌─────────────────────────┐
-    │       encrypt loop      │
-    └─────────────────────────┘
-`}
-</Figure>
-
 The default child process descriptors of `stdin`, `stdout`, `stderr` are also closed using `close()`. This prevents the daemon process from continuing to interact with the terminal. The closed descriptors are also redirected to `/dev/null` and duplicated with `dup()` to force any attempt to access the standard channels to be redirected to `/dev/null`.
 
 ```c

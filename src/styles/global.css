@@ -246,19 +246,30 @@ header.site {
     border-top: var(--hair);
     border-bottom: var(--hair);
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
+    gap: 8px 12px;
 }
 
 .menu ul {
     margin: 12px 0;
     padding: 0;
     list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 10px;
     text-align: right;
 }
 
+.menu a {
+    white-space: normal;
+    line-height: 1.35;
+}
+
 .menu li {
-    display: inline;
-    margin-left: 10px;
+    display: inline-flex;
+    margin-left: 0;
 }
 
 .menu a {
@@ -338,6 +349,7 @@ html.light .menu .mode button[data-theme-set="light"],
 
 .ident .who {
     color: var(--comment);
+    max-width: 100%;
 }
 
 .cmd {
@@ -388,7 +400,7 @@ html.light .menu .mode button[data-theme-set="light"],
 
 .out {
     padding-left: 16px;
-    padding-bottom: 8px;
+    margin-bottom: 8px;
     border-left: var(--hair);
 }
 
@@ -537,17 +549,55 @@ ul.plain {
 }
 
 @media (max-width: 700px) {
-    .listing .head {
-        grid-template-columns: minmax(0, 1fr) auto;
+    .listing .head,
+    .listing .pornografo {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px 0;
+        padding: 4px 0;
     }
 
-    .listing .when {
-        grid-column: 1 / -1;
+    .listing .when,
+    .listing .len {
+        display: inline-block;
+        font-size: 14px;
+    }
+
+    .listing .title {
+        padding: 0;
+        overflow-wrap: anywhere;
+        line-height: 1.4;
     }
 
     .listing .desc,
     .listing .tags {
         padding-left: 0;
+    }
+
+    .menu {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .menu ul {
+        width: 100%;
+        margin: 8px 0;
+        text-align: left;
+    }
+
+    .menu li {
+        margin: 0 10px 0 0;
+    }
+
+    .menu .lang {
+        margin-left: 0;
+    }
+
+    .contacts {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px 0;
     }
 }
 
@@ -869,9 +919,9 @@ footer.site {
 
 .article :not(pre) > code {
     padding: 0 4px;
-    border: var(--hair);
-    background: var(--blood-dark);
-    color: var(--blood);
+    border: 0;
+    background: var(--code-surface);
+    color: var(--accent);
     font-family: var(--code);
     font-size: 14px;
     overflow-wrap: anywhere;
@@ -879,14 +929,15 @@ footer.site {
 
 .article pre {
     margin: 0;
-    padding: 10px 12px;
-    border: var(--hair);
-    background: var(--blood-dark) !important;
+    padding: 14px 14px 12px;
+    border: 0;
+    background: var(--code-surface) !important;
     overflow-x: auto;
     font-family: var(--code);
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.55;
     tab-size: 4;
+    box-shadow: none;
 }
 
 .article pre,
@@ -896,19 +947,23 @@ footer.site {
 }
 
 .article pre code {
+    display: block;
     font-family: var(--code);
     color: inherit;
+    background: transparent;
 }
 
 .code-wrap {
     margin: 15px 0;
-    border: var(--hair);
-    background: var(--blood-dark);
+    border: 0;
+    background: var(--code-panel);
+    overflow: hidden;
+    box-shadow: none;
 }
 
 .code-wrap > pre {
     border: 0;
-    border-top: var(--hair);
+    border-top: 0;
 }
 
 .code-bar {
@@ -916,9 +971,9 @@ footer.site {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 3px 10px;
-    background: var(--win-bar);
-    color: var(--blood);
+    padding: 4px 10px;
+    background: transparent;
+    color: var(--comment);
     font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -927,9 +982,9 @@ footer.site {
 .code-copy {
     min-height: 24px;
     padding: 0 8px;
-    border: var(--hair);
+    border: 0;
     background: transparent;
-    color: var(--base);
+    color: var(--comment);
     font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -962,31 +1017,51 @@ footer.site {
 }
 
 :root {
-    --astro-code-color-text: #ece4e2;
-    --astro-code-color-background: transparent;
-    --astro-code-token-comment: #8a7a78;
-    --astro-code-token-keyword: #ff5c6a;
-    --astro-code-token-string: #e8b04b;
-    --astro-code-token-function: #ffd9d4;
-    --astro-code-token-constant: #ff8f5e;
-    --astro-code-token-parameter: #ece4e2;
-    --astro-code-token-string-expression: #e8b04b;
-    --astro-code-token-punctuation: #a39694;
-    --astro-code-token-link: #ff4d5c;
+    --code-surface: #0a0505;
+    --code-surface-2: #0d1218;
+    --code-panel: #140b0b;
+    --code-border: #331616;
+    --astro-code-color-text: #f5eee8;
+    --astro-code-color-background: var(--code-surface);
+    --astro-code-token-comment: #7f8da3;
+    --astro-code-token-keyword: #fc7d7d;
+    --astro-code-token-string: #86efac;
+    --astro-code-token-function: #c084fc;
+    --astro-code-token-constant: #fbbf24;
+    --astro-code-token-parameter: #f5eee8;
+    --astro-code-token-string-expression: #86efac;
+    --astro-code-token-punctuation: #94a3b8;
+    --astro-code-token-link: #38bdf8;
+    --astro-code-token-operator: #fda4af;
+    --astro-code-token-tag: #fb923c;
+    --astro-code-token-literal: #c084fc;
+    --astro-code-token-number: #f59e0b;
+    --astro-code-token-attr-name: #f9a8d4;
+    --astro-code-token-attr-value: #86efac;
 }
 
 html.light {
-    --astro-code-color-text: #17100f;
-    --astro-code-color-background: transparent;
-    --astro-code-token-comment: #6b5a58;
-    --astro-code-token-keyword: #a8071a;
-    --astro-code-token-string: #7a5300;
-    --astro-code-token-function: #5c1018;
-    --astro-code-token-constant: #9c3a00;
-    --astro-code-token-parameter: #17100f;
-    --astro-code-token-string-expression: #7a5300;
-    --astro-code-token-punctuation: #6b5c59;
-    --astro-code-token-link: #a8071a;
+    --code-surface: #f5efe9;
+    --code-surface-2: #efe4dc;
+    --code-panel: #f0e6de;
+    --code-border: #d8c3b6;
+    --astro-code-color-text: #1f1713;
+    --astro-code-color-background: var(--code-surface);
+    --astro-code-token-comment: #7b6f6a;
+    --astro-code-token-keyword: #176d95;
+    --astro-code-token-string: #2d6a4f;
+    --astro-code-token-function: #7c3aed;
+    --astro-code-token-constant: #b45309;
+    --astro-code-token-parameter: #1f1713;
+    --astro-code-token-string-expression: #2d6a4f;
+    --astro-code-token-punctuation: #5e5754;
+    --astro-code-token-link: #176d95;
+    --astro-code-token-operator: #b91c1c;
+    --astro-code-token-tag: #a16207;
+    --astro-code-token-literal: #7c3aed;
+    --astro-code-token-number: #b45309;
+    --astro-code-token-attr-name: #9d174d;
+    --astro-code-token-attr-value: #2d6a4f;
 }
 
 .ascii {
@@ -1014,18 +1089,20 @@ html.light {
     }
 }
 
+@media (max-width: 900px) {
+    body.has-windows .window,
+    body.has-windows .taskbar {
+        display: none !important;
+    }
+
+    html.js.floating body.has-windows {
+        padding-bottom: 0;
+    }
+}
+
 @media (max-width: 700px) {
     .window {
         width: 100%;
-    }
-
-
-    .menu ul {
-        text-align: left;
-    }
-
-    .menu li {
-        margin: 0 10px 0 0;
     }
 }
 

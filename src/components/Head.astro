@@ -426,10 +426,19 @@ const jsonLd = article
             return p;
         };
 
-        /* The gutter slot: out of the column's way, stacked by index. */
         function parking(win: HTMLElement, i: number): Pos {
+            const width = win.offsetWidth || WIN_W;
+            if (win.id === "win-status") {
+                return { x: GAP+150, y: 175 };
+            }
+            if (win.id === "win-lab") {
+                return {
+                    x: Math.max(GAP, window.innerWidth - width - 170),
+                    y: 460,
+                };
+            }
             return {
-                x: window.innerWidth - (win.offsetWidth || WIN_W) - GAP,
+                x: Math.max(GAP, window.innerWidth - width - GAP),
                 y: 96 + i * 240,
             };
         }
