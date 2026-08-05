@@ -3,9 +3,7 @@ dist/
 .astro/
 .DS_Store
 
-# Review-session logs from the design tooling: useful locally, not source.
-.impeccable/critique/
-
-# Screenshots de verificacao, nunca fonte.
+# Verification screenshots, never source.
 *.png
 !public/**/*.png
+.impeccable/

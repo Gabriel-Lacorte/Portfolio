@@ -179,11 +179,6 @@ main > :first-child {
     margin-top: 0;
 }
 
-html.js.floating body.has-windows {
-    padding-bottom: 56px;
-}
-
-
 .skip {
     position: absolute;
     left: -9999px;
@@ -660,40 +655,6 @@ html.js.floating .window__controls {
     color: var(--green);
 }
 
-.taskbar {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 40;
-    display: none;
-    gap: 6px;
-    padding: 6px 10px;
-    border-top: 1px solid var(--win-edge);
-    background: var(--win-bar);
-}
-
-html.js.floating .taskbar {
-    display: flex;
-}
-
-.taskbar button {
-    min-height: 24px;
-    padding: 2px 10px;
-    border: 1px solid var(--win-line);
-    background: transparent;
-    color: var(--base);
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.taskbar button[aria-pressed="true"],
-.taskbar button:hover,
-.taskbar button:focus-visible {
-    color: var(--bg);
-    background: var(--base);
-}
-
 footer.site {
     margin: 20px 0 15px;
     padding-top: 10px;
@@ -1050,16 +1011,6 @@ footer.site {
     }
 }
 
-@media (max-width: 900px) {
-    body.has-windows .taskbar {
-        display: none !important;
-    }
-
-    html.js.floating body.has-windows {
-        padding-bottom: 0;
-    }
-}
-
 @media (max-width: 700px) {
     .window {
         width: 100%;
@@ -1107,7 +1058,6 @@ footer.site {
         --astro-code-token-attr-value: #000;
     }
 
-    .taskbar,
     .window,
     .menu,
     .code-bar,

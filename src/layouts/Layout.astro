@@ -67,7 +67,7 @@ const uiStrings = JSON.stringify({
             article={article}
         />
     </head>
-    <body class:list={[windows && "has-windows"]} data-ui={uiStrings}>
+    <body data-ui={uiStrings}>
         <a class="skip" href="#main">{t("action.skip")}</a>
 
         <div class="container">
@@ -197,10 +197,5 @@ const uiStrings = JSON.stringify({
             </div>
         </div>
 
-        {
-            windows && (
-                <div class="taskbar" role="group" aria-label={t("win.windows")} />
-            )
-        }
     </body>
 </html>

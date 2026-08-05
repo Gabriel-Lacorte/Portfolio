@@ -234,7 +234,6 @@ const jsonLdSafe = jsonLd
     }
 
     const POS_KEY = "win:pos";
-    const OPEN_KEY = "win:open";
     const WIN_W = 280;
     const GAP = 24;
 
@@ -258,30 +257,11 @@ const jsonLdSafe = jsonLd
         }
     }
 
-    function readOpen(): Record<string, boolean> {
-        try {
-            return JSON.parse(localStorage.getItem(OPEN_KEY) ?? "{}");
-        } catch {
-            return {};
-        }
-    }
-
-    function saveOpen(id: string, open: boolean) {
-        const all = readOpen();
-        all[id] = open;
-        try {
-            localStorage.setItem(OPEN_KEY, JSON.stringify(all));
-        } catch {
-            /*  */
-        }
-    }
-
     function windows(signal: AbortSignal) {
         const wins = [...document.querySelectorAll<HTMLElement>(".window")];
         if (!wins.length) return;
 
         const ui = strings();
-        const tray = document.querySelector<HTMLElement>(".taskbar");
         let top = 50;
 
         function margins() {
@@ -341,48 +321,13 @@ const jsonLdSafe = jsonLd
             savePosition(win.id, p);
         }
 
-        const setOpen = (id: string, open: boolean, persist = true) => {
-            const win = document.getElementById(id);
-            const task = tray?.querySelector<HTMLButtonElement>(
-                `[data-window-task="${id}"]`,
-            );
-            if (win) win.hidden = !open;
-            task?.setAttribute("aria-pressed", String(open));
-            if (persist) saveOpen(id, open);
-            if (!open || !win) return;
-            if (win.style.position === "fixed") {
-                place(win, parseFloat(win.style.left), parseFloat(win.style.top));
-                repark(win, wins.indexOf(win));
-            } else win.scrollIntoView({ block: "nearest" });
-        };
-
-        function buildTray() {
-            if (!tray || tray.childElementCount) return;
-            for (const win of wins) {
-                const button = document.createElement("button");
-                button.type = "button";
-                button.dataset.windowTask = win.id;
-                button.textContent =
-                    win
-                        .querySelector(".window__bar > span")
-                        ?.textContent?.trim() || win.id;
-                button.setAttribute("aria-pressed", String(!win.hidden));
-                button.addEventListener("click", () =>
-                    setOpen(
-                        win.id,
-                        button.getAttribute("aria-pressed") !== "true",
-                    ),
-                );
-                tray.append(button);
-            }
-        }
-
         document
             .querySelectorAll<HTMLButtonElement>("[data-window-close]")
             .forEach((b) =>
-                b.addEventListener("click", () =>
-                    setOpen(b.dataset.windowClose!, false),
-                ),
+                b.addEventListener("click", () => {
+                    const win = document.getElementById(b.dataset.windowClose!);
+                    if (win) win.hidden = true;
+                }),
             );
 
         const lift = (win: HTMLElement, i: number) => {
@@ -444,12 +389,6 @@ const jsonLdSafe = jsonLd
                 repark(win, i);
             });
 
-            if (!floating) return;
-            buildTray();
-            const open = readOpen();
-            wins.forEach((win) =>
-                setOpen(win.id, open[win.id] !== false, false),
-            );
         };
 
         wins.forEach((win) => {
