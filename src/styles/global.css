@@ -1083,6 +1083,28 @@ footer.site {
         --accent: #000;
         --rule: #999;
         --hair: solid 1px #999;
+
+        /* Code and ASCII figures keep their own dark surfaces otherwise, and
+           the ink above turns black on top of them. */
+        --code-surface: #fff;
+        --code-panel: #fff;
+        --astro-code-color-text: #000;
+        --astro-code-color-background: #fff;
+        --astro-code-token-comment: #555;
+        --astro-code-token-keyword: #000;
+        --astro-code-token-string: #000;
+        --astro-code-token-function: #000;
+        --astro-code-token-constant: #000;
+        --astro-code-token-parameter: #000;
+        --astro-code-token-string-expression: #000;
+        --astro-code-token-punctuation: #000;
+        --astro-code-token-link: #000;
+        --astro-code-token-operator: #000;
+        --astro-code-token-tag: #000;
+        --astro-code-token-literal: #000;
+        --astro-code-token-number: #000;
+        --astro-code-token-attr-name: #000;
+        --astro-code-token-attr-value: #000;
     }
 
     .taskbar,

@@ -5,3 +5,7 @@ dist/
 
 # Review-session logs from the design tooling: useful locally, not source.
 .impeccable/critique/
+
+# Screenshots de verificacao, nunca fonte.
+*.png
+!public/**/*.png
