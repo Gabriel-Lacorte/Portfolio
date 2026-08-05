@@ -67,6 +67,26 @@ const jsonLd = article
           ...(article.words ? { wordCount: article.words } : {}),
       }
     : null;
+
+/* JSON.stringify leaves "<" alone, so a "</script>" anywhere in a post's
+   title, description, or tags would close this tag and let the rest of the
+   string be parsed as markup. Escaping the characters that can start a tag
+   or an entity keeps the payload valid JSON and inert. U+2028/U+2029 are
+   legal in JSON but terminate a line in JavaScript, so they go too. */
+const JSON_LD_ESCAPES: Record<string, string> = {
+    "<": "\\u003c",
+    ">": "\\u003e",
+    "&": "\\u0026",
+    "\u2028": "\\u2028",
+    "\u2029": "\\u2029",
+};
+
+const jsonLdSafe = jsonLd
+    ? JSON.stringify(jsonLd).replace(
+          /[<>&\u2028\u2029]/g,
+          (c) => JSON_LD_ESCAPES[c] ?? c,
+      )
+    : null;
 ---
 
 <meta charset="utf-8" />
@@ -123,12 +143,8 @@ const jsonLd = article
 <meta name="twitter:description" content={description} />
 
 {
-    jsonLd && !noindex && (
-        <script
-            is:inline
-            type="application/ld+json"
-            set:html={JSON.stringify(jsonLd)}
-        />
+    jsonLdSafe && !noindex && (
+        <script is:inline type="application/ld+json" set:html={jsonLdSafe} />
     )
 }
 
