@@ -47,7 +47,7 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
         arg={file}
         icon="note"
         as="h2"
-        aside={`${iso} * ${readingTime(post.body ?? "")} min`}
+        aside={`${iso} · ${readingTime(post.body ?? "")} min`}
     />
 
     <div class="out">

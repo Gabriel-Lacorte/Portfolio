@@ -42,7 +42,6 @@
 :root {
     --base: #ece4e2;
     --bg: #0a0507;
-    --white: #ffffff;
     --comment: #a39694;
 
     --blood: #db001a;
@@ -51,46 +50,23 @@
 
     --rule: #50171c;
     --hair: solid 1px #50171c;
-    --accent: var(--blood);
+    /* Structure red (--blood) is too dark to carry 15px text on --bg: 3.88:1.
+       --accent is the same hue lifted just far enough to clear 4.5:1, and it
+       is what every mark, label, and hover fill that touches text uses. */
+    --accent: #eb242a;
     --green: #4fd67f;
     --amber: #e8b04b;
-    --red: var(--blood);
+    --red: var(--accent);
 
     --win-line: #5f171e;
     --win-bar: #1a0a0e;
     --win-edge: #8d1622;
-    --win-title: #e70e20;
+    --win-title: #f2252b;
 
     --mono: "Departure Mono", "Departure stand-in", "Iosevka", ui-monospace, monospace;
     --code: "Iosevka", "Iosevka stand-in", ui-monospace, "Cascadia Mono", monospace;
 
     color-scheme: dark;
-}
-
-html.light {
-    --base: #17100f;
-    --bg: #f0e9e6;
-    --white: #000000;
-    --comment: #6b5c59;
-
-    --blood: #a8071a;
-    --blood-deep: #d9394a;
-    --blood-dark: #f7e7e5;
-
-    --rule: #c2a5a2;
-    --hair: solid 1px #c2a5a2;
-
-    --accent: var(--blood);
-    --green: #0d6b38;
-    --amber: #7a5300;
-    --red: var(--blood);
-
-    --win-line: #c2a5a2;
-    --win-bar: #e6d5d2;
-    --win-edge: #a8071a;
-    --win-title: #a8071a;
-
-    color-scheme: light;
 }
 
 :where(a, button, summary, [tabindex]):focus-visible {
@@ -262,11 +238,6 @@ header.site {
     text-align: right;
 }
 
-.menu a {
-    white-space: normal;
-    line-height: 1.35;
-}
-
 .menu li {
     display: inline-flex;
     margin-left: 0;
@@ -275,6 +246,7 @@ header.site {
 .menu a {
     display: inline-block;
     padding: 3px 0;
+    line-height: 1.35;
     color: var(--base);
     text-decoration: none;
     white-space: nowrap;
@@ -306,33 +278,6 @@ header.site {
     background: var(--base);
 }
 
-.menu .mode {
-    display: none;
-    margin-left: 18px;
-    color: var(--comment);
-    white-space: nowrap;
-}
-
-html.js .menu .mode {
-    display: inline;
-}
-
-.menu .mode button {
-    padding: 3px 0;
-    border: 0;
-    background: transparent;
-    color: var(--comment);
-    cursor: pointer;
-}
-
-html:not(.light) .menu .mode button[data-theme-set="dark"],
-html.light .menu .mode button[data-theme-set="light"],
-.menu .mode button:hover,
-.menu .mode button:focus-visible {
-    color: var(--bg);
-    background: var(--base);
-}
-
 .ident {
     display: flex;
     flex-wrap: wrap;
@@ -352,18 +297,21 @@ html.light .menu .mode button[data-theme-set="light"],
     max-width: 100%;
 }
 
+/* A command opens a section, so it gets the page's largest gap above and its
+   smallest below: the output beneath it belongs to it, the section above does
+   not. That 4:1 ratio is what makes the boundaries readable while scrolling. */
 .cmd {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     gap: 2px 8px;
-    margin: 26px 0 10px;
+    margin: 40px 0 10px;
     font-weight: normal;
     font-size: 15px;
 }
 
 .cmd::before {
-    content: "$";
+    content: "$" / "";
     color: var(--green);
 }
 
@@ -386,15 +334,33 @@ html.light .menu .mode button[data-theme-set="light"],
 }
 
 .cmd .aside {
-    margin-left: auto;
+    display: flex;
+    flex: 1;
+    align-items: baseline;
+    gap: 10px;
     color: var(--comment);
     font-size: 14px;
 }
 
+/* At full column width the stats sit ~500px from the command they describe
+   and read as an unrelated item. The leader carries the eye across, using the
+   same dot idiom as the window bodies. */
+.cmd .aside::before {
+    content: "";
+    flex: 1;
+    min-width: 24px;
+    align-self: center;
+    border-bottom: 1px dotted var(--rule);
+}
+
 @media (max-width: 700px) {
     .cmd .aside {
-        margin-left: 0;
-        flex-basis: 100%;
+        flex: 0 0 100%;
+    }
+
+    /* Wrapped onto its own line, the leader has nothing left to connect. */
+    .cmd .aside::before {
+        content: none;
     }
 }
 
@@ -407,18 +373,6 @@ html.light .menu .mode button[data-theme-set="light"],
 .out p {
     max-width: 72ch;
     font-family: var(--code);
-}
-
-p:has(> .titulo) {
-    margin-top: 22px;
-}
-
-.titulo {
-    display: inline-block;
-    color: var(--bg);
-    background: var(--base);
-    text-decoration: underline;
-    font-weight: normal;
 }
 
 .comment {
@@ -459,7 +413,7 @@ main ul:not(.plain):not(.rows) > li {
 }
 
 main ul:not(.plain) > li::before {
-    content: "-";
+    content: "-" / "";
     margin-right: 9px;
 }
 
@@ -521,7 +475,7 @@ ul.plain {
 .listing .head:hover .title,
 .listing .head:focus-visible .title {
     color: var(--bg);
-    background: var(--blood);
+    background: var(--accent);
     text-decoration: none;
 }
 
@@ -544,8 +498,8 @@ ul.plain {
 }
 
 .listing .tag::before {
-    content: "#";
-    color: var(--blood);
+    content: "#" / "";
+    color: var(--accent);
 }
 
 @media (max-width: 700px) {
@@ -601,10 +555,6 @@ ul.plain {
     }
 }
 
-.anal li {
-    margin-bottom: 8px;
-}
-
 .rows > li {
     padding: 2px 0;
     display: flex;
@@ -632,9 +582,22 @@ main ul.rows > li::before {
     color: var(--red);
 }
 
+/* In flow, the windows are a pair of panels sitting side by side rather than
+   two narrow columns stranded in an empty band above the footer. Lifted out
+   of flow, the row must reserve nothing at all. */
+.windows {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 40px;
+}
+
+html.js.floating .windows {
+    display: contents;
+}
+
 .window {
     width: min(340px, 100%);
-    margin: 20px 0;
     border: 1px solid var(--win-line);
     background: var(--bg);
 }
@@ -760,16 +723,30 @@ footer.site {
 .buttons88 {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
     gap: 6px;
     margin: 18px 0 24px;
 }
 
+/* Each badge keeps its own size. Forcing them all to 88x31 stretched the
+   29x20 webring button to nearly twice its aspect, and the width/height
+   attributes now reserve the right box before the image arrives. */
 .buttons88 img {
     display: block;
-    width: 88px;
-    height: 31px;
     image-rendering: pixelated;
+}
+
+/* A linked badge is a real target, and the smallest one is 29x20; the inline
+   exception does not cover it, so it gets padded up to the 24px minimum. */
+.buttons88 a {
+    display: block;
+    padding: 3px;
+}
+
+.buttons88 a:hover,
+.buttons88 a:focus-visible {
+    background: var(--base);
 }
 
 .article {
@@ -814,8 +791,8 @@ footer.site {
 }
 
 .article h2::before {
-    content: "## ";
-    color: var(--blood);
+    content: "## " / "";
+    color: var(--accent);
 }
 
 .article h3 {
@@ -823,8 +800,8 @@ footer.site {
 }
 
 .article h3::before {
-    content: "### ";
-    color: var(--blood);
+    content: "### " / "";
+    color: var(--accent);
 }
 
 .article h4 {
@@ -833,13 +810,13 @@ footer.site {
 }
 
 .article a {
-    color: var(--blood);
+    color: var(--accent);
     text-decoration-color: var(--rule);
 }
 
 .article a:hover {
     color: var(--bg);
-    background: var(--blood);
+    background: var(--accent);
 }
 
 .article ul,
@@ -857,8 +834,8 @@ footer.site {
 }
 
 .article ul > li::before {
-    content: "— ";
-    color: var(--blood);
+    content: "— " / "";
+    color: var(--accent);
 }
 
 .article ol {
@@ -873,8 +850,8 @@ footer.site {
 
 .article ol > li::before {
     counter-increment: item;
-    content: counter(item) ". ";
-    color: var(--blood);
+    content: counter(item) ". " / "";
+    color: var(--accent);
 }
 
 .article li + li {
@@ -913,7 +890,7 @@ footer.site {
 
 .article th {
     background: var(--blood-dark);
-    color: var(--blood);
+    color: var(--accent);
     font-weight: 400;
 }
 
@@ -992,8 +969,8 @@ footer.site {
 }
 
 .code-copy:hover {
-    border-color: var(--blood);
-    background: var(--blood);
+    border-color: var(--accent);
+    background: var(--accent);
     color: var(--bg);
 }
 
@@ -1018,9 +995,7 @@ footer.site {
 
 :root {
     --code-surface: #0c0505;
-    --code-surface-2: #180d0d;
     --code-panel: #160606;
-    --code-border: #160606;
     --astro-code-color-text: #f5eee8;
     --astro-code-color-background: var(--code-surface);
     --astro-code-token-comment: #7f8da3;
@@ -1040,30 +1015,6 @@ footer.site {
     --astro-code-token-attr-value: #86efac;
 }
 
-html.light {
-    --code-surface: #f5efe9;
-    --code-surface-2: #efe4dc;
-    --code-panel: #f0e6de;
-    --code-border: #d8c3b6;
-    --astro-code-color-text: #1f1713;
-    --astro-code-color-background: var(--code-surface);
-    --astro-code-token-comment: #7b6f6a;
-    --astro-code-token-keyword: #176d95;
-    --astro-code-token-string: #2d6a4f;
-    --astro-code-token-function: #7c3aed;
-    --astro-code-token-constant: #b45309;
-    --astro-code-token-parameter: #1f1713;
-    --astro-code-token-string-expression: #2d6a4f;
-    --astro-code-token-punctuation: #5e5754;
-    --astro-code-token-link: #176d95;
-    --astro-code-token-operator: #b91c1c;
-    --astro-code-token-tag: #a16207;
-    --astro-code-token-literal: #7c3aed;
-    --astro-code-token-number: #b45309;
-    --astro-code-token-attr-name: #9d174d;
-    --astro-code-token-attr-value: #2d6a4f;
-}
-
 .ascii {
     margin: 0;
     font-family: var(--code);
@@ -1071,6 +1022,36 @@ html.light {
     overflow-x: auto;
     overscroll-behavior-x: contain;
     tab-size: 4;
+}
+
+/* Pages do not dissolve into one another. The new screen is painted straight
+   over the old one from the top down, in visible steps, the way a terminal
+   redraws: no easing curve, no opacity fade. The steps() timing is the whole
+   point, so keep it a step function if the duration ever changes. */
+@keyframes repaint {
+    from {
+        clip-path: inset(0 0 100% 0);
+    }
+
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+/* The browser's default cross-fade blends the two snapshots additively; that
+   has to go, or the overlap washes out instead of overwriting. */
+::view-transition-old(root),
+::view-transition-new(root) {
+    mix-blend-mode: normal;
+}
+
+/* The outgoing screen holds still and is simply covered. */
+::view-transition-old(root) {
+    animation: none;
+}
+
+::view-transition-new(root) {
+    animation: repaint 140ms steps(8, jump-start) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1089,8 +1070,11 @@ html.light {
     }
 }
 
+/* The taskbar only means anything while the windows float. The windows
+   themselves stay: hiding them took the build facts, the homelab summary and
+   the writeup link away from every phone and every reader at 200% zoom, which
+   is the same static-aside case the Power-Off Rule already covers. */
 @media (max-width: 900px) {
-    body.has-windows .window,
     body.has-windows .taskbar {
         display: none !important;
     }
@@ -1103,6 +1087,18 @@ html.light {
 @media (max-width: 700px) {
     .window {
         width: 100%;
+    }
+}
+
+/* A fingertip needs more than a 20px line box. Padding on an inline link
+   grows the hit area without touching the line rhythm, and only where the
+   pointer is actually coarse, so the desktop spacing is untouched. */
+@media (pointer: coarse) {
+    .listing .title,
+    .out .rows a,
+    .contacts a,
+    .window__body a {
+        padding-block: 4px;
     }
 }
 

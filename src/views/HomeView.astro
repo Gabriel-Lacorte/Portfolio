@@ -17,6 +17,11 @@ const stats = await getStats();
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
+/* Dot leaders are computed rather than typed, so a translated value never
+   knocks the window's columns out of alignment. */
+const FIELD = 11;
+const key = (k: string) => `${k}${".".repeat(Math.max(1, FIELD - k.length))} `;
+
 const NEW_FOR_DAYS = 90;
 const isNew = (d: Date) =>
     (Date.parse(stats.built) - d.valueOf()) / 86_400_000 < NEW_FOR_DAYS;
@@ -48,8 +53,8 @@ const isNew = (d: Date) =>
         icon="note"
         aside={`${posts.length} ${t("unit.posts")} · ${compact(stats.words)} ${t("unit.words")}`}
     />
-    <div class="out lede">
-        <ul class="rows anal">
+    <div class="out feed">
+        <ul class="rows">
             {
                 posts.map((post) => (
                     <li>
@@ -83,14 +88,17 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    <Cmd run="git log" arg="--oneline" icon="term" />
+    {/* Not --oneline: that prints abbreviated hashes, and this prints dates
+        and subjects. The flags below are the ones that would actually produce
+        the lines underneath, which is the whole point of the metaphor. */}
+    <Cmd run="git log" arg={'--date=short --format="%ad %s"'} icon="term" />
     <div class="out">
         <ul class="rows">
             {
                 CHANGELOG.map(({ DATE, TEXT }) => (
                     <li>
                         <span class="when">{iso(new Date(DATE))}</span>
-                        <span>{TEXT}</span>
+                        <span>{TEXT[locale]}</span>
                     </li>
                 ))
             }
@@ -112,11 +120,11 @@ const isNew = (d: Date) =>
             <pre
                 class="window__body"><span class="prompt">$</span> ./status
 
-host....... lacorte.city
-served..... vercel
-build...... {stats.commit}
-updated.... {stats.built}
-engine..... {Astro.generator.toLowerCase()}</pre>
+{key("host")}lacorte.city
+{key("served")}vercel
+{key("build")}{stats.commit}
+{key("updated")}{stats.built}
+{key("engine")}{Astro.generator.toLowerCase()}</pre>
         </aside>
 
         <aside id="win-lab" class="window" aria-label={t("win.lab")}>
@@ -133,12 +141,12 @@ engine..... {Astro.generator.toLowerCase()}</pre>
             <pre
                 class="window__body"><span class="prompt">$</span> cat ~/README
 
-nyx........ debian 12
-parts...... 2 salvaged desktops
-runtime.... docker
-ingress.... cloudflare tunnel
-note....... runs my services
-writeup.... <a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
+{key("nyx")}debian 12
+{key("parts")}{t("lab.parts")}
+{key("runtime")}docker
+{key("ingress")}cloudflare tunnel
+{key("note")}{t("lab.note")}
+{key("writeup")}<a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
         </aside>
     </Fragment>
 </Layout>
@@ -148,15 +156,18 @@ writeup.... <a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
         max-width: 100%;
     }
 
-    .lede {
-        margin-bottom: 34px;
-    }
-
-    .lede :global(.rows > li) {
+    /* A dated thing, a link, and a one-line summary that takes its own row. */
+    .feed :global(.rows > li) {
         padding: 3px 0;
     }
 
-    .lede :global(.desc) {
+    .feed :global(.rows > li + li) {
+        margin-top: 8px;
+    }
+
+    /* Its own row, capped at the same measure as prose. */
+    .feed :global(.desc) {
         flex-basis: 100%;
+        max-width: 72ch;
     }
 </style>

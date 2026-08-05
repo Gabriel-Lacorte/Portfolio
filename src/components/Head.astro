@@ -39,6 +39,10 @@ const canonical = new URL(
 
 const here = unlocalised(Astro.url.pathname);
 const base = Astro.site ?? Astro.url;
+
+/* Social cards need an absolute URL; the card itself is the wordmark rendered
+   in the site's own fonts, regenerated from public/_og-card.html. */
+const ogImage = new URL("/og.png", base).href;
 const withSlash = (path: string) => (path.endsWith("/") ? path : `${path}/`);
 const urlFor = (code: Locale) =>
     new URL(withSlash(localised(here, code)), base).href;
@@ -70,8 +74,8 @@ const jsonLd = article
 
 /* JSON.stringify leaves "<" alone, so a "</script>" anywhere in a post's
    title, description, or tags would close this tag and let the rest of the
-   string be parsed as markup. Escaping the characters that can start a tag
-   or an entity keeps the payload valid JSON and inert. U+2028/U+2029 are
+   string be parsed as markup. Escaping the three characters that can start a
+   tag or an entity keeps the payload valid JSON and inert. U+2028/U+2029 are
    legal in JSON but terminate a line in JavaScript, so they go too. */
 const JSON_LD_ESCAPES: Record<string, string> = {
     "<": "\\u003c",
@@ -92,7 +96,7 @@ const jsonLdSafe = jsonLd
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="generator" content={Astro.generator} />
-<meta name="color-scheme" content="dark light" />
+<meta name="color-scheme" content="dark" />
 <meta name="theme-color" content="#0a0507" />
 
 <title>{title}</title>
@@ -138,9 +142,14 @@ const jsonLdSafe = jsonLd
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={`${SITE.HANDLE} — ${SITE.ROLE}`} />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
 
 {
     jsonLdSafe && !noindex && (
@@ -168,18 +177,31 @@ const jsonLdSafe = jsonLd
 <ClientRouter />
 
 <script is:inline>
-    (() => {
-        const root = document.documentElement;
-        root.classList.add("js");
-        root.classList.toggle(
-            "light",
-            localStorage.getItem("theme") === "light",
-        );
-    })();
+    /* Marks the document as scripted before first paint, so the styles that
+       only make sense with JS (window chrome, taskbar) never flash. */
+    document.documentElement.classList.add("js");
 </script>
 
 <script>
+    type UIStrings = {
+        copy: string;
+        copied: string;
+        copyFailed: string;
+        copyLabel: string;
+        moveHint: string;
+    };
+
+    /** Labels for anything the script builds, in the page's own language. */
+    function strings(): UIStrings {
+        try {
+            return JSON.parse(document.body.dataset.ui ?? "{}");
+        } catch {
+            return {} as UIStrings;
+        }
+    }
+
     function codeBlocks() {
+        const ui = strings();
         document
             .querySelectorAll<HTMLPreElement>(".article pre:not(.ascii)")
             .forEach((pre) => {
@@ -202,16 +224,16 @@ const jsonLdSafe = jsonLd
                 const button = document.createElement("button");
                 button.type = "button";
                 button.className = "code-copy";
-                button.textContent = "copy";
-                button.setAttribute("aria-label", "Copy code to clipboard");
+                button.textContent = ui.copy;
+                button.setAttribute("aria-label", ui.copyLabel);
                 button.addEventListener("click", async () => {
                     try {
                         await navigator.clipboard.writeText(pre.innerText);
-                        button.textContent = "copied";
+                        button.textContent = ui.copied;
                     } catch {
-                        button.textContent = "failed";
+                        button.textContent = ui.copyFailed;
                     }
-                    setTimeout(() => (button.textContent = "copy"), 1600);
+                    setTimeout(() => (button.textContent = ui.copy), 1600);
                 });
                 bar.append(button);
 
@@ -221,14 +243,8 @@ const jsonLdSafe = jsonLd
 
     const POS_KEY = "win:pos";
     const OPEN_KEY = "win:open";
-    const COLUMN = 984;
     const WIN_W = 280;
     const GAP = 24;
-    const FLOAT_FROM = COLUMN + 2 * (WIN_W + GAP);
-
-    const MOVE_HINT = document.documentElement.lang.startsWith("pt")
-        ? "janela, setas movem"
-        : "window, arrow keys move";
 
     type Pos = { x: number; y: number };
 
@@ -268,57 +284,34 @@ const jsonLdSafe = jsonLd
         }
     }
 
-    function windows() {
+    function windows(signal: AbortSignal) {
         const wins = [...document.querySelectorAll<HTMLElement>(".window")];
         if (!wins.length) return;
 
-        const setOpen = (id: string, open: boolean, persist = true) => {
-            const win = document.getElementById(id);
-            const task = document.querySelector<HTMLButtonElement>(
-                `[data-window-task="${id}"]`,
-            );
-            if (win) win.hidden = !open;
-            task?.setAttribute("aria-pressed", String(open));
-            if (persist) saveOpen(id, open);
-            if (!open || !win) return;
-            if (win.style.position === "fixed") repark(win);
-            else win.scrollIntoView({ block: "nearest" });
-        };
-
-        function repark(win: HTMLElement) {
-            if (!buriesColumn(win)) return;
-            const p = parking(win, wins.indexOf(win));
-            place(win, p.x, p.y);
-            savePosition(win.id, p);
-        }
-
-        document
-            .querySelectorAll<HTMLButtonElement>("[data-window-close]")
-            .forEach((b) =>
-                b.addEventListener("click", () =>
-                    setOpen(b.dataset.windowClose!, false),
-                ),
-            );
-
-        document
-            .querySelectorAll<HTMLButtonElement>("[data-window-task]")
-            .forEach((b) =>
-                b.addEventListener("click", () => {
-                    const id = b.dataset.windowTask!;
-                    setOpen(id, b.getAttribute("aria-pressed") !== "true");
-                }),
-            );
-
-        const openState = readOpen();
-        wins.forEach((win) => {
-            if (openState[win.id] === false) setOpen(win.id, false, false);
-        });
-
-        const saved = readPositions();
+        const ui = strings();
+        const tray = document.querySelector<HTMLElement>(".taskbar");
         let top = 50;
 
+        /* The column is the page; windows live in the margins beside it and
+           must never cover it. Both are measured, so the layout decides when
+           there is room to float rather than a constant that goes stale the
+           moment the column width changes. */
+        function margins() {
+            const main = document.querySelector("main");
+            if (!main) return null;
+            const r = main.getBoundingClientRect();
+            const room = document.documentElement.clientWidth;
+            return { left: r.left, right: room - r.right, room };
+        }
+
+        const floats = () => {
+            const m = margins();
+            return !!m && Math.min(m.left, m.right) >= WIN_W + 2 * GAP;
+        };
+
         const clamp = (win: HTMLElement, x: number, y: number): Pos => {
-            const maxX = Math.max(0, window.innerWidth - win.offsetWidth);
+            const room = document.documentElement.clientWidth;
+            const maxX = Math.max(0, room - win.offsetWidth);
             const maxY = Math.max(0, window.innerHeight - win.offsetHeight);
             return {
                 x: Math.min(Math.max(0, x), maxX),
@@ -333,21 +326,20 @@ const jsonLdSafe = jsonLd
             return p;
         };
 
+        /* Alternating margins, top down, so two windows never stack on one
+           side and neither can land on the column. Both sides park against
+           the column rather than the screen edge, so the pair stays with the
+           text instead of drifting into the corners on a wide monitor. */
         function parking(win: HTMLElement, i: number): Pos {
+            const m = margins();
             const width = win.offsetWidth || WIN_W;
-            if (win.id === "win-status") {
-                return { x: GAP + 140, y: 190 };
-            }
-            if (win.id === "win-lab") {
-                return {
-                    x: Math.max(GAP, window.innerWidth - width - 150),
-                    y: 440,
-                };
-            }
-            return {
-                x: Math.max(GAP, window.innerWidth - width - GAP),
-                y: 96 + i * 220,
-            };
+            const y = 190 + i * 250;
+            if (!m) return { x: GAP, y };
+            const x =
+                i % 2 === 0
+                    ? Math.max(GAP, m.left - width - GAP)
+                    : Math.min(m.room - width - GAP, m.room - m.right + GAP);
+            return { x, y };
         }
 
         function buriesColumn(win: HTMLElement) {
@@ -358,7 +350,60 @@ const jsonLdSafe = jsonLd
             return r.right > m.left && r.left < m.right;
         }
 
-        const floats = () => window.innerWidth >= FLOAT_FROM;
+        /* Also heals positions saved by an earlier build that parked on top
+           of the column. */
+        function repark(win: HTMLElement, i: number) {
+            if (!buriesColumn(win)) return;
+            const p = parking(win, i);
+            place(win, p.x, p.y);
+            savePosition(win.id, p);
+        }
+
+        const setOpen = (id: string, open: boolean, persist = true) => {
+            const win = document.getElementById(id);
+            const task = tray?.querySelector<HTMLButtonElement>(
+                `[data-window-task="${id}"]`,
+            );
+            if (win) win.hidden = !open;
+            task?.setAttribute("aria-pressed", String(open));
+            if (persist) saveOpen(id, open);
+            if (!open || !win) return;
+            if (win.style.position === "fixed") {
+                place(win, parseFloat(win.style.left), parseFloat(win.style.top));
+                repark(win, wins.indexOf(win));
+            } else win.scrollIntoView({ block: "nearest" });
+        };
+
+        /* Built from the windows on the page so the two cannot drift, and so
+           closing one is always reversible. */
+        function buildTray() {
+            if (!tray || tray.childElementCount) return;
+            for (const win of wins) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.dataset.windowTask = win.id;
+                button.textContent =
+                    win
+                        .querySelector(".window__bar > span")
+                        ?.textContent?.trim() || win.id;
+                button.setAttribute("aria-pressed", String(!win.hidden));
+                button.addEventListener("click", () =>
+                    setOpen(
+                        win.id,
+                        button.getAttribute("aria-pressed") !== "true",
+                    ),
+                );
+                tray.append(button);
+            }
+        }
+
+        document
+            .querySelectorAll<HTMLButtonElement>("[data-window-close]")
+            .forEach((b) =>
+                b.addEventListener("click", () =>
+                    setOpen(b.dataset.windowClose!, false),
+                ),
+            );
 
         const lift = (win: HTMLElement, i: number) => {
             const bar = win.querySelector<HTMLElement>(".window__bar");
@@ -366,16 +411,22 @@ const jsonLdSafe = jsonLd
 
             win.style.position = "fixed";
             win.style.margin = "0";
-            win.style.width = `${Math.min(WIN_W, window.innerWidth - 32)}px`;
+            win.style.width = `${Math.min(
+                WIN_W,
+                document.documentElement.clientWidth - 32,
+            )}px`;
             win.style.zIndex = String(++top);
 
-            const start = saved[win.id] ?? parking(win, i);
+            const start = readPositions()[win.id] ?? parking(win, i);
             place(win, start.x, start.y);
-            repark(win);
 
             bar.tabIndex = 0;
             bar.setAttribute("role", "application");
-            bar.setAttribute("aria-roledescription", MOVE_HINT);
+            bar.setAttribute("aria-roledescription", ui.moveHint);
+            /* Without this the bar takes its name from its own contents and
+               announces as "status x", the close button's label included. */
+            const named = win.getAttribute("aria-label");
+            if (named) bar.setAttribute("aria-label", named);
         };
 
         const drop = (win: HTMLElement) => {
@@ -398,17 +449,29 @@ const jsonLdSafe = jsonLd
         };
 
         const sync = () => {
-            document.documentElement.classList.toggle("floating", floats());
+            const floating = floats();
+            document.documentElement.classList.toggle("floating", floating);
 
             wins.forEach((win, i) => {
-                if (!floats()) return drop(win);
+                /* Inline, a window is an ordinary aside with no close control,
+                   so a closed one has to come back or it is lost for good. */
+                win.hidden = false;
+                if (!floating) return drop(win);
                 lift(win, i);
                 place(
                     win,
                     parseFloat(win.style.left),
                     parseFloat(win.style.top),
                 );
+                repark(win, i);
             });
+
+            if (!floating) return;
+            buildTray();
+            const open = readOpen();
+            wins.forEach((win) =>
+                setOpen(win.id, open[win.id] !== false, false),
+            );
         };
 
         wins.forEach((win) => {
@@ -471,50 +534,19 @@ const jsonLdSafe = jsonLd
 
         sync();
 
-        window.addEventListener("resize", sync);
+        window.addEventListener("resize", sync, { signal });
     }
 
-    function theme() {
-        const root = document.documentElement;
-        const meta = document.querySelector<HTMLMetaElement>(
-            'meta[name="theme-color"]',
-        );
-        const buttons =
-            document.querySelectorAll<HTMLButtonElement>("[data-theme-set]");
-
-        const sync = () => {
-            const light = root.classList.contains("light");
-            buttons.forEach((b) =>
-                b.setAttribute(
-                    "aria-pressed",
-                    String((b.dataset.themeSet === "light") === light),
-                ),
-            );
-
-            const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
-            if (bg) meta?.setAttribute("content", bg);
-        };
-
-        buttons.forEach((b) =>
-            b.addEventListener("click", () => {
-                const light = b.dataset.themeSet === "light";
-                root.classList.toggle("light", light);
-                try {
-                    localStorage.setItem("theme", light ? "light" : "dark");
-                } catch {
-                    /*  */
-                }
-                sync();
-            }),
-        );
-
-        sync();
-    }
+    /* One controller per navigation: the router swaps the document but leaves
+       window-level listeners behind, so each one is torn down before the next
+       page wires its own. */
+    let page: AbortController | undefined;
 
     function init() {
+        page?.abort();
+        page = new AbortController();
         codeBlocks();
-        windows();
-        theme();
+        windows(page.signal);
     }
 
     document.addEventListener("astro:page-load", init);

@@ -17,5 +17,7 @@ const {
         aria-hidden="true"></span>
     <span class="run">{run}</span>
     {arg && <span class="flag">{arg}</span>}
-    {aside && <span class="aside" aria-hidden="true">{aside}</span>}
+    {/* Real, unrepeated facts (post counts, dates, reading time), so they are
+        read out with the heading rather than hidden from it. */}
+    {aside && <span class="aside">{aside}</span>}
 </Tag>

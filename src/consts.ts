@@ -1,4 +1,5 @@
 import type {
+    Badge,
     ChangelogEntry,
     Metadata,
     NavItem,
@@ -44,10 +45,28 @@ export const PROJECTS_META: Metadata = {
     DESCRIPTION: "Things I have built.",
 };
 
+/* Building comes first, because that is the day job; security follows it
+   rather than trailing at the end, because it is the other half. Every item
+   is backed by something shipped: the systems row by the projects' own
+   sources, Active Directory and reverse engineering by the posts, Windows
+   kernel and side channels by CVE-2025-7771 and prefetch-bleed. */
 export const STACK_GROUPS: StackGroup[] = [
+    {
+        GROUP: "systems",
+        ITEMS: ["C++", "Rust", "x86 assembly"],
+    },
     {
         GROUP: "backend",
         ITEMS: ["Python (Flask, FastAPI)", "Go (Gin, Fiber)", "Node.js (Express, NestJS)"],
+    },
+    {
+        GROUP: "security",
+        ITEMS: [
+            "Active Directory",
+            "Windows kernel",
+            "Reverse engineering",
+            "Side channels",
+        ],
     },
     {
         GROUP: "frontend",
@@ -55,16 +74,8 @@ export const STACK_GROUPS: StackGroup[] = [
     },
     {
         GROUP: "devops",
-        ITEMS: ["Docker", "Nginx", "Git", "CI/CD"],
+        ITEMS: ["Docker", "Nginx", "Cloudflare Tunnel"],
     },
-    {
-        GROUP: "security",
-        ITEMS: [
-            "Offensive",
-            "Active Directory",
-            "Reverse engineering",
-        ],
-    }
 ];
 
 export const PROJECTS: Project[] = [
@@ -133,18 +144,34 @@ export const USES: UsesGroup[] = [
 ];
 
 export const CHANGELOG: ChangelogEntry[] = [
-    { DATE: "2026-08-04", TEXT: "Rebuilt the site from scratch." },
+    {
+        DATE: "2026-08-04",
+        TEXT: {
+            en: "Rebuilt the site from scratch.",
+            "pt-br": "Reconstruí o site do zero.",
+        },
+    },
     {
         DATE: "2024-12-24",
-        TEXT: "New post: static analysis of RansomHub's ESXi locker.",
+        TEXT: {
+            en: "New post: static analysis of RansomHub's ESXi locker.",
+            "pt-br":
+                "Novo post: análise estática do locker ESXi do RansomHub.",
+        },
     },
     {
         DATE: "2024-06-01",
-        TEXT: "New post: a home server out of salvaged parts.",
+        TEXT: {
+            en: "New post: a home server out of salvaged parts.",
+            "pt-br": "Novo post: um servidor caseiro feito de peças recuperadas.",
+        },
     },
     {
         DATE: "2024-05-04",
-        TEXT: "New post: attacking Kerberos in Active Directory.",
+        TEXT: {
+            en: "New post: attacking Kerberos in Active Directory.",
+            "pt-br": "Novo post: atacando Kerberos no Active Directory.",
+        },
     },
 ];
 
@@ -154,6 +181,30 @@ export const NOW = {
         "Rebuilding this site.",
     ],
 };
+
+/* The 88x31 wall. Each badge carries its own true size so the row never
+   reflows, and HREF is optional because most of these are ornaments — but a
+   membership badge that points nowhere is a webring worn as costume, so the
+   WebCírculo entry wants its hub URL as soon as there is one to point at. */
+export const BADGES: Badge[] = [
+    { SRC: "/badges/lacorte.gif", W: 88, H: 31, ALT: "lacorte.city" },
+    { SRC: "/badges/chill-pill.gif", W: 88, H: 31, ALT: "take a chill pill" },
+    {
+        SRC: "/badges/privacy-net.gif",
+        STILL: "/badges/privacy-net-still.gif",
+        W: 88,
+        H: 31,
+        ALT: "internet privacy now!",
+    },
+    {
+        SRC: "/badges/webcirculo-br.png",
+        W: 29,
+        H: 20,
+        ALT: "Esse site faz parte do WebCírculo BR",
+        LANG: "pt-BR",
+        // HREF: the ring's hub, once known.
+    },
+];
 
 export const SOCIALS: Socials = [
     {

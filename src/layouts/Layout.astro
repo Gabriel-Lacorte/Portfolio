@@ -1,6 +1,6 @@
 ---
 import Head from "@components/Head.astro";
-import { NAV_KEYS, SITE, SOCIALS } from "@consts";
+import { BADGES, NAV_KEYS, SITE, SOCIALS } from "@consts";
 import { HTML_LANG, LOCALE_LABEL, LOCALES } from "@i18n/ui";
 import {
     localised,
@@ -52,6 +52,17 @@ const t = useTranslations(locale);
 const here = unlocalised(Astro.url.pathname);
 const isCurrent = (href: string) =>
     href === "/" ? here === "/" : here === href || here.startsWith(href + "/");
+
+/* The client script builds copy buttons and window chrome after render, so its
+   labels have to be handed to it rather than guessed from the lang attribute
+   inside the script, which is how they drifted out of the dictionary before. */
+const uiStrings = JSON.stringify({
+    copy: t("action.copy"),
+    copied: t("action.copied"),
+    copyFailed: t("action.copyFailed"),
+    copyLabel: t("action.copyLabel"),
+    moveHint: t("win.moveHint"),
+});
 ---
 
 <!doctype html>
@@ -67,7 +78,7 @@ const isCurrent = (href: string) =>
             article={article}
         />
     </head>
-    <body class:list={[windows && "has-windows"]}>
+    <body class:list={[windows && "has-windows"]} data-ui={uiStrings}>
         <a class="skip" href="#main">{t("action.skip")}</a>
 
         <div class="container">
@@ -123,7 +134,13 @@ const isCurrent = (href: string) =>
                 <slot />
             </main>
 
-            <slot name="windows" />
+            {
+                windows && (
+                    <div class="windows">
+                        <slot name="windows" />
+                    </div>
+                )
+            }
 
             <footer class="site">
                 <div class="contacts">
@@ -154,31 +171,53 @@ const isCurrent = (href: string) =>
             </footer>
 
             <div class="buttons88">
-                <img
-                    src="/badges/lacorte.gif"
-                    width="88"
-                    height="31"
-                    alt="lacorte.city"
-                />
-                <img
-                    src="/badges/chill-pill.gif"
-                    width="88"
-                    height="31"
-                    alt="take a chill pill"
-                />
-                <img
-                    src="/badges/privacy-net.gif"
-                    width="88"
-                    height="31"
-                    alt="internet privacy now!"
-                />
-                <img
-                    src="/badges/webcirculo-br.png"
-                    title="Esse site faz parte do WebCírculo BR!"
-                />
+                {
+                    /* A badge that loops forever is the one moving thing the
+                       global reduced-motion rules cannot reach, so animated
+                       ones ship a still frame alongside. */
+                    BADGES.map((badge) => {
+                        const img = (
+                            <img
+                                src={badge.SRC}
+                                width={badge.W}
+                                height={badge.H}
+                                lang={badge.LANG}
+                                alt={badge.ALT}
+                            />
+                        );
+                        const art = badge.STILL ? (
+                            <picture>
+                                <source
+                                    srcset={badge.STILL}
+                                    media="(prefers-reduced-motion: reduce)"
+                                />
+                                {img}
+                            </picture>
+                        ) : (
+                            img
+                        );
+                        return badge.HREF ? (
+                            <a
+                                href={badge.HREF}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                >{art}</a
+                            >
+                        ) : (
+                            art
+                        );
+                    })
+                }
             </div>
         </div>
 
-        <slot name="taskbar" />
+        {
+            /* Shell only. The buttons are built from the windows actually on
+               the page, so the two can never drift apart, and a scripting-off
+               visitor gets no controls for windows they cannot close anyway. */
+            windows && (
+                <div class="taskbar" role="group" aria-label={t("win.windows")} />
+            )
+        }
     </body>
 </html>
