@@ -1,23 +1,13 @@
-/**
- * UI strings, one dictionary per locale.
- *
- * `en` is the source of truth: its keys define the `UIKey` type, so a
- * missing or misspelt Portuguese key is a build error rather than a
- * silently English word in the middle of a Portuguese page.
- */
-
 export const LOCALES = ["en", "pt-br"] as const;
 export type Locale = (typeof LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = "en";
 
-/** What the language switcher shows for each locale. */
 export const LOCALE_LABEL: Record<Locale, string> = {
     en: "EN",
     "pt-br": "PT",
 };
 
-/** Goes in <html lang="…">. */
 export const HTML_LANG: Record<Locale, string> = {
     en: "en",
     "pt-br": "pt-BR",
@@ -36,8 +26,6 @@ const en = {
     "win.close": "Close window",
     "win.windows": "Windows",
     "win.moveHint": "window, arrow keys move",
-    /* Window field names stay English; they are the output of a shell script,
-       not prose. Only the values that are sentences get translated. */
     "lab.parts": "2 salvaged desktops",
     "lab.note": "runs my services",
 

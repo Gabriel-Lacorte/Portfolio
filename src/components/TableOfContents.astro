@@ -22,11 +22,8 @@ type Props = {
 
 const { headings, label = "contents", bare = false, lang } = Astro.props;
 
-/* Only h2/h3 make the outline, deeper levels turn it into noise.
- *
- * The previous implementation did `parentHeadings.get(depth - 1).subheadings
- * .push(...)`, which throws on any post whose first heading is an h3, or that
- * has an h4 with no h3 above it. Orphans are promoted here instead. */
+/* h2/h3 only. An h3 with no h2 above it is promoted rather than dropped,
+   which a parent lookup would throw on. */
 function buildToc(flat: Omit<Heading, "subheadings">[]): Heading[] {
     const toc: Heading[] = [];
 

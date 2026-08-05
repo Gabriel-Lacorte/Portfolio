@@ -5,8 +5,6 @@ import { UI } from "@i18n/ui";
 import { localised } from "@i18n/utils";
 import { postsFor } from "@lib/posts";
 
-/* The feed is a courtesy, not a funnel: subscription on the reader's
-   terms. One per locale; this is the English one. */
 export async function GET(context: APIContext) {
     const posts = await postsFor("en");
     return rss({

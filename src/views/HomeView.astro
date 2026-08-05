@@ -17,8 +17,6 @@ const stats = await getStats();
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
-/* Dot leaders are computed rather than typed, so a translated value never
-   knocks the window's columns out of alignment. */
 const FIELD = 11;
 const key = (k: string) => `${k}${".".repeat(Math.max(1, FIELD - k.length))} `;
 
@@ -88,9 +86,6 @@ const isNew = (d: Date) =>
         </ul>
     </div>
 
-    {/* Not --oneline: that prints abbreviated hashes, and this prints dates
-        and subjects. The flags below are the ones that would actually produce
-        the lines underneath, which is the whole point of the metaphor. */}
     <Cmd run="git log" arg={'--date=short --format="%ad %s"'} icon="term" />
     <div class="out">
         <ul class="rows">
@@ -156,7 +151,6 @@ const isNew = (d: Date) =>
         max-width: 100%;
     }
 
-    /* A dated thing, a link, and a one-line summary that takes its own row. */
     .feed :global(.rows > li) {
         padding: 3px 0;
     }
@@ -165,7 +159,6 @@ const isNew = (d: Date) =>
         margin-top: 8px;
     }
 
-    /* Its own row, capped at the same measure as prose. */
     .feed :global(.desc) {
         flex-basis: 100%;
         max-width: 72ch;

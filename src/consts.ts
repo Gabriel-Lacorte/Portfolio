@@ -45,11 +45,6 @@ export const PROJECTS_META: Metadata = {
     DESCRIPTION: "Things I have built.",
 };
 
-/* Building comes first, because that is the day job; security follows it
-   rather than trailing at the end, because it is the other half. Every item
-   is backed by something shipped: the systems row by the projects' own
-   sources, Active Directory and reverse engineering by the posts, Windows
-   kernel and side channels by CVE-2025-7771 and prefetch-bleed. */
 export const STACK_GROUPS: StackGroup[] = [
     {
         GROUP: "systems",
@@ -80,7 +75,7 @@ export const STACK_GROUPS: StackGroup[] = [
 
 export const PROJECTS: Project[] = [
     {
-        NAME: "prefetch-bleed",
+        NAME: "Prefetch Bleed",
         SUMMARY:
             "Breaks Windows KASLR through the prefetch side-channel, times PREFETCHNTA against kernel addresses to find the kernel base.",
         STACK: ["C++", "x86 Assembly", "CMake"],
@@ -182,10 +177,6 @@ export const NOW = {
     ],
 };
 
-/* The 88x31 wall. Each badge carries its own true size so the row never
-   reflows, and HREF is optional because most of these are ornaments — but a
-   membership badge that points nowhere is a webring worn as costume, so the
-   WebCírculo entry wants its hub URL as soon as there is one to point at. */
 export const BADGES: Badge[] = [
     { SRC: "/badges/lacorte.gif", W: 88, H: 31, ALT: "lacorte.city" },
     { SRC: "/badges/chill-pill.gif", W: 88, H: 31, ALT: "take a chill pill" },
@@ -202,7 +193,6 @@ export const BADGES: Badge[] = [
         H: 20,
         ALT: "Esse site faz parte do WebCírculo BR",
         LANG: "pt-BR",
-        // HREF: the ring's hub, once known.
     },
 ];
 
