@@ -765,6 +765,14 @@ footer.site {
     max-width: 72ch;
 }
 
+/* A screenshot is not prose. Markdown wraps images in a paragraph, so the
+   72ch measure was scaling 1920px UI captures down to 540px — a 3.5x
+   reduction that left the interface in them unreadable, in posts whose whole
+   job is to be followed step by step. Figures get the column; words don't. */
+.article > p:has(> img:only-child) {
+    max-width: none;
+}
+
 .article > * {
     margin: 0;
 }

@@ -224,6 +224,11 @@ Blunt instruments: zero radius, hard color inversions, no easing — every contr
 ### Table of Contents
 - **Style:** `<details>` with `[+]` / `[-]` textual markers on the summary (Comment; hover inverts), hairline-left, h2/h3 only.
 
+### Article Figures
+- **Measure:** prose caps at 72ch (~540px), but a paragraph holding only an image is released to the full column (~967px). Screenshots are not prose: at the prose measure a 1920px UI capture is scaled down 3.5x and the interface inside it becomes unreadable, which defeats a post meant to be followed step by step.
+- **Loading:** `width`/`height` from the real file (via the rehype plugin) so nothing reflows, plus `loading="lazy"` and `decoding="async"`. A 1px win-line border frames the capture.
+- **Authoring note:** on a phone even the full column is ~326px, so a 1920px screenshot still lands around 6x down. Crop captures to the region that matters rather than shipping the whole desktop.
+
 ### ASCII Figure
 - **Style:** `pre` in Iosevka inside a hairline border, horizontal scroll allowed; caption in Comment 14px with an optional Accent label. Font steps 14 → 10 → 8px at 700/430px.
 
