@@ -1,4 +1,4 @@
-import type { UIKey } from "@i18n/ui";
+import type { Locale, UIKey } from "@i18n/ui";
 
 export type Site = {
     TITLE: string;
@@ -41,7 +41,7 @@ export type Project = {
 
 export type ChangelogEntry = {
     DATE: string;
-    TEXT: string;
+    TEXT: Record<Locale, string>;
 };
 
 export type UsesGroup = {
@@ -54,3 +54,13 @@ export type Socials = {
     HANDLE: string;
     HREF: string;
 }[];
+
+export type Badge = {
+    SRC: string;
+    W: number;
+    H: number;
+    ALT: string;
+    LANG?: string;
+    STILL?: string;
+    HREF?: string;
+};

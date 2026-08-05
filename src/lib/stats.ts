@@ -1,10 +1,6 @@
 import { getCollection } from "astro:content";
 import { execFileSync } from "node:child_process";
 
-/**
- * Build-time facts about the site. Everything here is resolved once during
- * the static build, nothing ships to the client.
- */
 
 export type SiteStats = {
     posts: number;
@@ -14,8 +10,6 @@ export type SiteStats = {
     latest: string | null;
 };
 
-/** Close enough for a word count, and stable: strips frontmatter, fenced
- *  code, and inline markup before counting. */
 export function countWords(body: string): number {
     const prose = body
         .replace(/^---[\s\S]*?---/, "")
@@ -27,7 +21,6 @@ export function countWords(body: string): number {
     return prose.split(/\s+/).filter(Boolean).length;
 }
 
-/** Reading time in whole minutes, floored at 1. */
 export function readingTime(body: string): number {
     return Math.max(1, Math.round(countWords(body) / 200));
 }
@@ -80,11 +73,6 @@ export function compact(n: number): string {
     return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 }
 
-/**
- * The self-test readout, in the idiom of the avionics panels this design
- * is drawn from. Every line is a fact about this build rather than a
- * slogan, which is the only reason it is worth putting on the page.
- */
 export function getSelfTest(stats: SiteStats) {
     return [
         { k: "build", v: stats.commit, s: "PASS" },

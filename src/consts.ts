@@ -1,4 +1,5 @@
 import type {
+    Badge,
     ChangelogEntry,
     Metadata,
     NavItem,
@@ -46,8 +47,21 @@ export const PROJECTS_META: Metadata = {
 
 export const STACK_GROUPS: StackGroup[] = [
     {
+        GROUP: "systems",
+        ITEMS: ["C++", "Rust", "x86 assembly"],
+    },
+    {
         GROUP: "backend",
         ITEMS: ["Python (Flask, FastAPI)", "Go (Gin, Fiber)", "Node.js (Express, NestJS)"],
+    },
+    {
+        GROUP: "security",
+        ITEMS: [
+            "Active Directory",
+            "Windows kernel",
+            "Reverse engineering",
+            "Side channels",
+        ],
     },
     {
         GROUP: "frontend",
@@ -55,21 +69,13 @@ export const STACK_GROUPS: StackGroup[] = [
     },
     {
         GROUP: "devops",
-        ITEMS: ["Docker", "Nginx", "Git", "CI/CD"],
+        ITEMS: ["Docker", "Nginx", "Cloudflare Tunnel"],
     },
-    {
-        GROUP: "security",
-        ITEMS: [
-            "Offensive",
-            "Active Directory",
-            "Reverse engineering",
-        ],
-    }
 ];
 
 export const PROJECTS: Project[] = [
     {
-        NAME: "prefetch-bleed",
+        NAME: "Prefetch Bleed",
         SUMMARY:
             "Breaks Windows KASLR through the prefetch side-channel, times PREFETCHNTA against kernel addresses to find the kernel base.",
         STACK: ["C++", "x86 Assembly", "CMake"],
@@ -104,7 +110,7 @@ export const PROJECTS: Project[] = [
 
 export const USES: UsesGroup[] = [
     {
-        GROUP: "Workstation",
+        GROUP: "workstation",
         ROWS: [
             { k: "os", v: "Debian 13" },
             { k: "cpu", v: "Intel i5-9400F, 6 cores" },
@@ -133,18 +139,34 @@ export const USES: UsesGroup[] = [
 ];
 
 export const CHANGELOG: ChangelogEntry[] = [
-    { DATE: "2026-08-04", TEXT: "Rebuilt the site from scratch." },
+    {
+        DATE: "2026-08-04",
+        TEXT: {
+            en: "Rebuilt the site from scratch.",
+            "pt-br": "Reconstruí o site do zero.",
+        },
+    },
     {
         DATE: "2024-12-24",
-        TEXT: "New post: static analysis of RansomHub's ESXi locker.",
+        TEXT: {
+            en: "New post: static analysis of RansomHub's ESXi locker.",
+            "pt-br":
+                "Novo post: análise estática do locker ESXi do RansomHub.",
+        },
     },
     {
         DATE: "2024-06-01",
-        TEXT: "New post: a home server out of salvaged parts.",
+        TEXT: {
+            en: "New post: a home server out of salvaged parts.",
+            "pt-br": "Novo post: um servidor caseiro feito de peças recuperadas.",
+        },
     },
     {
         DATE: "2024-05-04",
-        TEXT: "New post: attacking Kerberos in Active Directory.",
+        TEXT: {
+            en: "New post: attacking Kerberos in Active Directory.",
+            "pt-br": "Novo post: atacando Kerberos no Active Directory.",
+        },
     },
 ];
 
@@ -154,6 +176,25 @@ export const NOW = {
         "Rebuilding this site.",
     ],
 };
+
+export const BADGES: Badge[] = [
+    { SRC: "/badges/lacorte.gif", W: 88, H: 31, ALT: "lacorte.city" },
+    { SRC: "/badges/chill-pill.gif", W: 88, H: 31, ALT: "take a chill pill" },
+    {
+        SRC: "/badges/privacy-net.gif",
+        STILL: "/badges/privacy-net-still.gif",
+        W: 88,
+        H: 31,
+        ALT: "internet privacy now!",
+    },
+    {
+        SRC: "/badges/webcirculo-br.png",
+        W: 29,
+        H: 20,
+        ALT: "Esse site faz parte do WebCírculo BR",
+        LANG: "pt-BR",
+    },
+];
 
 export const SOCIALS: Socials = [
     {

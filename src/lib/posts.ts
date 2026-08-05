@@ -8,14 +8,7 @@ export function localeOf(post: Post): Locale {
     return post.id.split("/")[0] as Locale;
 }
 
-/**
- * Published posts for one locale, newest first.
- *
- * Translation is optional: a locale that has not translated a post still
- * lists the original rather than a gap, and the post page shows a notice.
- * That is what keeps a second locale from doubling the writing cost of
- * every post forever.
- */
+/** A locale that has not translated a post lists the original, not a gap. */
 export async function postsFor(locale: Locale, fallback = true) {
     const all = (await getCollection("blog")).filter((p) => !p.data.draft);
 

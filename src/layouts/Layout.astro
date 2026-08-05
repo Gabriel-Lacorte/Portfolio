@@ -1,6 +1,6 @@
 ---
 import Head from "@components/Head.astro";
-import { NAV_KEYS, SITE, SOCIALS } from "@consts";
+import { BADGES, NAV_KEYS, SITE, SOCIALS } from "@consts";
 import { HTML_LANG, LOCALE_LABEL, LOCALES } from "@i18n/ui";
 import {
     localised,
@@ -13,17 +13,11 @@ type Props = {
     locale: Locale;
     title: string;
     description: string;
-    /** Home passes false, its <title> is just the site name. */
     suffix?: boolean;
-    /** Home shows the floating windows and the taskbar. */
     windows?: boolean;
-    /** Forwarded to <Head>, locales whose route serves borrowed text. */
     untranslated?: Locale[];
-    /** Forwarded to <Head>, keeps the page out of the index. */
     noindex?: boolean;
-    /** Forwarded to <Head>, points the canonical at another route. */
     canonicalPath?: string;
-    /** Forwarded to <Head>, article facts for JSON-LD. */
     article?: {
         headline: string;
         published: Date;
@@ -47,11 +41,17 @@ const {
 
 const t = useTranslations(locale);
 
-/* Compared with the locale segment stripped, so the same logic serves both
-   languages. */
 const here = unlocalised(Astro.url.pathname);
 const isCurrent = (href: string) =>
     href === "/" ? here === "/" : here === href || here.startsWith(href + "/");
+
+const uiStrings = JSON.stringify({
+    copy: t("action.copy"),
+    copied: t("action.copied"),
+    copyFailed: t("action.copyFailed"),
+    copyLabel: t("action.copyLabel"),
+    moveHint: t("win.moveHint"),
+});
 ---
 
 <!doctype html>
@@ -67,7 +67,7 @@ const isCurrent = (href: string) =>
             article={article}
         />
     </head>
-    <body class:list={[windows && "has-windows"]}>
+    <body class:list={[windows && "has-windows"]} data-ui={uiStrings}>
         <a class="skip" href="#main">{t("action.skip")}</a>
 
         <div class="container">
@@ -123,7 +123,13 @@ const isCurrent = (href: string) =>
                 <slot />
             </main>
 
-            <slot name="windows" />
+            {
+                windows && (
+                    <div class="windows">
+                        <slot name="windows" />
+                    </div>
+                )
+            }
 
             <footer class="site">
                 <div class="contacts">
@@ -154,31 +160,47 @@ const isCurrent = (href: string) =>
             </footer>
 
             <div class="buttons88">
-                <img
-                    src="/badges/lacorte.gif"
-                    width="88"
-                    height="31"
-                    alt="lacorte.city"
-                />
-                <img
-                    src="/badges/chill-pill.gif"
-                    width="88"
-                    height="31"
-                    alt="take a chill pill"
-                />
-                <img
-                    src="/badges/privacy-net.gif"
-                    width="88"
-                    height="31"
-                    alt="internet privacy now!"
-                />
-                <img
-                    src="/badges/webcirculo-br.png"
-                    title="Esse site faz parte do WebCírculo BR!"
-                />
+                {
+                    BADGES.map((badge) => {
+                        const img = (
+                            <img
+                                src={badge.SRC}
+                                width={badge.W}
+                                height={badge.H}
+                                lang={badge.LANG}
+                                alt={badge.ALT}
+                            />
+                        );
+                        const art = badge.STILL ? (
+                            <picture>
+                                <source
+                                    srcset={badge.STILL}
+                                    media="(prefers-reduced-motion: reduce)"
+                                />
+                                {img}
+                            </picture>
+                        ) : (
+                            img
+                        );
+                        return badge.HREF ? (
+                            <a
+                                href={badge.HREF}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                >{art}</a
+                            >
+                        ) : (
+                            art
+                        );
+                    })
+                }
             </div>
         </div>
 
-        <slot name="taskbar" />
+        {
+            windows && (
+                <div class="taskbar" role="group" aria-label={t("win.windows")} />
+            )
+        }
     </body>
 </html>

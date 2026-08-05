@@ -1,9 +1,4 @@
 ---
-/**
- * An aside inside an article. Framed and labelled rather than led by an
- * emoji, so it holds up in the monochrome design, and the label is real
- * text, which the emoji version was not.
- */
 type Props = {
     type?: "note" | "info" | "warning" | "error";
     label?: string;
@@ -39,7 +34,7 @@ const DEFAULT_LABEL: Record<string, string> = {
     }
 
     .callout-label::before {
-        content: "! ";
+        content: "! " / "";
     }
 
     .warning .callout-label {
