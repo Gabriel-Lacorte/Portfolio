@@ -115,7 +115,7 @@ export const PROJECTS: Project[] = [
 
 export const USES: UsesGroup[] = [
     {
-        GROUP: "Workstation",
+        GROUP: "workstation",
         ROWS: [
             { k: "os", v: "Debian 13" },
             { k: "cpu", v: "Intel i5-9400F, 6 cores" },
