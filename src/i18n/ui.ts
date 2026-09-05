@@ -15,12 +15,12 @@ export const HTML_LANG: Record<Locale, string> = {
 
 const en = {
     "site.role": "systems engineer",
-    "site.tagline": "python * backend * offensive security",
+    "site.tagline": "systems * backend * offsec",
 
     "home.intro1":
         "Hey, welcome. I'm Gabriel, a systems engineer. I build systems and software, mostly around compilers and Windows internals, and I love offensive security.",
     "home.intro2":
-        "This is where I write down what I find when I take things apart: the writeups, the projects that came out of them, and the machines I run it all on.",
+        "This is where I write down what some writeups and projects that I produce on what I find interesting to share",
     "win.status": "Blog status",
     "win.lab": "Homelab status",
     "win.close": "Close window",
@@ -87,7 +87,7 @@ const ptBR: Record<UIKey, string> = {
     "home.intro1":
         "Olá, seja bem-vindo. Sou o Gabriel, engenheiro de sistemas. Construo sistemas e software, principalmente em compiladores e internals do Windows, e amo segurança ofensiva.",
     "home.intro2":
-        "Aqui é onde anoto o que encontro quando desmonto essas coisas: os artigos, os projetos que saíram deles, e as máquinas onde tudo isso roda.",
+        "Aqui é onde anoto o que encontro quando desmonto essas coisas, os artigos e os projetos que saíram deles.",
     "win.status": "Status do blog",
     "win.lab": "Status do homelab",
     "win.close": "Fechar janela",
@@ -119,7 +119,7 @@ const ptBR: Record<UIKey, string> = {
 
     "meta.blogTitle": "Blog",
     "meta.blogDescription":
-        "Anotações sobre sistemas, compiladores e engenharia de baixo nível.",
+        "Anotações sobre sistemas, offsec e engenharia de baixo nível.",
     "meta.projectsTitle": "Projetos",
     "meta.projectsDescription": "Coisas que eu construí.",
     "meta.usesTitle": "Setup",
