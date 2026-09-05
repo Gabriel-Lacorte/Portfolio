@@ -37,7 +37,7 @@ export const HOME: Metadata = {
 
 export const BLOG: Metadata = {
     TITLE: "Blog",
-    DESCRIPTION: "Notes on systems, compilers, and low-level engineering.",
+    DESCRIPTION: "Notes on offsec, systems, and low-level engineering.",
 };
 
 export const PROJECTS_META: Metadata = {
@@ -60,7 +60,6 @@ export const STACK_GROUPS: StackGroup[] = [
             "Active Directory",
             "Windows kernel",
             "Reverse engineering",
-            "Side channels",
         ],
     },
     {
@@ -69,7 +68,7 @@ export const STACK_GROUPS: StackGroup[] = [
     },
     {
         GROUP: "devops",
-        ITEMS: ["Docker", "Nginx", "Cloudflare Tunnel"],
+        ITEMS: ["Docker", "Nginx", "Git"],
     },
 ];
 
@@ -78,7 +77,7 @@ export const PROJECTS: Project[] = [
         NAME: "Prefetch Bleed",
         SUMMARY:
             "Breaks Windows KASLR through the prefetch side-channel, times PREFETCHNTA against kernel addresses to find the kernel base.",
-        STACK: ["C++", "x86 Assembly", "CMake"],
+        STACK: ["C++", "x86 Assembly"],
         HREF: "https://github.com/Gabriel-Lacorte/prefetch-bleed",
         YEAR: "2026",
     },
@@ -86,12 +85,12 @@ export const PROJECTS: Project[] = [
         NAME: "CVE-2025-7771",
         SUMMARY:
             "Arbitrary kernel function call through a vulnerable driver.",
-        STACK: ["C++", "Windows kernel", "IOCTL"],
+        STACK: ["C++", "Windows kernel", "BYOVD"],
         HREF: "https://github.com/Gabriel-Lacorte/CVE-2025-7771",
         YEAR: "2025",
     },
     {
-        NAME: "$Crypt",
+        NAME: "$crypt",
         SUMMARY:
             "Protocol analysis framework for dissecting traffic.",
         STACK: ["Rust", "Lua", "Just"],
@@ -102,7 +101,7 @@ export const PROJECTS: Project[] = [
         NAME: "CVE-2026-36670",
         SUMMARY:
             "Time-based blind SQL injection in the OpenSIPS Control Panel. First CVE.",
-        STACK: ["SQL injection", "OpenSIPS"],
+        STACK: ["SQL injection"],
         HREF: "https://github.com/Gabriel-Lacorte/CVE-2026-36670",
         YEAR: "2026",
     },
