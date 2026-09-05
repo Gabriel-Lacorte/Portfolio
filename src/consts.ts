@@ -74,22 +74,6 @@ export const STACK_GROUPS: StackGroup[] = [
 
 export const PROJECTS: Project[] = [
     {
-        NAME: "CVE-2025-7771",
-        SUMMARY:
-            "Arbitrary kernel function call through a vulnerable driver.",
-        STACK: ["C++", "Windows kernel", "BYOVD"],
-        HREF: "https://github.com/Gabriel-Lacorte/CVE-2025-7771",
-        YEAR: "2025",
-    },
-    {
-        NAME: "CVE-2026-36670",
-        SUMMARY:
-            "Time-based blind SQL injection in the OpenSIPS Control Panel. First CVE.",
-        STACK: ["SQL injection"],
-        HREF: "https://github.com/Gabriel-Lacorte/CVE-2026-36670",
-        YEAR: "2026",
-    },
-    {
         NAME: "Starforge",
         SUMMARY:
             "A Multiplayer Pixel Art & Animation Studio.",
@@ -111,6 +95,22 @@ export const PROJECTS: Project[] = [
             "Breaks Windows KASLR through the prefetch side-channel, times PREFETCHNTA against kernel addresses to find the kernel base.",
         STACK: ["C++", "x86 Assembly"],
         HREF: "https://github.com/Gabriel-Lacorte/prefetch-bleed",
+        YEAR: "2026",
+    },
+    {
+        NAME: "CVE-2025-7771",
+        SUMMARY:
+            "Arbitrary kernel function call through a vulnerable driver.",
+        STACK: ["C++", "Windows kernel", "BYOVD"],
+        HREF: "https://github.com/Gabriel-Lacorte/CVE-2025-7771",
+        YEAR: "2025",
+    },
+    {
+        NAME: "CVE-2026-36670",
+        SUMMARY:
+            "Time-based blind SQL injection in the OpenSIPS Control Panel. First CVE.",
+        STACK: ["SQL injection"],
+        HREF: "https://github.com/Gabriel-Lacorte/CVE-2026-36670",
         YEAR: "2026",
     },
 ];
@@ -149,8 +149,8 @@ export const CHANGELOG: ChangelogEntry[] = [
     {
         DATE: "2026-09-05",
         TEXT: {
-            en: "Built Starforge (https://starforge.lacorte.city/).",
-            "pt-br": "Construi Starforge (https://starforge.lacorte.city/).",
+            en: "Built Starforge (starforge.lacorte.city)",
+            "pt-br": "Construi Starforge (starforge.lacorte.city)",
         },
     },
     {
