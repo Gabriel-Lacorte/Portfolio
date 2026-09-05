@@ -187,7 +187,6 @@ export const CHANGELOG: ChangelogEntry[] = [
 export const NOW = {
     UPDATED: "2026-09-05",
     LINES: [
-        "Rebuilding this site.",
         "Building Starfoge, check the project!"
     ],
 };
