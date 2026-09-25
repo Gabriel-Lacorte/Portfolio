@@ -12,7 +12,8 @@
         "preview": "astro preview",
         "astro": "astro",
         "headers": "node scripts/gen-headers.mjs",
-        "headers:check": "node scripts/gen-headers.mjs --check"
+        "headers:check": "node scripts/gen-headers.mjs --check",
+        "deploy": "bash scripts/deploy.sh"
     },
     "dependencies": {
         "@astrojs/check": "^0.9.10",
