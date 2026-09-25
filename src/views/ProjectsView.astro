@@ -60,11 +60,7 @@ const projects = [...PROJECTS].sort((a, b) => b.YEAR.localeCompare(a.YEAR));
                         </a>
                         <p class="desc">{project.SUMMARY}</p>
                         {project.STACK.length > 0 && (
-                            <p class="tags">
-                                {project.STACK.map((item) => (
-                                    <span class="tag">{item}</span>
-                                ))}
-                            </p>
+                            <p class="stack">{project.STACK.join(" · ")}</p>
                         )}
                     </li>
                 ))

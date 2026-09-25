@@ -5,7 +5,7 @@ import sitemap from "@astrojs/sitemap";
 import rehypeImageSize from "./src/lib/rehype-image-size.mjs";
 
 export default defineConfig({
-    site: "https://lacorte.city",
+    site: "https://lacort.ee",
     integrations: [
         sitemap({
             filter: (page) => !/\/404\/?$/.test(new URL(page).pathname),

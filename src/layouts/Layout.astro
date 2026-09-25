@@ -1,6 +1,6 @@
 ---
 import Head from "@components/Head.astro";
-import { BADGES, NAV_KEYS, SITE, SOCIALS } from "@consts";
+import { BADGES, NAV_KEYS, NOW, SITE, SOCIALS } from "@consts";
 import { HTML_LANG, LOCALE_LABEL, LOCALES } from "@i18n/ui";
 import {
     localised,
@@ -70,11 +70,22 @@ const uiStrings = JSON.stringify({
     <body data-ui={uiStrings}>
         <a class="skip" href="#main">{t("action.skip")}</a>
 
+        <div class="progress" id="progress" aria-hidden="true"></div>
+
         <div class="container">
             <header class="site">
                 <slot name="ident">
                     <p class="ident">
-                        <span class="mark">{SITE.HANDLE}</span>
+                        <span class="mark">
+                            {SITE.HANDLE.split(".").map((part, i, parts) => (
+                                <>
+                                    {part}
+                                    {i < parts.length - 1 && (
+                                        <span class="mark-dot">.</span>
+                                    )}
+                                </>
+                            ))}
+                        </span>
                         <span class="who">{t("site.tagline")}</span>
                     </p>
                 </slot>
@@ -157,6 +168,9 @@ const uiStrings = JSON.stringify({
                         }
                     </span>
                 </div>
+                <p class="colophon">
+                    <span class="comment">{t("footer.served")}</span>
+                </p>
             </footer>
 
             <div class="buttons88">
@@ -197,5 +211,912 @@ const uiStrings = JSON.stringify({
             </div>
         </div>
 
+        <dialog id="zoom" class="zoom" aria-label={t("post.read")}>
+            <img alt="" />
+        </dialog>
+
+        <div id="tty" class="tty" hidden data-now={NOW.LINES.join("\n")}>
+            <pre class="tty__log" aria-live="polite"></pre>
+            <div class="tty__row">
+                <span class="tty__prompt" id="tty-prompt"></span>
+                <input
+                    id="tty-input"
+                    class="tty__input"
+                    type="text"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    aria-label="console"
+                />
+            </div>
+        </div>
+
     </body>
 </html>
+
+<script>
+    const FIRMWARE = {
+        version: "2.6",
+        vendor: "lacort.ee",
+        copyright: "Gabriel Lacorte",
+        ally: "an energy star ally",
+        processor: (threads: number, os: string) => `guest, ${threads} threads (${os})`,
+        memoryLabel: "Memory Test",
+        drives: [
+            { bus: "Primary Master", target: "~/writing", note: (s: any) => `${s.posts} posts, ${s.words} words` },
+            { bus: "Primary Slave", target: "~/projects", note: (s: any) => `${s.projects} linked` },
+            { bus: "Secondary Master", target: "/edge", note: () => "cloudflared tunnel up" },
+            { bus: "Secondary Slave", target: "", note: () => "None" },
+        ],
+        pnp: "Initializing Plug and Play Cards ... done",
+        cmos: "CMOS checksum OK · rtc valid",
+        dmi: "Verifying DMI Pool Data ..........",
+        booting: "Booting from hd0 ...",
+    };
+
+    const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const linuxDate = (d = new Date()) => {
+        const p = (n: number) => String(n).padStart(2, "0");
+        const tz =
+            Intl.DateTimeFormat(undefined, { timeZoneName: "short" })
+                .formatToParts(d)
+                .find((x) => x.type === "timeZoneName")?.value ?? "UTC";
+        return `${DOW[d.getDay()]} ${MON[d.getMonth()]} ${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())} ${tz} ${d.getFullYear()}`;
+    };
+
+    const SHELL = {
+        users: ["lacorte", "root"],
+        prompt: (user: string) => `${user}@lacort.ee:~${user === "root" ? "#" : "$"}`,
+        loginPrompt: "lacort.ee login:",
+        passwordPrompt: "Password:",
+        loginFail: "Login incorrect",
+        header: "lacort.ee 2.6  tty1",
+        motd: [
+            "Welcome to lacort.ee 2.6 (tty1)",
+            "",
+            "  type `help` for commands, `startx` for the graphical interface.",
+        ],
+        help: [
+            "help        this text",
+            "ls          the files of this page",
+            "open <name> go to that page",
+            "cd <name>   same as open; bare cd goes home",
+            "cat now     what I am up to",
+            "echo <txt>  print text",
+            "whoami      the account you are on",
+            "id          uid and groups",
+            "pwd         where you are",
+            "uname -a    system info",
+            "date        local time",
+            "clear       wipe the screen",
+            "startx      launch the graphical interface",
+            "exit        log out",
+        ],
+        routes: {
+            "~": "/",
+            "/": "/",
+            home: "/",
+            blog: "/blog/",
+            writing: "/blog/",
+            projects: "/projects/",
+            uses: "/uses/",
+            now: "/now/",
+            "pt-br": "/pt-br/",
+            pt: "/pt-br/",
+            en: "/",
+        },
+        home: (user: string) => (user === "root" ? "/root" : "/home/lacorte"),
+        id: (user: string) =>
+            user === "root"
+                ? "uid=0(root) gid=0(root) groups=0(root)"
+                : `uid=1000(${user}) gid=1000(${user}) groups=1000(${user}),27(sudo)`,
+        uname: "Linux lacort.ee 2.6 #1 SMP PREEMPT lacort.ee GNU/Linux",
+        x: "xinit: starting server for X on display :0",
+        logout: "logout",
+        delays: { password: 1200, fail: 1600, nav: 400, x: 900 },
+        errors: {
+            notFound: (cmd: string) => `bash: ${cmd}: command not found`,
+            open: (q: string) => `bash: open: ${q}: no such file`,
+            cd: (dir: string) => `bash: cd: ${dir}: No such file or directory`,
+            cat: (file: string) => `cat: ${file}: No such file or directory`,
+        },
+    };
+    type UIStrings = {
+        copy: string;
+        copied: string;
+        copyFailed: string;
+        copyLabel: string;
+        moveHint: string;
+    };
+
+    function strings(): UIStrings {
+        try {
+            return JSON.parse(document.body.dataset.ui ?? "{}");
+        } catch {
+            return {} as UIStrings;
+        }
+    }
+
+    function codeBlocks() {
+        const ui = strings();
+        document
+            .querySelectorAll<HTMLPreElement>(".article pre:not(.ascii)")
+            .forEach((pre) => {
+                if (pre.parentElement?.classList.contains("code-wrap")) return;
+
+                const wrap = document.createElement("div");
+                wrap.className = "code-wrap";
+
+                const bar = document.createElement("div");
+                bar.className = "code-bar";
+
+                const lang = document.createElement("span");
+                lang.textContent =
+                    pre.dataset.language && pre.dataset.language !== "plaintext"
+                        ? pre.dataset.language
+                        : "text";
+
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "code-copy";
+                button.textContent = ui.copy;
+                button.setAttribute("aria-label", ui.copyLabel);
+                button.addEventListener("click", async () => {
+                    try {
+                        await navigator.clipboard.writeText(pre.innerText);
+                        button.textContent = ui.copied;
+                    } catch {
+                        button.textContent = ui.copyFailed;
+                    }
+                    setTimeout(() => (button.textContent = ui.copy), 1600);
+                });
+
+                bar.append(lang, button);
+                wrap.append(bar, pre);
+                pre.replaceWith(wrap);
+            });
+    }
+
+    function wrapTables() {
+        document.querySelectorAll(".article > table").forEach((table) => {
+            if (table.parentElement?.classList.contains("table-wrap")) return;
+            const wrap = document.createElement("div");
+            wrap.className = "table-wrap";
+            table.replaceWith(wrap);
+            wrap.append(table);
+        });
+    }
+
+    function progressBar(signal: AbortSignal) {
+        const bar = document.getElementById("progress");
+        if (!bar || !document.querySelector(".article")) return;
+
+        let ticking = false;
+        const paint = () => {
+            ticking = false;
+            const doc = document.documentElement;
+            const max = doc.scrollHeight - doc.clientHeight;
+            const pct = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+            bar.style.transform = `scaleX(${pct})`;
+        };
+        const onScroll = () => {
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(paint);
+            }
+        };
+
+        paint();
+        window.addEventListener("scroll", onScroll, { signal, passive: true });
+    }
+
+    function scrollSpy(signal: AbortSignal) {
+        const rail = document.querySelector(".toc-rail");
+        if (!rail) return;
+
+        const links = [...rail.querySelectorAll<HTMLAnchorElement>("a[href^='#']")];
+        const byId = new Map(
+            links
+                .map((link) => [decodeURIComponent(link.hash.slice(1)), link] as const)
+                .filter(([id]) => document.getElementById(id)),
+        );
+        if (!byId.size) return;
+
+        const headings = [...byId.keys()].map((id) => document.getElementById(id)!);
+
+        let ticking = false;
+        const mark = () => {
+            ticking = false;
+            const line = window.scrollY + 120;
+            let current: string | null = null;
+            for (const h of headings) {
+                if (h.offsetTop <= line) current = h.id;
+            }
+            for (const [id, link] of byId) {
+                if (id === current) link.setAttribute("aria-current", "true");
+                else link.removeAttribute("aria-current");
+            }
+        };
+        const onScroll = () => {
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(mark);
+            }
+        };
+
+        mark();
+        window.addEventListener("scroll", onScroll, { signal, passive: true });
+    }
+
+    function imageZoom(signal: AbortSignal) {
+        const dialog = document.getElementById("zoom") as HTMLDialogElement | null;
+        if (!dialog) return;
+        const img = dialog.querySelector("img");
+
+        const open = (src: string, alt: string) => {
+            if (!img) return;
+            img.src = src;
+            img.alt = alt;
+            dialog.showModal();
+        };
+
+        document.querySelectorAll(".article img").forEach((el) => {
+            const image = el as HTMLImageElement;
+            image.addEventListener("click", () => open(image.currentSrc, image.alt), {
+                signal,
+            });
+        });
+
+        dialog.addEventListener("click", () => dialog.close(), { signal });
+    }
+
+    const POS_KEY = "win:pos";
+    const WIN_W = 280;
+    const GAP = 24;
+
+    type Pos = { x: number; y: number };
+
+    function readPositions(): Record<string, Pos> {
+        try {
+            return JSON.parse(localStorage.getItem(POS_KEY) ?? "{}");
+        } catch {
+            return {};
+        }
+    }
+
+    function savePosition(id: string, pos: Pos) {
+        const all = readPositions();
+        all[id] = pos;
+        try {
+            localStorage.setItem(POS_KEY, JSON.stringify(all));
+        } catch {}
+    }
+
+    function windows(signal: AbortSignal) {
+        const wins = [...document.querySelectorAll<HTMLElement>(".window")];
+        if (!wins.length) return;
+
+        const ui = strings();
+        let top = 50;
+
+        const margins = () => {
+            const main = document.querySelector("main");
+            if (!main) return null;
+            const r = main.getBoundingClientRect();
+            const room = document.documentElement.clientWidth;
+            return { left: r.left, right: room - r.right, room };
+        };
+
+        const floats = () => {
+            const m = margins();
+            return !!m && Math.min(m.left, m.right) >= WIN_W + 2 * GAP;
+        };
+
+        const clamp = (win: HTMLElement, x: number, y: number): Pos => {
+            const room = document.documentElement.clientWidth;
+            const maxX = Math.max(0, room - win.offsetWidth);
+            const maxY = Math.max(0, window.innerHeight - win.offsetHeight);
+            return {
+                x: Math.min(Math.max(0, x), maxX),
+                y: Math.min(Math.max(0, y), maxY),
+            };
+        };
+
+        const place = (win: HTMLElement, x: number, y: number) => {
+            const p = clamp(win, x, y);
+            win.style.left = `${p.x}px`;
+            win.style.top = `${p.y}px`;
+            return p;
+        };
+
+        const parking = (win: HTMLElement, i: number): Pos => {
+            const m = margins();
+            const width = win.offsetWidth || WIN_W;
+            const y = 190 + i * 250;
+            if (!m) return { x: GAP, y };
+            const x =
+                i % 2 === 0
+                    ? Math.max(GAP, m.left - width - GAP)
+                    : Math.min(m.room - width - GAP, m.room - m.right + GAP);
+            return { x, y };
+        };
+
+        const buriesColumn = (win: HTMLElement) => {
+            const main = document.querySelector("main");
+            if (!main) return false;
+            const m = main.getBoundingClientRect();
+            const r = win.getBoundingClientRect();
+            return r.right > m.left && r.left < m.right;
+        };
+
+        const repark = (win: HTMLElement, i: number) => {
+            if (!buriesColumn(win)) return;
+            const p = parking(win, i);
+            place(win, p.x, p.y);
+            savePosition(win.id, p);
+        };
+
+        document.querySelectorAll<HTMLButtonElement>("[data-window-close]").forEach((b) =>
+            b.addEventListener("click", () => {
+                const win = document.getElementById(b.dataset.windowClose!);
+                if (win) win.hidden = true;
+            }),
+        );
+
+        const lift = (win: HTMLElement, i: number) => {
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            if (!bar || win.style.position === "fixed") return;
+
+            win.style.position = "fixed";
+            win.style.margin = "0";
+            win.style.width = `${Math.min(WIN_W, document.documentElement.clientWidth - 32)}px`;
+            win.style.zIndex = String(++top);
+
+            const start = readPositions()[win.id] ?? parking(win, i);
+            place(win, start.x, start.y);
+
+            bar.tabIndex = 0;
+            bar.setAttribute("role", "application");
+            bar.setAttribute("aria-roledescription", ui.moveHint);
+            /* Otherwise the bar is named from its contents, including the
+               close button's "x". */
+            const named = win.getAttribute("aria-label");
+            if (named) bar.setAttribute("aria-label", named);
+        };
+
+        const drop = (win: HTMLElement) => {
+            if (win.style.position !== "fixed") return;
+            for (const p of ["position", "left", "top", "width", "margin", "z-index"])
+                win.style.removeProperty(p);
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            bar?.removeAttribute("tabindex");
+            bar?.removeAttribute("role");
+            bar?.removeAttribute("aria-roledescription");
+        };
+
+        const sync = () => {
+            const floating = floats();
+            document.documentElement.classList.toggle("floating", floating);
+
+            wins.forEach((win, i) => {
+                win.hidden = false;
+                if (!floating) return drop(win);
+                lift(win, i);
+                place(win, parseFloat(win.style.left), parseFloat(win.style.top));
+                repark(win, i);
+            });
+        };
+
+        wins.forEach((win) => {
+            const bar = win.querySelector<HTMLElement>(".window__bar");
+            if (!bar) return;
+
+            bar.addEventListener("pointerdown", (e) => {
+                if (win.style.position !== "fixed") return;
+                if ((e.target as HTMLElement).closest("button")) return;
+                e.preventDefault();
+                win.style.zIndex = String(++top);
+
+                const r = win.getBoundingClientRect();
+                const dx = e.clientX - r.left;
+                const dy = e.clientY - r.top;
+                bar.setPointerCapture(e.pointerId);
+                bar.dataset.dragging = "1";
+
+                const move = (ev: PointerEvent) => place(win, ev.clientX - dx, ev.clientY - dy);
+
+                const up = (ev: PointerEvent) => {
+                    delete bar.dataset.dragging;
+                    bar.releasePointerCapture(ev.pointerId);
+                    bar.removeEventListener("pointermove", move);
+                    bar.removeEventListener("pointerup", up);
+                    savePosition(win.id, {
+                        x: parseFloat(win.style.left),
+                        y: parseFloat(win.style.top),
+                    });
+                };
+
+                bar.addEventListener("pointermove", move);
+                bar.addEventListener("pointerup", up);
+            });
+
+            bar.addEventListener("keydown", (e) => {
+                if (win.style.position !== "fixed") return;
+                const step = e.shiftKey ? 4 : 16;
+                const by: Record<string, [number, number]> = {
+                    ArrowLeft: [-step, 0],
+                    ArrowRight: [step, 0],
+                    ArrowUp: [0, -step],
+                    ArrowDown: [0, step],
+                };
+                const d = by[e.key];
+                if (!d) return;
+                e.preventDefault();
+                win.style.zIndex = String(++top);
+                savePosition(
+                    win.id,
+                    place(win, parseFloat(win.style.left) + d[0], parseFloat(win.style.top) + d[1]),
+                );
+            });
+        });
+
+        sync();
+
+        const resync = () => requestAnimationFrame(sync);
+        document.addEventListener("visibilitychange", resync, { signal });
+        window.addEventListener("resize", resync, { signal });
+        requestAnimationFrame(sync);
+    }
+
+    function boot() {
+        const overlay = document.getElementById("boot");
+        if (!overlay) return;
+
+        try {
+            if (sessionStorage.getItem("boot")) return;
+        } catch {
+            return;
+        }
+
+        try {
+            sessionStorage.setItem("boot", "1");
+        } catch {}
+
+        if ((window as any).__delEarly) {
+            openTTY();
+            return;
+        }
+
+        const pre = overlay.querySelector("pre");
+        if (!pre) return;
+        overlay.hidden = false;
+
+        const stats = overlay.dataset;
+        const threads = navigator.hardwareConcurrency || 4;
+        const nav = navigator as any;
+        const platform = (nav.userAgentData?.platform ?? navigator.platform ?? "").toLowerCase();
+        const os = platform.includes("win")
+            ? "windows"
+            : platform.includes("mac")
+              ? "macos"
+              : platform.includes("linux")
+                ? "linux"
+                : platform || "unknown";
+
+        const memK = Math.max(1, (nav.deviceMemory ?? 8) | 0) * 1024 * 1024;
+
+        const [by, bm, bd] = (stats.built ?? "").split("-");
+        const biosDate = by && bm && bd ? `${bm}/${bd}/${by.slice(2)}` : "";
+
+        const probe = (bus: string) => `Detecting IDE ${bus.padEnd(17, " ")} ...`;
+        const driveLine = (d: (typeof FIRMWARE.drives)[number]) =>
+            d.target
+                ? `${probe(d.bus)} ${d.target.padEnd(11, " ")} ${d.note(stats)}`
+                : `${probe(d.bus)} ${d.note(stats)}`;
+
+        const canonical = [
+            `${FIRMWARE.vendor} BIOS v${FIRMWARE.version} -- ${FIRMWARE.ally}`,
+            `Copyright (C) 2026, ${FIRMWARE.copyright} * build ${stats.commit ?? "0000000"}`,
+            "",
+            `Main Processor${" ".repeat(9)}: ${FIRMWARE.processor(threads, os)}`,
+            `${FIRMWARE.memoryLabel}${" ".repeat(12)}: ${memK}K OK`,
+            "",
+            ...FIRMWARE.drives.map(driveLine),
+            "",
+            FIRMWARE.pnp,
+            FIRMWARE.cmos,
+            "",
+            `BIOS Date: ${biosDate}  Ver: ${FIRMWARE.version}`,
+            "",
+            FIRMWARE.dmi,
+            "",
+            FIRMWARE.booting,
+        ];
+
+        let lines: string[] = [];
+        let finished = false;
+        const timers: ReturnType<typeof setTimeout>[] = [];
+
+        const render = () => {
+            pre.textContent = lines.join("\n");
+        };
+        const push = (text: string): number => {
+            lines.push(text);
+            render();
+            return lines.length - 1;
+        };
+        const put = (i: number, text: string) => {
+            lines[i] = text;
+            render();
+        };
+
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            timers.forEach((t) => {
+                clearTimeout(t);
+                clearInterval(t);
+            });
+            overlay.classList.add("boot--done");
+            setTimeout(() => (overlay.hidden = true), 340);
+        };
+
+        const skip = () => {
+            if (finished) return;
+            lines = canonical.slice();
+            render();
+            finish();
+        };
+
+        const at = (ms: number, fn: () => void) => timers.push(setTimeout(fn, ms));
+
+        at(0, () => push(canonical[0]));
+        at(220, () => push(canonical[1]));
+        at(420, () => push(canonical[2]));
+        at(560, () => push(canonical[3]));
+
+        at(750, () => {
+            let k = 1024;
+            const i = push(`${FIRMWARE.memoryLabel}${" ".repeat(12)}: ${k}K`);
+            const iv = setInterval(() => {
+                k = Math.min(k * 4, memK);
+                put(
+                    i,
+                    `${FIRMWARE.memoryLabel}${" ".repeat(12)}: ${k}K${k >= memK ? " OK" : ""}`,
+                );
+                if (k >= memK) clearInterval(iv);
+            }, 90);
+            timers.push(iv);
+        });
+
+        at(1900, () => push(""));
+
+        let t = 2050;
+        for (const drive of FIRMWARE.drives) {
+            at(t, () => {
+                const i = push(probe(drive.bus));
+                at(200, () => put(i, driveLine(drive)));
+            });
+            t += 320;
+        }
+
+        at(t + 120, () => push(canonical[11]));
+        at(t + 360, () => push(canonical[12]));
+        at(t + 560, () => push(""));
+        at(t + 720, () => push(canonical[14]));
+        at(t + 1900, () => push(canonical[16]));
+        at(t + 2500, () => push(""));
+        at(t + 2700, () => push(canonical[18]));
+        at(t + 3500, finish);
+
+        window.addEventListener("keydown", (e) => {
+            if (finished) return;
+            if (e.key === "Delete") {
+                finished = true;
+                timers.forEach((t) => {
+                    clearTimeout(t);
+                    clearInterval(t);
+                });
+                overlay.hidden = true;
+                openTTY();
+                return;
+            }
+            skip();
+        });
+    }
+
+    let openTTY: () => void = () => {};
+
+    const COMMANDS = [
+        "cat",
+        "cd",
+        "clear",
+        "date",
+        "echo",
+        "exit",
+        "help",
+        "id",
+        "logout",
+        "ls",
+        "open",
+        "pwd",
+        "startx",
+        "sudo",
+        "uname",
+        "whoami",
+    ];
+
+    function tty() {
+        const tty = document.getElementById("tty");
+        const input = document.getElementById("tty-input") as HTMLInputElement | null;
+        const promptEl = document.getElementById("tty-prompt");
+        const log = tty?.querySelector<HTMLElement>(".tty__log");
+        if (!tty || !input || !promptEl || !log) return;
+
+        let state: "login" | "password" | "wait" | "shell" = "login";
+        let user = "";
+        let history: string[] = [];
+        let historyAt = 0;
+
+        const print = (text = "") => {
+            log.textContent += (log.textContent ? "\n" : "") + text;
+            tty.scrollTop = tty.scrollHeight;
+        };
+
+        const setPrompt = (text: string, type = "text") => {
+            promptEl.textContent = text;
+            input.type = type;
+        };
+
+        openTTY = () => {
+            if (!tty.hidden) {
+                input.focus();
+                return;
+            }
+            tty.hidden = false;
+            state = "login";
+            user = "";
+            log.textContent = "";
+            print("");
+            print(SHELL.header);
+            print("");
+            setPrompt(SHELL.loginPrompt);
+            input.focus();
+        };
+
+        const links = () =>
+            [
+                ...document.querySelectorAll<HTMLAnchorElement>("main a[href], header .menu a[href]"),
+            ].filter((a) => !a.hash || a.hash === "");
+
+        const normalize = (s: string) =>
+            s
+                .replace(/\[|\]/g, "")
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9\-~/.]/g, "");
+
+        const names = () => {
+            const seen = new Set<string>();
+            for (const a of links()) {
+                const n = normalize(a.textContent ?? "");
+                if (n && n !== "~" && n !== "~/" && n !== "/") seen.add(n);
+            }
+            return [...seen];
+        };
+
+        const go = (target: string, err: (t: string) => string) => {
+            const route = (SHELL.routes as Record<string, string>)[target];
+            if (route) {
+                setTimeout(
+                    () => window.location.assign(new URL(route, location.origin).href),
+                    SHELL.delays.nav,
+                );
+                return;
+            }
+            const found = links().find((a) => {
+                const h = a.getAttribute("href")!.toLowerCase();
+                const t = a.textContent!.toLowerCase();
+                return (
+                    h.includes(target) ||
+                    t.includes(target) ||
+                    normalize(a.textContent!) === target
+                );
+            });
+            if (!found) return print(err(target));
+            setTimeout(() => window.location.assign(found.href), SHELL.delays.nav);
+        };
+
+        const run = (raw: string) => {
+            const line = raw.trim();
+            if (!line) {
+                print(SHELL.prompt(user));
+                return;
+            }
+            print(`${SHELL.prompt(user)} ${line}`);
+            history.push(line);
+            historyAt = history.length;
+            const [cmd, ...rest] = line.split(/\s+/);
+            const arg = rest.join(" ").toLowerCase();
+            const argRaw = rest.join(" ");
+            switch (cmd) {
+                case "help":
+                    print(SHELL.help.join("\n"));
+                    break;
+                case "ls": {
+                    for (const name of names()) {
+                        if (arg && !name.includes(arg)) continue;
+                        print(name);
+                    }
+                    break;
+                }
+                case "open":
+                    if (!arg) print("usage: open <name>");
+                    else go(arg, SHELL.errors.open);
+                    break;
+                case "cd":
+                    go(arg || "~", SHELL.errors.cd);
+                    break;
+                case "cat":
+                    if (arg === "now") print(tty.dataset.now ?? "");
+                    else print(SHELL.errors.cat(argRaw || ""));
+                    break;
+                case "echo":
+                    print(argRaw);
+                    break;
+                case "whoami":
+                    print(user);
+                    break;
+                case "id":
+                    print(SHELL.id(user));
+                    break;
+                case "pwd":
+                    print(SHELL.home(user));
+                    break;
+                case "uname":
+                    print(SHELL.uname);
+                    break;
+                case "date":
+                    print(linuxDate());
+                    break;
+                case "sudo":
+                    if (!argRaw) print("usage: sudo <command>");
+                    else run(argRaw);
+                    break;
+                case "clear":
+                    log.textContent = "";
+                    break;
+                case "startx":
+                    print(SHELL.x);
+                    setTimeout(() => (tty.hidden = true), SHELL.delays.x);
+                    break;
+                case "exit":
+                case "logout":
+                    print(SHELL.logout);
+                    print("");
+                    state = "login";
+                    user = "";
+                    setPrompt(SHELL.loginPrompt);
+                    break;
+                default:
+                    print(SHELL.errors.notFound(cmd));
+            }
+        };
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                if (state === "wait") return;
+                const value = input.value;
+                input.value = "";
+                if (state === "login") {
+                    const name = value.trim().toLowerCase();
+                    print(`${SHELL.loginPrompt} ${name}`);
+                    user = name;
+                    if (!name) {
+                        state = "wait";
+                        setTimeout(() => {
+                            print("");
+                            state = "login";
+                            setPrompt(SHELL.loginPrompt);
+                        }, SHELL.delays.fail);
+                    } else {
+                        state = "password";
+                        input.classList.add("tty__input--silent");
+                        setPrompt(SHELL.passwordPrompt);
+                    }
+                } else if (state === "password") {
+                    if (!value) return;
+                    print(SHELL.passwordPrompt);
+                    setPrompt("");
+                    state = "wait";
+                    setTimeout(() => {
+                        input.classList.remove("tty__input--silent");
+                        input.value = "";
+                        if (!SHELL.users.includes(user)) {
+                            print(SHELL.loginFail);
+                            print("");
+                            state = "login";
+                            user = "";
+                            setPrompt(SHELL.loginPrompt);
+                            return;
+                        }
+                        state = "shell";
+                        setPrompt(SHELL.prompt(user));
+                        print(`Last login: ${linuxDate()} on tty1`);
+                        print("");
+                        print(SHELL.motd.join("\n"));
+                        print("");
+                    }, SHELL.delays.password);
+                } else {
+                    run(value);
+                }
+                return;
+            }
+            if (state !== "shell") return;
+            if (e.key === "Tab") {
+                e.preventDefault();
+                const value = input.value;
+                const parts = value.split(/\s+/);
+                const last = (parts[parts.length - 1] ?? "").toLowerCase();
+                const pool =
+                    parts.length <= 1
+                        ? COMMANDS
+                        : parts[0] === "cd" || parts[0] === "open"
+                          ? [...Object.keys(SHELL.routes), ...names()]
+                          : names();
+                const hits = pool.filter((c) => c.startsWith(last));
+                if (!hits.length) return;
+                if (hits.length === 1) {
+                    parts[parts.length - 1] = hits[0];
+                    input.value = `${parts.join(" ")}${parts.length === 1 ? " " : ""}`;
+                    return;
+                }
+                let prefix = hits[0];
+                for (const h of hits) {
+                    while (!h.startsWith(prefix)) prefix = prefix.slice(0, -1);
+                }
+                if (prefix.length > last.length) {
+                    parts[parts.length - 1] = prefix;
+                    input.value = parts.join(" ");
+                } else {
+                    print(`${SHELL.prompt(user)} ${value}`);
+                    print(hits.join("  "));
+                }
+                return;
+            }
+            if (e.key === "ArrowUp" && historyAt > 0) {
+                historyAt -= 1;
+                input.value = history[historyAt] ?? "";
+                e.preventDefault();
+            } else if (e.key === "ArrowDown") {
+                historyAt = Math.min(historyAt + 1, history.length);
+                input.value = history[historyAt] ?? "";
+                e.preventDefault();
+            }
+        });
+
+        tty.addEventListener("click", () => input.focus());
+    }
+
+    /* The router swaps the document but leaves window-level listeners in
+       place, so each navigation tears down the previous one. */
+    let page: AbortController | undefined;
+
+    function init() {
+        page?.abort();
+        page = new AbortController();
+        codeBlocks();
+        wrapTables();
+        progressBar(page.signal);
+        scrollSpy(page.signal);
+        imageZoom(page.signal);
+        windows(page.signal);
+        boot();
+        tty();
+    }
+
+    document.addEventListener("astro:page-load", init);
+</script>

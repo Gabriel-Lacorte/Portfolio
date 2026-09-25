@@ -93,7 +93,7 @@ if (CHECK_EXTERNAL) {
                 const res = await fetch(url, {
                     redirect: "follow",
                     signal: AbortSignal.timeout(20_000),
-                    headers: { "user-agent": "Mozilla/5.0 (link check; lacorte.city)" },
+                    headers: { "user-agent": "Mozilla/5.0 (link check; lacort.ee)" },
                 });
                 return { url, where, status: res.status, ok: res.ok };
             } catch (err) {

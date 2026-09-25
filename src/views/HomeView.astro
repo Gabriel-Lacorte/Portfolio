@@ -5,7 +5,7 @@ import Masthead from "@components/Masthead.astro";
 import { postsFor } from "@lib/posts";
 import { compact, getStats, readingTime } from "@lib/stats";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
-import { CHANGELOG, SITE, STACK_GROUPS } from "@consts";
+import { CHANGELOG, PROJECTS, SITE, STACK_GROUPS } from "@consts";
 
 type Props = { locale: Locale };
 const { locale } = Astro.props;
@@ -115,8 +115,8 @@ const isNew = (d: Date) =>
             <pre
                 class="window__body"><span class="prompt">$</span> ./status
 
-{key("host")}lacorte.city
-{key("served")}vercel
+{key("host")}lacort.ee
+{key("served")}raspberry pi
 {key("build")}{stats.commit}
 {key("updated")}{stats.built}
 {key("engine")}{Astro.generator.toLowerCase()}</pre>
@@ -139,11 +139,25 @@ const isNew = (d: Date) =>
 {key("nyx")}debian 12
 {key("parts")}{t("lab.parts")}
 {key("runtime")}docker
-{key("ingress")}cloudflare tunnel
 {key("note")}{t("lab.note")}
 {key("writeup")}<a href={L("/blog/home-server-guide")}>home-server-guide</a></pre>
         </aside>
     </Fragment>
+
+    <div
+        id="boot"
+        class="boot"
+        hidden
+        aria-hidden="true"
+        data-posts={posts.length}
+        data-words={compact(stats.words)}
+        data-projects={PROJECTS.length}
+        data-built={stats.built}
+        data-commit={stats.commit}
+    >
+        <pre id="boot-text"></pre>
+        <p class="boot__hint">press del to enter console · any key to skip</p>
+    </div>
 </Layout>
 
 <style>

@@ -7,7 +7,7 @@
 # became oldstable. None of those look wrong in a diff.
 #
 # The build itself already runs `astro check` and the header check, so a
-# type error or a stale vercel.json fails here without a separate step.
+# type error or a stale deploy/nginx.conf fails here without a separate step.
 
 name: checks
 

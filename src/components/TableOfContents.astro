@@ -10,17 +10,18 @@ export interface Heading {
 
 type Props = {
     headings: Omit<Heading, "subheadings">[];
-    /** Localised label for the summary. Ignored when `bare`. */
+    /** Localised label for the summary. Ignored when `bare` or `rail`. */
     label?: string;
     /** Drop the disclosure wrapper, for when a panel already titles it,
      *  which otherwise renders "contents" twice, one inside the other. */
     bare?: boolean;
+    rail?: boolean;
     /** The headings' own language, when it is not the page's. Goes on the
      *  list rather than the wrapper so `label` stays in the page's. */
     lang?: string;
 };
 
-const { headings, label = "contents", bare = false, lang } = Astro.props;
+const { headings, label = "contents", bare = false, rail = false, lang } = Astro.props;
 
 /* h2/h3 only. An h3 with no h2 above it is promoted rather than dropped,
    which a parent lookup would throw on. */
@@ -47,9 +48,17 @@ const toc = buildToc(headings);
 
 {
     toc.length > 0 &&
-        (bare ? (
+        (rail ? (
+            <nav class="toc-rail" aria-label={label}>
+                <ul class="plain" lang={lang}>
+                    {toc.map((heading) => (
+                        <TableOfContentsHeading heading={heading} />
+                    ))}
+                </ul>
+            </nav>
+        ) : bare ? (
             <nav class="toc-bare" aria-label={label}>
-                <ul lang={lang}>
+                <ul class="plain" lang={lang}>
                     {toc.map((heading) => (
                         <TableOfContentsHeading heading={heading} />
                     ))}
@@ -59,7 +68,7 @@ const toc = buildToc(headings);
             <details class="toc" open>
                 <summary>{label}</summary>
                 <nav aria-label={label}>
-                    <ul lang={lang}>
+                    <ul class="plain" lang={lang}>
                         {toc.map((heading) => (
                             <TableOfContentsHeading heading={heading} />
                         ))}

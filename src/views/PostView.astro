@@ -3,7 +3,12 @@ import { render } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Cmd from "@components/Cmd.astro";
 import TableOfContents from "@components/TableOfContents.astro";
-import { borrowingLocales, isFallback, localeOf, type Post } from "@lib/posts";
+import {
+    borrowingLocales,
+    isFallback,
+    localeOf,
+    type Post,
+} from "@lib/posts";
 import { compact, countWords, readingTime } from "@lib/stats";
 import { HTML_LANG } from "@i18n/ui";
 import { localised, useTranslations, type Locale } from "@i18n/utils";
@@ -50,43 +55,64 @@ const file = `~/writing/${localeOf(post)}/${post.data.translationKey}.md`;
         aside={`${iso} · ${readingTime(post.body ?? "")} min`}
     />
 
-    <div class="out">
-        <p>
-            <b lang={bodyLang}>{post.data.title}</b>
-            <br />
-            <span lang={bodyLang}>{post.data.description}</span>
-            <br />
-            <span class="comment">
-                {compact(countWords(post.body ?? ""))} {t("unit.words")}
-                {post.data.tags.length > 0 && (
-                    <> · {post.data.tags.join(", ")}</>
-                )}
-            </span>
-        </p>
+    <div class="out paper">
+        <header class="paper-head">
+            <h3 class="paper-title" lang={bodyLang}>
+                {post.data.title}<span class="cursor" aria-hidden="true"
+                    >█</span
+                >
+            </h3>
+            <p class="paper-meta">
+                <span>{iso}</span>
+                <span aria-hidden="true">·</span>
+                <span>{readingTime(post.body ?? "")} min</span>
+                <span aria-hidden="true">·</span>
+                <span>
+                    {compact(countWords(post.body ?? ""))} {t("unit.words")}
+                </span>
+            </p>
+            <p class="paper-abstract" lang={bodyLang}>
+                {post.data.description}
+            </p>
+        </header>
 
         {borrowed && <p class="amber">! {t("fallback.notice")}</p>}
 
-        {
-            hasToc && (
-                <TableOfContents
-                    headings={headings}
-                    label={t("panel.contents")}
-                    lang={bodyLang}
-                />
-            )
-        }
+        <div class="post-grid">
+            <div class="post-main">
+                {
+                    hasToc && (
+                        <div class="toc-inline">
+                            <TableOfContents
+                                headings={headings}
+                                label={t("panel.contents")}
+                                lang={bodyLang}
+                            />
+                        </div>
+                    )
+                }
 
-        <article class="article" lang={bodyLang}>
-            <Content />
-        </article>
-    </div>
+                <article class="article" lang={bodyLang}>
+                    <Content />
+                </article>
+            </div>
 
-    <Cmd run="cd" arg="~/writing" icon="term" />
-    <div class="out">
-        <p>
-            <a href={localised("/blog", locale)}
-                >&lt;- {t("action.backToBlog")}</a
-            >
+            {
+                hasToc && (
+                    <TableOfContents
+                        headings={headings}
+                        rail
+                        label={t("panel.onpage")}
+                        lang={bodyLang}
+                    />
+                )
+            }
+        </div>
+
+        <p class="paper-back">
+            <a href={localised("/blog", locale)}>
+                &lt;- {t("action.backToBlog")}
+            </a>
         </p>
     </div>
 

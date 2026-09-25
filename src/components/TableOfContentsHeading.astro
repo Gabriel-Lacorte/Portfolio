@@ -12,7 +12,7 @@ const { heading } = Astro.props;
     <a href={`#${heading.slug}`}>{heading.text}</a>
     {
         heading.subheadings.length > 0 && (
-            <ul class="nested">
+            <ul class="nested plain">
                 {heading.subheadings.map((subheading) => (
                     <Astro.self heading={subheading} />
                 ))}

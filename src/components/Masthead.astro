@@ -5,16 +5,39 @@ type Props = {
 
 const { tagline } = Astro.props;
 
-const R0 = "██   ▄▄▄▄   ▄▄▄▄  ▄▄▄▄  ▄▄▄▄▄  ▄▄   ▄▄▄▄      ▄▄▄▄ ██   ▄▄  ▄▄  ▄▄";
-const R1 = "██   ▄▄▄██ ██    ██  ██ ██ ▀▀ ▀██▀ ██▄▄██    ██        ▀██▀ ██  ██";
-const R2 = `██  ██  ██ ██    ██  ██ ██     ██  ██     <span class="dot">▄▄</span> ██    ██   ██   ▀▀▀██`;
-const R3 = `▀▀▀  ▀▀▀▀▀  ▀▀▀▀  ▀▀▀▀  ▀▀     ▀▀▀  ▀▀▀▀  <span class="dot">▀▀</span>  ▀▀▀▀ ▀▀▀  ▀▀▀  ▄▄▄█▀`;
+const GLYPHS: Record<string, string[]> = {
+    l: ["██ ", "██ ", "██ ", "▀▀▀"],
+    a: [" ▄▄▄▄ ", " ▄▄▄██", "██  ██", " ▀▀▀▀▀"],
+    c: [" ▄▄▄▄", "██   ", "██   ", " ▀▀▀▀"],
+    o: [" ▄▄▄▄ ", "██  ██", "██  ██", " ▀▀▀▀ "],
+    r: ["▄▄▄▄▄", "██ ▀▀", "██   ", "▀▀   "],
+    t: [" ▄▄ ", "▀██▀", " ██ ", " ▀▀▀"],
+    e: [" ▄▄▄▄ ", "██▄▄██", "██    ", " ▀▀▀▀ "],
+    ".": ["  ", "  ", "▄▄", "▀▀"],
+};
 
-const ART = [R0, R1, R2, R3].join("\n");
+const rows: (string | { dot: string })[][] = [[], [], [], []];
+[..."lacort.ee"].forEach((ch, i) => {
+    const glyph = GLYPHS[ch];
+    const w = Math.max(...glyph.map((row) => row.length));
+    if (i > 0) for (let r = 0; r < 4; r++) rows[r].push(" ");
+    for (let r = 0; r < 4; r++) {
+        const cell = glyph[r].padEnd(w);
+        rows[r].push(ch === "." ? { dot: cell } : cell);
+    }
+});
+
+const ART = rows
+    .map((segs) =>
+        segs
+            .map((seg) => (typeof seg === "string" ? seg : `<span class="dot">${seg.dot}</span>`))
+            .join(""),
+    )
+    .join("\n");
 ---
 
 <div class="masthead">
-    <div class="art" role="img" aria-label="lacorte.city">
+    <div class="art" role="img" aria-label="lacort.ee">
         <pre set:html={ART} />
     </div>
     <p class="who">{tagline}</p>
@@ -36,6 +59,7 @@ const ART = [R0, R1, R2, R3].join("\n");
 
     .art :global(.dot) {
         color: var(--accent);
+        text-shadow: var(--glow);
     }
 
     .who {
@@ -43,15 +67,9 @@ const ART = [R0, R1, R2, R3].join("\n");
         color: var(--comment);
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 560px) {
         .art pre {
-            font-size: 10px;
-        }
-    }
-
-    @media (max-width: 370px) {
-        .art pre {
-            font-size: 8px;
+            font-size: 2.55vw;
         }
     }
 </style>
